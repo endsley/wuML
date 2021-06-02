@@ -1,7 +1,13 @@
 
-import numpy as np
+import numpy as np; np.random.seed(0)
 from wplotlib import lines		#pip install wplotlib
+from wplotlib import heatMap
 import wpreprocess as wPr
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns; sns.set_theme()
+import random
 
 
 def missing_data_stats(df): 
@@ -26,6 +32,10 @@ def missing_data_stats(df):
 	lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
 				imgText=textstr, outpath='./DatStats/feature_missing_percentage.png')
 
-	mdp[mdp < 0.3]
-	import pdb; pdb.set_trace()
+
+	X2 = np.isnan(X).astype(int)
+	hMap = heatMap()
+	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', path='./DatStats/missing_data_heatMap.png')
+
+
 
