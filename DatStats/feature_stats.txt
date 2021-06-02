@@ -1,0 +1,5 @@
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 1177 entries, 1 to 1177
+Columns: 96 entries, id to finalga_best
+dtypes: float64(95), int64(1)
+memory usage: 891.9 KB

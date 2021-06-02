@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import wpreprocess as wPr
+import wuml 
 import numpy as np
 import pandas as pd
 import sys
@@ -10,7 +10,7 @@ import sys
 df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
 #df = pd.read_csv ('./data/wine.csv', header=None)
 
-wPr.missing_data_stats(df)
+wuml.missing_data_stats(df)
 
 #print(np.mean(X,axis=0))
 

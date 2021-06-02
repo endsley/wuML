@@ -2,8 +2,9 @@
 import numpy as np; np.random.seed(0)
 from wplotlib import lines		#pip install wplotlib
 from wplotlib import heatMap
-import wpreprocess as wPr
+import wuml 
 
+import io
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set_theme()
@@ -15,7 +16,7 @@ def missing_data_stats(df):
 	n = X.shape[0]
 	d = X.shape[1]
 
-	wPr.ensure_path_exists('./DatStats')
+	wuml.ensure_path_exists('./DatStats')
 
 	mdp = missing_data_counter_per_feature = []
 	for column in df:
@@ -37,5 +38,10 @@ def missing_data_stats(df):
 	hMap = heatMap()
 	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', path='./DatStats/missing_data_heatMap.png')
 
+	wuml.write_to(str(df.info()), './DatStats/feature_stats.txt')
 
+	buffer = io.StringIO()
+	df.info(buf=buffer, verbose=False)
+	s = buffer.getvalue()
+	wuml.write_to(s, './DatStats/feature_stats.txt')
 
