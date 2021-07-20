@@ -8,7 +8,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import KBinsDiscretizer
-from opt_gaussian import *
+from wuml.opt_gaussian import *
 import pandas as pd
 import numpy as np
 import ppscore as pps

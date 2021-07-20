@@ -36,12 +36,16 @@ def missing_data_stats(df):
 
 	X2 = np.isnan(X).astype(int)
 	hMap = heatMap()
-	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', path='./DatStats/missing_data_heatMap.png')
+	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
+							xlabel='Feature ID', ylabel='Sample ID',
+							path='./DatStats/missing_data_heatMap.png')
 
-	wuml.write_to(str(df.info()), './DatStats/feature_stats.txt')
+	#wuml.write_to(str(df.info()), './DatStats/feature_stats.txt')
+	#import pdb; pdb.set_trace()
 
 	buffer = io.StringIO()
-	df.info(buf=buffer, verbose=False)
+	df.info(buf=buffer, verbose=True)
 	s = buffer.getvalue()
 	wuml.write_to(s, './DatStats/feature_stats.txt')
+
 
