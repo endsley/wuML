@@ -6,13 +6,18 @@ import pandas as pd
 import sys
 
 
-
-df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
+#	We prefer dataFrame where 1st row have feature labels and the 1st column consists of sample id
 #df = pd.read_csv ('./data/wine.csv', header=None)
+#df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
 
-wuml.missing_data_stats(df)
 
-#print(np.mean(X,axis=0))
+# Decimate DataFrame with missing data
+df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
+dfSmall = wuml.decimate_data_with_missing_entries(df, column_threshold=0.7, row_threshold=0.7,newDataFramePath='')
+
+
+#wuml.missing_data_stats(dfSmall)
+
 
 
 #foo = [wPr.center_and_scale]

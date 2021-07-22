@@ -10,13 +10,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set_theme()
 import random
 
-
-def missing_data_stats(df): 
+def identify_missing_data_per_feature(df):
 	X = df.values
 	n = X.shape[0]
 	d = X.shape[1]
-
-	wuml.ensure_path_exists('./DatStats')
 
 	mdp = missing_data_counter_per_feature = []
 	for column in df:
@@ -24,28 +21,32 @@ def missing_data_stats(df):
 		missing_percentage = np.sum(np.isnan(x))/n
 		mdp.append(missing_percentage)
 
+	return mdp
 
+def missing_data_stats(df): 
+	header = './results/DatStats/'
+	wuml.ensure_path_exists('./results')
+	wuml.ensure_path_exists(header)
+
+	mdp = identify_missing_data_per_feature(df)
 	mdp = np.array(mdp)
 	textstr = ''
 	x = np.arange(1, len(mdp)+1)
 
 	lp = lines()
 	lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
-				imgText=textstr, outpath='./DatStats/feature_missing_percentage.png')
+				imgText=textstr, outpath= header + 'feature_missing_percentage.png')
 
 
 	X2 = np.isnan(X).astype(int)
 	hMap = heatMap()
 	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
 							xlabel='Feature ID', ylabel='Sample ID',
-							path='./DatStats/missing_data_heatMap.png')
-
-	#wuml.write_to(str(df.info()), './DatStats/feature_stats.txt')
-	#import pdb; pdb.set_trace()
+							path= header + 'missing_data_heatMap.png')
 
 	buffer = io.StringIO()
 	df.info(buf=buffer, verbose=True)
 	s = buffer.getvalue()
-	wuml.write_to(s, './DatStats/feature_stats.txt')
+	wuml.write_to(s, header + 'feature_stats.txt')
 
 
