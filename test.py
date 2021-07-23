@@ -10,17 +10,27 @@ import sys
 #df = pd.read_csv ('./data/wine.csv', header=None)
 #df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
 
+## Decimate DataFrame with missing data
+#data = wuml.load_csv('./data/chem.exposures.csv', row_id_with_label=0)
+#wuml.missing_data_stats(data)
+
 
 ## Decimate DataFrame with missing data
-#df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
-#dfSmall = wuml.decimate_data_with_missing_entries(df, column_threshold=0.7, row_threshold=0.7,newDataFramePath='')
+#data = wuml.load_csv('./data/chem.exposures.csv', row_id_with_label=0)
+#dfSmall = wuml.decimate_data_with_missing_entries(data, column_threshold=0.7, row_threshold=0.7,newDataFramePath='')
 
 
-# Show label histogram after data decimation
-df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
-wuml.get_feature_histograms(df['finalga_best'].values, title='Histogram of Data Labels')
+## Show label histogram after data decimation
+#df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
+#wuml.get_feature_histograms(df['finalga_best'].values, title='Histogram of Data Labels')
 
 
+##	Test out the built-in neural network
+#X = wuml.load_csv('./data/wine.csv', row_id_with_label=None)
+#import pdb; pdb.set_trace()
+#costFunction = None
+#X = np.random.randn(10,2)
+#bNet = wuml.basicNetwork(costFunction, X)
 
 
 #foo = [wPr.center_and_scale]

@@ -3,6 +3,7 @@
 from numpy import genfromtxt
 from wuml.IO import *
 from wuml.data_stats import *
+from wuml.data_loading import *
 
 from sklearn.model_selection import KFold
 from sklearn import preprocessing
@@ -25,7 +26,8 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = dataFrame
+	df = dataFrame.get_data_as('DataFrame')
+
 	X = df.values
 	n = X.shape[0]
 	d = X.shape[1]
@@ -52,6 +54,8 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 
 	write_to(output_str, pth + 'row_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
+
+	df_decimated = load_csv(dataFrame=df_decimated)
 	return df_decimated
 
 
@@ -63,7 +67,8 @@ def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDa
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = dataFrame
+	df = dataFrame.get_data_as('DataFrame')
+
 	X = df.values
 	n = X.shape[0]
 	d = X.shape[1]
@@ -101,26 +106,33 @@ def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDa
 
 	write_to(output_str, pth + 'column_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
+
+	df_decimated = load_csv(dataFrame=df_decimated)
 	return df_decimated
 
 def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_threshold=0.6,newDataFramePath=''):
 	'''
 		It will automatically remove rows and columns of a dataFrame with missing entries.
 	'''
-	df = dataFrame
-	mdp = np.array(identify_missing_data_per_feature(df))
+	df = dataFrame.get_data_as('DataFrame')
+	dfSize = 'Data size:' + str(df.shape)
+
+	mdp = np.array(identify_missing_data_per_feature(dataFrame))
 	x = np.arange(1, len(mdp)+1)
 
 	lp = lines(figsize=(10,5))
-	lp.plot_line(x, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', imgText='', subplot=121, ylim=[0,1])
+	lp.plot_line(x, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=dfSize, subplot=121, ylim=[0,1], xTextLoc=0, yTextLoc=0.9)
 
 	df = remove_columns_with_too_much_missing_entries(dataFrame, threshold=column_threshold)
 	df_decimated = remove_rows_with_too_much_missing_entries(df, threshold=row_threshold, newDataFramePath=newDataFramePath)
+	dfSize = 'Data size:' + str(df_decimated.shape)
 
 	mdp = np.array(identify_missing_data_per_feature(df_decimated))
 	x = np.arange(1, len(mdp)+1)
 
-	lp.plot_line(x, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', imgText='', subplot=122, ylim=[0,1])
+	lp.plot_line(x, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=dfSize, subplot=122, ylim=[0,1], xTextLoc=0, yTextLoc=0.9)
 	lp.show()
 
 	return df_decimated
