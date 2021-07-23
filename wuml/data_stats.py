@@ -2,6 +2,7 @@
 import numpy as np; np.random.seed(0)
 from wplotlib import lines		#pip install wplotlib
 from wplotlib import heatMap
+from wplotlib import histograms
 import wuml 
 
 import io
@@ -9,6 +10,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set_theme()
 import random
+
+
+def get_feature_histograms(X, path=None, title=''):
+	header = './results/DatStats/'
+	wuml.ensure_path_exists('./results')
+	wuml.ensure_path_exists(header)
+
+	H = histograms()
+	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None)
 
 def identify_missing_data_per_feature(df):
 	X = df.values
@@ -48,5 +58,6 @@ def missing_data_stats(df):
 	df.info(buf=buffer, verbose=True)
 	s = buffer.getvalue()
 	wuml.write_to(s, header + 'feature_stats.txt')
+
 
 

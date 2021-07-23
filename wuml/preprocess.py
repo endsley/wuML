@@ -195,3 +195,15 @@ def gen_10_fold_data(data_name, data_path='./data/'):
 		np.savetxt( fold_path + data_name + '_' + str(count+1) + '_test.csv', X_test, delimiter=',', fmt='%.6f') 
 		np.savetxt( fold_path + data_name + '_' + str(count+1) + '_label_test.csv', Y_test, delimiter=',', fmt='%d') 
 
+def rearrange_sample_to_same_class(X,Y):
+	l = np.unique(Y)
+	newX = np.empty((0, X.shape[1]))
+	newY = np.empty((0))
+
+	for i in l:
+		indices = np.where(Y == i)[0]
+		newX = np.vstack((newX, X[indices, :]))
+		newY = np.hstack((newY, Y[indices]))
+
+	return [newX, newY]
+

@@ -11,12 +11,15 @@ import sys
 #df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
 
 
-# Decimate DataFrame with missing data
-df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
-dfSmall = wuml.decimate_data_with_missing_entries(df, column_threshold=0.7, row_threshold=0.7,newDataFramePath='')
+## Decimate DataFrame with missing data
+#df = pd.read_csv ('./data/chem.exposures.csv', header='infer',index_col=0)
+#dfSmall = wuml.decimate_data_with_missing_entries(df, column_threshold=0.7, row_threshold=0.7,newDataFramePath='')
 
 
-#wuml.missing_data_stats(dfSmall)
+# Show label histogram after data decimation
+df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
+wuml.get_feature_histograms(df['finalga_best'].values, title='Histogram of Data Labels')
+
 
 
 
