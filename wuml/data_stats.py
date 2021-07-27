@@ -54,8 +54,7 @@ def missing_data_stats(df):
 	lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
 				imgText=textstr, outpath= header + 'feature_missing_percentage.png')
 
-
-	X2 = np.isnan(X).astype(int)
+	X2 = np.isnan(df.values).astype(int)
 	hMap = heatMap()
 	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
 							xlabel='Feature ID', ylabel='Sample ID',

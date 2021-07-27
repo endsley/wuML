@@ -5,7 +5,6 @@ import wuml
 #import pandas as pd
 #import torch
 import sys
-print(sys.path)
 
 
 #	Preprocess examples
@@ -17,8 +16,8 @@ print(sys.path)
 #df = pd.read_csv ('./data/exposures_row_decimated.csv', header='infer',index_col=0)
 
 ## Decimate DataFrame with missing data
-#data = wuml.load_csv('./data/chem.exposures.csv', row_id_with_label=0)
-#wuml.missing_data_stats(data)
+data = wuml.load_csv('examples/data/chem.exposures.csv', row_id_with_label=0)
+wuml.missing_data_stats(data)
 
 
 ## Decimate DataFrame with missing data
