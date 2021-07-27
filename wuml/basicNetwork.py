@@ -30,9 +30,9 @@ class flexable_Model(torch.nn.Module):
 			var = 'self.y' + str(m+1)
 
 			if layer.activation == 'none':
-				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(y' + str(m) + ')'
+				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(self.y' + str(m) + ')'
 			else:
-				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(y' + str(m) + '))'
+				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
 			exec(cmd)
 		return self.yout
 

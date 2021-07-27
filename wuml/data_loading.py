@@ -4,6 +4,7 @@ import wuml
 import pandas as pd
 import numpy as np
 import torch
+from torch.utils.data import Dataset, DataLoader
 
 class load_csv:
 	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
