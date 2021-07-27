@@ -87,18 +87,19 @@ class basicNetwork:
 			loss_list = []	
 			for (i, data) in enumerate(self.trainLoader):
 				[x, y, ind] = data
+			
 				x = Variable(x.type(self.Torch_dataType), requires_grad=False)
 				y = Variable(y.type(self.Torch_dataType), requires_grad=False)
 				optimizer.zero_grad()
 				
 				ŷ = model(x, y, ind)
 				loss = self.costFunction(x, y, ŷ, ind)
-			
+				
 				loss.backward()
 				optimizer.step()
 	
 				loss_list.append(loss.item())
-	
+
 			loss_avg = np.array(loss_list).mean()
 			scheduler.step(loss_avg)
 			print(loss_avg)

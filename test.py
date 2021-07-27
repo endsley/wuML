@@ -27,14 +27,14 @@ import sys
 
 
 ##	Test out the built-in neural network
-X = wuml.load_csv('./data/wine.csv', './data/wine_label.csv',row_id_with_label=None)
-X = wuml.center_and_scale(X)
-import pdb; pdb.set_trace()
+X = wuml.load_csv('./data/regress.csv', './data/regress_label.csv',row_id_with_label=None)
+#X = wuml.load_csv('./data/wine.csv', './data/wine_label.csv',row_id_with_label=None)
+#X = wuml.center_and_scale(X)
 #X = wuml.load_csv('./data/chem.exposures.csv', row_id_with_label=0)
 def costFunction(x, y, ŷ, ind):
 	return torch.sum((y- ŷ) ** 2)	
 
-bNet = wuml.basicNetwork(costFunction, X, networkStructure=[(200,'relu'),(200,'relu'),(1,'none')], max_epoch=100)
+bNet = wuml.basicNetwork(costFunction, X, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=1000)
 bNet.train()
 
 #foo = [wPr.center_and_scale]
