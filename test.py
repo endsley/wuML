@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-#import wuml 
+import wuml 
 #import numpy as np
 #import pandas as pd
 #import torch
-#import sys
+import sys
+print(sys.path)
 
 
 #	Preprocess examples
-import examples.preprocess.decimate_with_missing_data 
+#import examples.preprocess.decimate_with_missing_data 
 
 
 #	We prefer dataFrame where 1st row have feature labels and the 1st column consists of sample id

@@ -11,20 +11,22 @@ with open(path.join(this_directory, 'README'), encoding='utf-8') as f:
 setup(
   name = 'wuml',         # How you named your package folder (MyLib)
   packages = ['wuml'],   # Chose the same as "name"
-  version = '0.001',      # Start with a small number and increase it with every change you make
+  version = '0.002',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A library that simplifies some basic ML stuff.',   # Give a short description about your library
   long_description='A simplified ML library for Chieh',
   long_description_content_type='text/markdown',  
   author = 'Chieh Wu',                   # Type in your name
   author_email = 'chieh.t.wu@gmail.com',      # Type in your E-Mail
-  url = 'https://github.com/endsley/wPlotLib.git',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/endsley/wPlotLib/archive/refs/tags/0.13.tar.gz',    # I explain this later on
-  keywords = ['plot', 'data'],   # Keywords that define your package best
+  url = 'https://github.com/endsley/wuML.git',   # Provide either the link to your github or to your website
+  download_url = 'https://github.com/endsley/wuML/archive/refs/tags/0.002.tar.gz',    # I explain this later on
+  keywords = ['ML', 'data analysis'],   # Keywords that define your package best
   include_package_data=False,
   install_requires=[            # I get to this in a second
           'matplotlib',
           'numpy',
+          'pandas',
+          'torch',
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package

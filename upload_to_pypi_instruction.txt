@@ -39,4 +39,4 @@ Or
 		twine upload dist/*
 
 
-pip install wplotlib -U
+pip install wuml -U

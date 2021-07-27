@@ -6,3 +6,4 @@ from .opt_gaussian import *
 from .data_stats import *
 from .IO import *
 from .dependency import *
+from .tools.DManager import *
