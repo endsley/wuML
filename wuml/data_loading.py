@@ -3,8 +3,8 @@ from sklearn import preprocessing
 #from wuml.tools.DManager import *
 #import pandas as pd
 #import numpy as np
-#import torch
-#
+import torch
+
 class load_csv:
 	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
 					sample_id_included=False, torchDataType=torch.FloatTensor, batch_size=20):
