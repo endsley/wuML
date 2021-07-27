@@ -22,7 +22,8 @@ def get_feature_histograms(X, path=None, title=''):
 	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None)
 
 def identify_missing_data_per_feature(df):
-	df = df.get_data_as('DataFrame')
+	if type(df).__name__ != 'DataFrame': 
+		df = df.get_data_as('DataFrame')
 
 	X = df.values
 	n = X.shape[0]
@@ -37,7 +38,8 @@ def identify_missing_data_per_feature(df):
 	return mdp
 
 def missing_data_stats(df): 
-	df = df.get_data_as('DataFrame')
+	if type(df).__name__ != 'DataFrame': 
+		df = df.get_data_as('DataFrame')
 
 	header = './results/DatStats/'
 	wuml.ensure_path_exists('./results')
