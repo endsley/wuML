@@ -1,0 +1,42 @@
+
+User Name is : Chieh.8772
+Password can be found on chrome password settings on pypi
+
+
+Go into setup.py
+
+	update version to the next one
+
+Go into Github, create a new tag
+	Use the endsley account, find wPlotLib
+	Click on Tags above the code, and then release -> draft a new release
+	Once you have created a new tag, 
+		copy the new tag link into url inside setup.py under label "download_url"
+
+Run this command 
+	First get the password from chrome on pypi
+	syncPypi.py
+Or 
+	Remove the dist folder
+	
+		rm -r dist/
+	
+	Update the sdist folder
+	
+		python setup.py sdist
+	
+	Make sure twin is installed
+	
+		pip install twine
+	
+	Upload Test 
+	
+		twine upload --repository testpypi dist/*
+		twine check dist/*
+	
+	Upload Real
+	
+		twine upload dist/*
+
+
+pip install wplotlib -U

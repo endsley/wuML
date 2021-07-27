@@ -25,9 +25,9 @@ class flexable_Model(torch.nn.Module):
 			inDim = outDim
 
 	def forward(self, x, y,ind):
-		y0 = x
+		self.y0 = x
 		for m, layer in enumerate(self.children(),0):
-			var = 'y' + str(m+1)
+			var = 'self.y' + str(m+1)
 
 			if layer.activation == 'none':
 				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(y' + str(m) + ')'
