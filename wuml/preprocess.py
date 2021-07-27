@@ -138,9 +138,13 @@ def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_thre
 	return df_decimated
 
 
-def center_and_scale(X):
+def center_and_scale(wuData):
+	X = wuData.get_data_as('ndarray')
 	X = preprocessing.scale(X)
-	return X
+	wuData.df = pd.DataFrame(X)
+	return wuData
+
+
 
 def center_scale_with_missing_data(X, replace_nan_with_0=False): 
 	'''

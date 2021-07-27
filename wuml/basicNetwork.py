@@ -6,6 +6,7 @@ import sys
 from sklearn import linear_model
 from torch import nn
 from torch.autograd import Variable
+import torch.nn.functional as F
 import collections
 
 class flexable_Model(torch.nn.Module):
@@ -23,56 +24,38 @@ class flexable_Model(torch.nn.Module):
 			exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
 			inDim = outDim
 
+	def forward(self, x, y,ind):
+		y0 = x
+		for m, layer in enumerate(self.children(),0):
+			var = 'y' + str(m+1)
 
-	def forward(self, x,y,ind):
-
-		import pdb; pdb.set_trace()	
-
-#		for m, layer in enumerate(self.children(),1):
-#			if m == self.net_depth*2:
-#				cmd = 'self.y_pred = self.l' + str(m) + '(y' + str(m-1) + ')'
-#				exec(cmd)
-#				break;
-#			elif m == self.net_depth:
-#				if self.add_decoder:
-#					var = 'y' + str(m)
-#					cmd = var + ' = self.l' + str(m) + '(y' + str(m-1) + ')'
-#					exec(cmd)
-#				else:
-#					cmd = 'self.y_pred = self.l' + str(m) + '(y' + str(m-1) + ')'
-#					exec(cmd)
-#					return [self.y_pred, self.y_pred]
-#
-#			else:
-#				var = 'y' + str(m)
-#				cmd = var + ' = F.relu(self.l' + str(m) + '(y' + str(m-1) + '))'
-#				#cmd2 = var + '= F.dropout(' + var + ', training=self.training)'
-#				exec(cmd)
-#				#exec(cmd2)
-#
-#		exec('self.fx = y' + str(self.net_depth))
-#		return [self.y_pred, self.fx]
-
+			if layer.activation == 'none':
+				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(y' + str(m) + ')'
+			else:
+				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(y' + str(m) + '))'
+			exec(cmd)
+		return self.yout
 
 class basicNetwork:
 	def __init__(self, costFunction, X, 
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
-						on_new_epoch_call_back = None,
+						on_new_epoch_call_back = None, max_epoch=1000, 	Torch_dataType=torch.FloatTensor, 
 						learning_rate=0.001):
 		'''
 			possible activation functions: softmax, relu, tanh, sigmoid, none
 		'''
-		self.X = X
-		self.Y = Y
-		self.N = X.shape[1]
+		#	X should be in wuml format
+		self.trainLoader = X.get_data_as('DataLoader')
+
 		self.lr = learning_rate
+		self.max_epoch = max_epoch
+		self.Torch_dataType = Torch_dataType
 		self.costFunction = costFunction
 		self.NetStructure = networkStructure
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-		self.model = flexable_Model(self.N, networkStructure, learning_rate=0.001)
+		self.model = flexable_Model(X.shape[1], networkStructure, learning_rate=0.001)
 
 		self.info()
-		import pdb; pdb.set_trace()
 
 	def info(self):
 		print('Network Info:')
@@ -87,30 +70,30 @@ class basicNetwork:
 
 
 	def on_new_epoch_call_back(self, loss_avg, num_of_epoch, lr):
-		# Get Train, Test Accuracy, get loss, epoch, lr
-		db = self.db
-		db['debug'].output_current_network_state(loss_avg, num_of_epoch, lr, db['bigS'])
-		if loss_avg < 0.00001: return True	# early exit
+		## Get Train, Test Accuracy, get loss, epoch, lr
+		#db = self.db
+		#db['debug'].output_current_network_state(loss_avg, num_of_epoch, lr, db['bigS'])
+		#if loss_avg < 0.00001: return True	# early exit
 		return False
 
-	def train(self, train_loader):
+	def train(self):
 		model = self.model
 	
 		optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)	
 		scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
 	
-		for epoch in range(db['max_ℓ#']):
+		for epoch in range(self.max_epoch):
 	
 			loss_list = []	
-			for (i, data) in enumerate(train_loader):
+			for (i, data) in enumerate(self.trainLoader):
 				[x, y, ind] = data
-				x = Variable(x.type(db['dataType']), requires_grad=False)
-				y = Variable(y.type(db['dataType']), requires_grad=False)
+				x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+				y = Variable(y.type(self.Torch_dataType), requires_grad=False)
 				optimizer.zero_grad()
 				
 				ŷ = model(x, y, ind)
 				loss = self.costFunction(x, y, ŷ, ind)
-
+			
 				loss.backward()
 				optimizer.step()
 	
@@ -118,10 +101,12 @@ class basicNetwork:
 	
 			loss_avg = np.array(loss_list).mean()
 			scheduler.step(loss_avg)
+			print(loss_avg)
 
-			if self.on_new_epoch_call_back is not None:
-				early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
-				if early_exit: break
+		import pdb; pdb.set_trace()
+			#if self.on_new_epoch_call_back is not None:
+			#	early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
+			#	if early_exit: break
 
 
 
