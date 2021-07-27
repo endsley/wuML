@@ -5,13 +5,14 @@ from sklearn import preprocessing
 #import numpy as np
 #import torch
 #
-#class load_csv:
-#	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
-#					sample_id_included=False, torchDataType=torch.FloatTensor, batch_size=20):
-#		'''
-#			row_id_with_label :  None = no labels, 0 = top row is the label
-#			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
-#		'''
+class load_csv:
+	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
+					sample_id_included=False, torchDataType=torch.FloatTensor, batch_size=20):
+		'''
+			row_id_with_label :  None = no labels, 0 = top row is the label
+			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
+		'''
+		pass
 #		if dataFrame is not None:
 #			self.df = dataFrame
 #		elif X_npArray is not None:
