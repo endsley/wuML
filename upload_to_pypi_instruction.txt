@@ -7,6 +7,8 @@ Go into setup.py
 
 	update version to the next one
 
+git commit and push
+
 Go into Github, create a new tag
 	Use the endsley account, find wPlotLib
 	Click on Tags above the code, and then release -> draft a new release
