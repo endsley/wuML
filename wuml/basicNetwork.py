@@ -3,6 +3,7 @@
 import torch
 import numpy as np
 import sys
+from wuml.IO import *
 from sklearn import linear_model
 from torch import nn
 from torch.autograd import Variable
@@ -55,11 +56,18 @@ class basicNetwork:
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 		self.model = flexable_Model(X.shape[1], networkStructure, learning_rate=0.001)
 
+		if torch.cuda.is_available(): 
+			self.device = 'cuda'
+			self.model.to(self.device)		# store the network weights in gpu or cpu device
+		else: self.device = 'cpu'
+
 		self.info()
 
 	def info(self):
 		print('Network Info:')
 		print('\tLearning rate: %.3f'%self.lr)
+		print('\tMax number of epochs: %d'%self.max_epoch)
+		print('\tCuda Available: %r'%torch.cuda.is_available())
 		print('\tNetwork Structure')
 		for i in self.model.children():
 			try:
@@ -77,14 +85,7 @@ class basicNetwork:
 
 		return self.model(x, None, None)
 
-	def on_new_epoch_call_back(self, loss_avg, num_of_epoch, lr):
-		## Get Train, Test Accuracy, get loss, epoch, lr
-		#db = self.db
-		#db['debug'].output_current_network_state(loss_avg, num_of_epoch, lr, db['bigS'])
-		#if loss_avg < 0.00001: return True	# early exit
-		return False
-
-	def train(self):
+	def train(self, print_status=True):
 		model = self.model
 	
 		optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)	
@@ -98,6 +99,8 @@ class basicNetwork:
 
 				x = Variable(x.type(self.Torch_dataType), requires_grad=False)
 				y = Variable(y.type(self.Torch_dataType), requires_grad=False)
+				x= x.to(self.device, non_blocking=True )
+				y= y.to(self.device, non_blocking=True )
 				optimizer.zero_grad()
 				
 				ŷ = model(x, y, ind)
@@ -110,11 +113,13 @@ class basicNetwork:
 
 			loss_avg = np.array(loss_list).mean()
 			scheduler.step(loss_avg)
-			print(loss_avg)
+			if print_status:
+				txt = '\tepoch: %d, Avg Loss: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, scheduler._last_lr[0])
+				write_to_current_line(txt)
 
-			#if self.on_new_epoch_call_back is not None:
-			#	early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
-			#	if early_exit: break
+			if self.on_new_epoch_call_back is not None:
+				early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
+				if early_exit: break
 
 
 

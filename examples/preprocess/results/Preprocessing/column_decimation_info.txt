@@ -3,26 +3,26 @@ Deciated dataFrame dimension : 1177 samples,  77 dimensions
 Removed Columns missing at least these percentage of entries : 0.300
 
 Removed Columns + Missing Percentage
-	Mo.blood  	0.84
-	MEHHTP    	0.55
-	OH_PHE_9  	0.36
-	OH_FLU_2  	0.36
-	AMPA      	0.85
-	OH_PHE_4  	0.36
-	OH_PHE_1  	0.36
 	Sn.blood  	0.84
+	OH_NAP_2  	0.36
+	AMPA      	0.85
+	OH_FLU_2  	0.36
 	Se.urine  	0.88
-	MECPTP    	0.55
-	W.blood   	0.84
-	OH_PYR_1  	0.36
-	Sb.blood  	0.84
+	Mo.blood  	0.84
+	OH_PHE_9  	0.36
+	MEHHTP    	0.55
+	Pt.blood  	0.84
 	MONP      	0.55
 	OH_NAP_1  	0.36
-	Pt.blood  	0.84
+	MECPTP    	0.55
+	OH_PHE_4  	0.36
+	Sb.blood  	0.84
+	W.blood   	0.84
 	OH_PHE_2_3	0.36
 	BPF       	0.34
-	OH_NAP_2  	0.36
+	OH_PHE_1  	0.36
 	Glyphosate	0.85
+	OH_PYR_1  	0.36
 
 Retained Columns + Missing Percentage
 	Unnamed: 0	0.00

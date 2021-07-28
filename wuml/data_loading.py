@@ -41,8 +41,6 @@ class load_csv:
 			return self.torchloader
 
 	def __getitem__(self, item):
-		import pdb; pdb.set_trace()
-		print('kkk')
 		return self.df.values[item]
 
 	def __str__(self): 
