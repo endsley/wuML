@@ -23,6 +23,7 @@ class load_csv:
 		if ypath is not None: 
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
 
+		self.X = self.df.values
 		self.batch_size = batch_size
 		self.shape = self.df.shape
 		self.torchDataType = torchDataType				

@@ -68,6 +68,14 @@ class basicNetwork:
 				print('\t\t%s '%(i))
 
 
+	def __call__(self, data):
+		if type(data).__name__ == 'ndarray': 
+			x = torch.from_numpy(data)
+			x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+		else:
+			raise
+
+		return self.model(x, None, None)
 
 	def on_new_epoch_call_back(self, loss_avg, num_of_epoch, lr):
 		## Get Train, Test Accuracy, get loss, epoch, lr
@@ -87,7 +95,7 @@ class basicNetwork:
 			loss_list = []	
 			for (i, data) in enumerate(self.trainLoader):
 				[x, y, ind] = data
-			
+
 				x = Variable(x.type(self.Torch_dataType), requires_grad=False)
 				y = Variable(y.type(self.Torch_dataType), requires_grad=False)
 				optimizer.zero_grad()
@@ -104,7 +112,6 @@ class basicNetwork:
 			scheduler.step(loss_avg)
 			print(loss_avg)
 
-		import pdb; pdb.set_trace()
 			#if self.on_new_epoch_call_back is not None:
 			#	early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
 			#	if early_exit: break
