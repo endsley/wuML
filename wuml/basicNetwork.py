@@ -76,14 +76,23 @@ class basicNetwork:
 				print('\t\t%s '%(i))
 
 
-	def __call__(self, data):
+	def __call__(self, data, output_type='Tensor'):
 		if type(data).__name__ == 'ndarray': 
 			x = torch.from_numpy(data)
 			x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+			x= x.to(self.device, non_blocking=True )
+		elif type(data).__name__ == 'Tensor': 
+			x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+			x= x.to(self.device, non_blocking=True )
 		else:
 			raise
 
-		return self.model(x, None, None)
+		yout = self.model(x, None, None)
+
+		if output_type == 'ndarray':
+			return yout.detach().cpu().numpy()
+
+		return yout
 
 	def train(self, print_status=True):
 		model = self.model
