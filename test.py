@@ -17,15 +17,19 @@ import wplotlib
 data = wuml.load_csv(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', batch_size=20)
 
 def costFunction(x, y, ŷ, ind):
-	lossFun = nn.CrossEntropyLoss() #weird from pytorch, dim of y is 1, and ŷ is 20x3
-	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3
-	
+	lossFun = nn.CrossEntropyLoss() 
+	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3	
 	return loss
 
+
+#It is important for pytorch that with classification, you need to define Y_dataType=torch.int64
 bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
 						Y_dataType=torch.int64, max_epoch=500, learning_rate=0.001)
 bNet.train()
 
+
+#_, predicted = torch.max(outputs, 1)
+#print('Predicted: ', ' '.join('%5s' % classes[predicted[j]] for j in range(4)))
 
 
 ##	Test out on test data
