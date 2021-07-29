@@ -38,6 +38,6 @@ lp.add_plot(newX, Ŷ)
 splot.show(title='Basic Network Regression', xlabel='x-axis', ylabel='y-axis')
 
 ```
-![Image](https://github.com/endsley/wPlotLib/blob/main/wplotlib/imgs/line_output.png?raw=true)
+![Image](https://github.com/endsley/wuML/blob/main/img/Regression.png?raw=true)
 
 
