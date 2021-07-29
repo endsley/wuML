@@ -40,8 +40,8 @@ class flexable_Model(torch.nn.Module):
 class basicNetwork:
 	def __init__(self, costFunction, X, 
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
-						on_new_epoch_call_back = None, max_epoch=1000, 	Torch_dataType=torch.FloatTensor, 
-						learning_rate=0.001):
+						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
+						Y_dataType=torch.FloatTensor, learning_rate=0.001):
 		'''
 			possible activation functions: softmax, relu, tanh, sigmoid, none
 		'''
@@ -50,7 +50,8 @@ class basicNetwork:
 
 		self.lr = learning_rate
 		self.max_epoch = max_epoch
-		self.Torch_dataType = Torch_dataType
+		self.X_dataType = X_dataType
+		self.Y_dataType = Y_dataType
 		self.costFunction = costFunction
 		self.NetStructure = networkStructure
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
@@ -79,10 +80,10 @@ class basicNetwork:
 	def __call__(self, data, output_type='Tensor'):
 		if type(data).__name__ == 'ndarray': 
 			x = torch.from_numpy(data)
-			x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+			x = Variable(x.type(self.X_dataType), requires_grad=False)
 			x= x.to(self.device, non_blocking=True )
 		elif type(data).__name__ == 'Tensor': 
-			x = Variable(x.type(self.Torch_dataType), requires_grad=False)
+			x = Variable(x.type(self.X_dataType), requires_grad=False)
 			x= x.to(self.device, non_blocking=True )
 		else:
 			raise
@@ -106,8 +107,8 @@ class basicNetwork:
 			for (i, data) in enumerate(self.trainLoader):
 				[x, y, ind] = data
 
-				x = Variable(x.type(self.Torch_dataType), requires_grad=False)
-				y = Variable(y.type(self.Torch_dataType), requires_grad=False)
+				x = Variable(x.type(self.X_dataType), requires_grad=False)
+				y = Variable(y.type(self.Y_dataType), requires_grad=False)
 				x= x.to(self.device, non_blocking=True )
 				y= y.to(self.device, non_blocking=True )
 				optimizer.zero_grad()
