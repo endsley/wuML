@@ -3,6 +3,7 @@ from sklearn import preprocessing
 import wuml
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 import torch
 from torch.utils.data import Dataset, DataLoader
 
@@ -22,6 +23,7 @@ class load_csv:
 
 		if ypath is not None: 
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
+			self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
 
 		self.X = self.df.values
 		self.batch_size = batch_size

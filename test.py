@@ -18,7 +18,6 @@ data = wuml.load_csv(xpath='examples/data/wine.csv', ypath='examples/data/wine_l
 
 def costFunction(x, y, ŷ, ind):
 	lossFun = nn.CrossEntropyLoss() #weird from pytorch, dim of y is 1, and ŷ is 20x3
-	import pdb; pdb.set_trace()
 	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3
 	
 	return loss
