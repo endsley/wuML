@@ -21,7 +21,7 @@ newX = np.expand_dims(np.arange(0,5,0.1),1)
 
 #	plot the results out
 splot = wplotlib.scatter()
-splot.add_plot(data.X, data.Y)
+splot.add_plot(data.X, data.Y, marker='o')
 
 lp = wplotlib.lines()	
 lp.add_plot(newX, Ŷ)
