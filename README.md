@@ -18,7 +18,8 @@ dfSmall = wuml.decimate_data_with_missing_entries(data, column_threshold=0.95, r
 #	column_threshold=0.95, this will keep features that are at least 95% full
 
 ```
-![Image](https://github.com/endsley/wuML/blob/main/img/Regression.png?raw=true)
+![Image](https://github.com/endsley/wuML/blob/main/img/BeforeAfterMissingPercentage.png?raw=true)
+
 
 
 
