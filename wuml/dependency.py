@@ -8,6 +8,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.metrics import accuracy_score
 from wuml.opt_gaussian import *
 import pandas as pd
 import numpy as np
@@ -79,7 +80,19 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 	return H
 
 
+def accuracy(Y, Ŷ):
+	if type(Y).__name__ == 'Tensor': 
+		Y = Y.cpu().numpy()
 
+	if type(Ŷ).__name__ == 'Tensor': 
+		Ŷ = Ŷ.cpu().numpy()
+
+
+	if type(Y).__name__ != 'ndarray' or type(Ŷ).__name__ != 'ndarray': 
+		print('Error: Y must be numpy array or Tensor')
+		exit()
+
+	return accuracy_score(Y, Ŷ)
 
 
 if __name__ == '__main__':

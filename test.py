@@ -24,25 +24,14 @@ def costFunction(x, y, ŷ, ind):
 
 #It is important for pytorch that with classification, you need to define Y_dataType=torch.int64
 bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-						Y_dataType=torch.int64, max_epoch=500, learning_rate=0.001)
+						Y_dataType=torch.int64, max_epoch=3000, learning_rate=0.001)
 bNet.train()
+netOutput = bNet(data.X)
 
+#	Output Accuracy
+_, Ŷ = torch.max(netOutput, 1)
 
-#_, predicted = torch.max(outputs, 1)
-#print('Predicted: ', ' '.join('%5s' % classes[predicted[j]] for j in range(4)))
+Acc = wuml.accuracy(data.Y, Ŷ)
+#Acc= accuracy_score(data.Y, Ŷ.cpu().numpy())
+print('Accuracy: %.3f'%Acc)
 
-
-##	Test out on test data
-#newX = np.expand_dims(np.arange(0,5,0.1),1)
-#Ŷ = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
-#
-##	plot the results out
-#splot = wplotlib.scatter()
-#splot.add_plot(data.X, data.Y, marker='o')
-#
-#lp = wplotlib.lines()	
-#lp.add_plot(newX, Ŷ)
-#
-#splot.show(title='Basic Network Regression', xlabel='x-axis', ylabel='y-axis')
-#
-#import pdb; pdb.set_trace()
