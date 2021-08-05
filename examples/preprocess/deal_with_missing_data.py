@@ -9,12 +9,12 @@ import wuml
 	It will lastly save and export the results to a csv file
 '''
 
-data = wuml.wData('examples/data/chem.exposures.csv', row_id_with_label=0)
+data = wuml.wData('../data/chem.exposures.csv', row_id_with_label=0)
 dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.95, row_threshold=0.9,newDataFramePath='')
 #	column_threshold=0.95, this will keep features that are at least 95% full
 
 
 X = wuml.impute(dataDecimated)		# perform mice imputation
-X.to_csv('examples/data/Chem_decimated_imputed.csv')	
+X.to_csv('../data/Chem_decimated_imputed.csv')	
 
 
