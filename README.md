@@ -12,7 +12,7 @@ pip install wuml
 
 import wuml 
 
-data = wuml.load_csv('../data/chem.exposures.csv', row_id_with_label=0)
+data = wuml.wData('../data/chem.exposures.csv', row_id_with_label=0)
 dfSmall = wuml.decimate_data_with_missing_entries(data, column_threshold=0.95, row_threshold=0.9,newDataFramePath='') 
 
 #	column_threshold=0.95, this will keep features that are at least 95% full
@@ -20,6 +20,44 @@ dfSmall = wuml.decimate_data_with_missing_entries(data, column_threshold=0.95, r
 ```
 ![Image](https://github.com/endsley/wuML/blob/main/img/BeforeAfterMissingPercentage.png?raw=true)
 
+
+#### **Code Feature Results**
+## Notice that all the missing entries have been filled
+
+```python
+(Pdb) X.info()
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 1122 entries, 0 to 1176
+Data columns (total 24 columns):
+ #   Column        Non-Null Count  Dtype  
+---  ------        --------------  -----  
+ 0   Unnamed: 0    1122 non-null   float64
+ 1   id            1122 non-null   float64
+ 2   MBP           1122 non-null   float64
+ 3   MBzP          1122 non-null   float64
+ 4   MCNP          1122 non-null   float64
+ 5   MCOP          1122 non-null   float64
+ 6   MCPP          1122 non-null   float64
+ 7   MECPP         1122 non-null   float64
+ 8   MEHHP         1122 non-null   float64
+ 9   MEHP          1122 non-null   float64
+ 10  MEOHP         1122 non-null   float64
+ 11  MEP           1122 non-null   float64
+ 12  MiBP          1122 non-null   float64
+ 13  preBMI        1122 non-null   float64
+ 14  preBMI_cat    1122 non-null   float64
+ 15  ppsex         1122 non-null   float64
+ 16  ISAGE         1122 non-null   float64
+ 17  mage_cat      1122 non-null   float64
+ 18  edu_cat       1122 non-null   float64
+ 19  currjob_cat   1122 non-null   float64
+ 20  marital_cat   1122 non-null   float64
+ 21  smk_cat       1122 non-null   float64
+ 22  alc_cat       1122 non-null   float64
+ 23  finalga_best  1122 non-null   float64
+dtypes: float64(24)
+memory usage: 219.1 KB
+```
 
 
 
@@ -44,7 +82,7 @@ import torch
 import wplotlib
 
 
-data = wuml.load_csv(xpath='examples/data/regress.csv', ypath='examples/data/regress_label.csv', batch_size=20)
+data = wuml.wData(xpath='examples/data/regress.csv', ypath='examples/data/regress_label.csv', batch_size=20)
 
 def costFunction(x, y, ŷ, ind):
 	ŷ = torch.squeeze(ŷ)
@@ -88,7 +126,7 @@ import wplotlib
 #		2. Define a cost function
 #		3. Call train()
 
-data = wuml.load_csv(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', batch_size=20)
+data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', batch_size=20)
 
 def costFunction(x, y, ŷ, ind):
 	lossFun = nn.CrossEntropyLoss() 

@@ -55,7 +55,7 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 	write_to(output_str, pth + 'row_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
 
-	df_decimated = load_csv(dataFrame=df_decimated)
+	df_decimated = wData(dataFrame=df_decimated)
 	return df_decimated
 
 
@@ -107,7 +107,7 @@ def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDa
 	write_to(output_str, pth + 'column_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
 
-	df_decimated = load_csv(dataFrame=df_decimated)
+	df_decimated = wData(dataFrame=df_decimated)
 	return df_decimated
 
 def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_threshold=0.6,newDataFramePath=''):

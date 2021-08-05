@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-class load_csv:
+class wData:
 	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
 					sample_id_included=False, torchDataType=torch.FloatTensor, batch_size=20):
 		'''
@@ -31,6 +31,9 @@ class load_csv:
 		self.torchDataType = torchDataType				
 		self.torchloader = None
 
+	def info(self):
+		print(self.df.info())
+
 	def get_data_as(self, data_type): #'DataFrame', 'read_csv', 'Tensor'
 		if data_type == 'read_csv': return self
 		if data_type == 'DataFrame': return self.df
@@ -41,6 +44,9 @@ class load_csv:
 			self.DM = wuml.DManager(self.df.values, self.Y)
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader
+
+	def to_csv(self, path):
+		self.df.to_csv(path)
 
 	def __getitem__(self, item):
 		return self.df.values[item]

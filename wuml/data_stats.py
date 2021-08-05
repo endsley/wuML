@@ -4,7 +4,7 @@ from wplotlib import lines		#pip install wplotlib
 from wplotlib import heatMap
 from wplotlib import histograms
 import wuml 
-from wuml.data_loading import load_csv
+from wuml.data_loading import wData
 
 import io
 import pandas as pd

@@ -14,7 +14,7 @@ import wplotlib
 #		2. Define a cost function
 #		3. Call train()
 
-data = wuml.load_csv(xpath='../data/regress.csv', ypath='../data/regress_label.csv', batch_size=20)
+data = wuml.wData(xpath='../data/regress.csv', ypath='../data/regress_label.csv', batch_size=20)
 
 def costFunction(x, y, ŷ, ind):
 	ŷ = torch.squeeze(ŷ)
