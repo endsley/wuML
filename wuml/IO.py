@@ -6,6 +6,10 @@ import sys
 import types
 import numpy as np
 
+def set_numpy_print_options(precision=2):
+	np.set_printoptions(precision=precision)
+	np.set_printoptions(linewidth=300)
+	np.set_printoptions(suppress=True)
 
 def read_txt_file(path):
 	f = open(path, 'r')
