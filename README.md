@@ -73,7 +73,7 @@ memory usage: 219.1 KB
 
 
 
-## Example of basic regression 
+## Example of basic regression requiring Neural Network TensorFlow
 ```python
 #!/usr/bin/env python
 
