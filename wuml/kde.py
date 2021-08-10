@@ -18,6 +18,7 @@ class KDE:
 		# use grid search cross-validation to optimize the bandwidth
 		params = {'bandwidth': np.logspace(-1, 1, 20)}
 		self.grid = GridSearchCV(KernelDensity(), params)
+	
 		self.grid.fit(data)
 		self.σ = self.grid.best_estimator_.bandwidth
 		self.kde = self.grid.best_estimator_
@@ -26,7 +27,9 @@ class KDE:
 		return self.kde.sample(num_of_samples, random_state=0)
 
 
-	def __call__(self, data):
+	def __call__(self, data, return_log_likelihood=False):
 		X = ensure_numpy(data)
-		prob = np.exp(self.kde.score_samples(X))
-		return prob
+
+		if return_log_likelihood: return self.kde.score_samples(X)
+		else: return np.exp(self.kde.score_samples(X))
+

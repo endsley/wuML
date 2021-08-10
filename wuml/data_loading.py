@@ -19,7 +19,7 @@ class wData:
 		elif X_npArray is not None:
 			self.df = pd.DataFrame(X_npArray)
 		else:
-			self.df = pd.read_csv (xpath, header=row_id_with_label)
+			self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
 
 		if ypath is not None: 
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
@@ -30,6 +30,14 @@ class wData:
 		self.shape = self.df.shape
 		self.torchDataType = torchDataType				
 		self.torchloader = None
+
+	def delete_column(self, column_name):
+		if type(column_name) == type([]):
+			for name in column_name:
+				del self.df[name]
+
+		elif type(column_name) == type(''):
+			del self.df[column_name]
 
 	def info(self):
 		print(self.df.info())
@@ -45,8 +53,8 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader
 
-	def to_csv(self, path):
-		self.df.to_csv(path)
+	def to_csv(self, path, add_row_indices=False, include_column_names=True):
+		self.df.to_csv(path, index=add_row_indices, header=include_column_names)
 
 	def __getitem__(self, item):
 		return self.df.values[item]

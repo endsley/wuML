@@ -4,6 +4,7 @@ from numpy import genfromtxt
 from wuml.IO import *
 from wuml.data_stats import *
 from wuml.data_loading import *
+from wuml.type_check import *
 
 from sklearn.model_selection import KFold
 from sklearn import preprocessing
@@ -222,4 +223,16 @@ def rearrange_sample_to_same_class(X,Y):
 		newY = np.hstack((newY, Y[indices]))
 
 	return [newX, newY]
+
+
+#	Relating all samples to the most likely one, with p(X1) > p(Xi) for all i
+#	Given X1 X2 with p(X1)/p(X2)=2  the weight for X1 = 1, and X2 = 2
+def get_likelihood_weight(data):
+	X = ensure_numpy(data)
+	
+	Pₓ = wuml.KDE(X)
+	logLike = Pₓ(X, return_log_likelihood=True)
+	max_likely = np.max(logLike)
+	ratios = np.exp(max_likely - logLike)
+	return wuml.wData(X_npArray=ratios)
 

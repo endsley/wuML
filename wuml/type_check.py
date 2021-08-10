@@ -3,8 +3,10 @@ import numpy as np
 
 def ensure_numpy(data):
 	if type(data).__name__ == 'ndarray': 
-		len(data.shape) == 1
-		X = np.atleast_2d(data).T
+		if len(data.shape) == 1:
+			X = np.atleast_2d(data).T
+		else:
+			X = data
 	elif type(data).__name__ == 'wData': 
 		X = data.df.values
 	elif type(data).__name__ == 'DataFrame': 
