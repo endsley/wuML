@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import collections
 
 class flexable_Model(torch.nn.Module):
-	def __init__(self, dataDim, networkStructure, learning_rate=0.001):
+	def __init__(self, dataDim, networkStructure):
 		super(flexable_Model, self).__init__()
 
 		inDim = dataDim
