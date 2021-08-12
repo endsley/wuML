@@ -11,3 +11,4 @@ from .imputation import *
 from .type_check import *
 from .kde import *
 from .L2X import *
+from .gumbel_softmax import *

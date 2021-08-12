@@ -1,15 +1,21 @@
 #!/usr/bin/env python
 
 import os 
-from pathlib import Path
 import sys
 import types
+import torch
 import numpy as np
+from pathlib import Path
 
-def set_numpy_print_options(precision=2):
+def set_terminal_print_options(precision=2):
 	np.set_printoptions(precision=precision)
-	np.set_printoptions(linewidth=300)
+	np.set_printoptions(linewidth=400)
 	np.set_printoptions(suppress=True)
+
+	torch.set_printoptions(edgeitems=3)
+	torch.set_printoptions(sci_mode=False)
+	torch.set_printoptions(precision=precision)
+	torch.set_printoptions(linewidth=400)
 
 def read_txt_file(path):
 	f = open(path, 'r')

@@ -25,7 +25,7 @@ class flexable_Model(torch.nn.Module):
 			exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
 			inDim = outDim
 
-	def forward(self, x, y,ind):
+	def forward(self, x):
 		self.y0 = x
 		for m, layer in enumerate(self.children(),0):
 			var = 'self.y' + str(m+1)
@@ -36,6 +36,51 @@ class flexable_Model(torch.nn.Module):
 				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
 			exec(cmd)
 		return self.yout
+
+
+def run_SGD(loss_function, model_parameters, trainLoader, device, 
+				X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor,
+				model=None, lr=0.001, print_status=True, max_epoch=1000):
+
+	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
+	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+
+	for epoch in range(max_epoch):
+
+		loss_list = []	
+		for (i, data) in enumerate(trainLoader):
+			[x, y, ind] = data
+
+			x = Variable(x.type(X_dataType), requires_grad=False)
+			y = Variable(y.type(Y_dataType), requires_grad=False)
+			x= x.to(device, non_blocking=True )
+			y= y.to(device, non_blocking=True )
+			optimizer.zero_grad()
+			
+			if model is not None:
+				ŷ = model(x)
+				loss = loss_function(x, y, ŷ, ind)
+			else:
+				loss = loss_function(x, y, ind)
+			
+			loss.backward()
+			optimizer.step()
+
+			loss_list.append(loss.item())
+
+		loss_avg = np.array(loss_list).mean()
+		scheduler.step(loss_avg)
+		if print_status:
+			txt = '\tepoch: %d, Avg Loss: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, scheduler._last_lr[0])
+			write_to_current_line(txt)
+
+
+		if model is not None:
+			if "on_new_epoch" in dir(model):
+				early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
+				if early_exit: break
+
+
 
 class basicNetwork:
 	def __init__(self, costFunction, X, 
@@ -88,7 +133,7 @@ class basicNetwork:
 		else:
 			raise
 
-		yout = self.model(x, None, None)
+		yout = self.model(x)
 
 		if output_type == 'ndarray':
 			return yout.detach().cpu().numpy()
@@ -96,40 +141,12 @@ class basicNetwork:
 		return yout
 
 	def train(self, print_status=True):
-		model = self.model
-	
-		optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)	
-		scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
-	
-		for epoch in range(self.max_epoch):
-	
-			loss_list = []	
-			for (i, data) in enumerate(self.trainLoader):
-				[x, y, ind] = data
+		param = self.model.parameters()
+		[ℓ, TL, mE, Dev] = [self.costFunction, self.trainLoader, self.max_epoch, self.device]
+		[Xtype, Ytype] = [self.X_dataType, self.Y_dataType]
 
-				x = Variable(x.type(self.X_dataType), requires_grad=False)
-				y = Variable(y.type(self.Y_dataType), requires_grad=False)
-				x= x.to(self.device, non_blocking=True )
-				y= y.to(self.device, non_blocking=True )
-				optimizer.zero_grad()
-				
-				ŷ = model(x, y, ind)
-				loss = self.costFunction(x, y, ŷ, ind)
-				
-				loss.backward()
-				optimizer.step()
-	
-				loss_list.append(loss.item())
+		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype)
 
-			loss_avg = np.array(loss_list).mean()
-			scheduler.step(loss_avg)
-			if print_status:
-				txt = '\tepoch: %d, Avg Loss: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, scheduler._last_lr[0])
-				write_to_current_line(txt)
-
-			if self.on_new_epoch_call_back is not None:
-				early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
-				if early_exit: break
 
 
 
