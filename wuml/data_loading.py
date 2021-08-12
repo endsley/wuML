@@ -1,5 +1,6 @@
 
 from sklearn import preprocessing
+import sys
 import wuml
 import pandas as pd
 import numpy as np
@@ -8,11 +9,15 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 class wData:
-	def __init__(self, xpath=None, ypath=None, dataFrame=None, X_npArray=None, row_id_with_label=None , 
-					sample_id_included=False, torchDataType=torch.FloatTensor, batch_size=20):
+	def __init__(self, xpath=None, ypath=None, label_column_name=None, dataFrame=None, 
+					X_npArray=None, row_id_with_label=None, sample_id_included=False, 
+					label_type=None, #it should be either 'continuous' or 'discrete'
+					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None):
 		'''
 			row_id_with_label :  None = no labels, 0 = top row is the label
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
+			ypath: loads the data as the label
+			label_column_name: if the label is loaded together with xpath, this separates label into Y
 		'''
 		if dataFrame is not None:
 			self.df = dataFrame
@@ -22,8 +27,19 @@ class wData:
 			self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
 
 		if ypath is not None: 
+			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
-			self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+			if label_type == 'discrete': self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+
+		if label_column_name is not None:
+			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+			self.Y = self.df[label_column_name].values
+			if label_type == 'discrete': self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+			self.delete_column(label_column_name)
+
+		if type(columns_to_ignore) == type([]):
+			for column_name in columns_to_ignore:
+				self.delete_column(column_name)
 
 		self.X = self.df.values
 		self.batch_size = batch_size
@@ -43,7 +59,7 @@ class wData:
 		print(self.df.info())
 
 	def get_data_as(self, data_type): #'DataFrame', 'read_csv', 'Tensor'
-		if data_type == 'read_csv': return self
+		if data_type == 'wData': return self
 		if data_type == 'DataFrame': return self.df
 		if data_type == 'ndarray': 
 			#self.df.values[subset]

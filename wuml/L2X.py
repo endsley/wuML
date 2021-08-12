@@ -1,46 +1,53 @@
 
 
 import numpy as np
-from wuml.type_check import *
+import wuml
+#from wuml.type_check import *
 
 
 class l2x:
-	def __init__(self, data, max_epoch=2000, learning_rate=0.001):
+	def __init__(self, data, max_epoch=2000, learning_rate=0.001, data_imbalance_weights=None):
 		self.data = data
 		d = data.shape[1]
 		self.max_epoch = max_epoch
+		self.W = data_imbalance_weights
 
 		self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(d*d,'none')])
 		self.θᴼ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(1,'none')])
 
 	def get_Selector(self, Z):
-		db = self.db
-		Ḡ = db['d']
-		ň = db['d'] # number of potential 1s
-		ř = self.repeat_factor
+		pass
 
-		#	This one repeat gumbel on a larger network output and reshape them and multiply by permutation matrix							# Change here
-		network_output = self.θˢ(Z) 
-		#network_output = self.θˢ.predict(Z)		# RFF network
+		#db = self.db
+		#Ḡ = db['d']
+		#ň = db['d'] # number of potential 1s
+		#ř = self.repeat_factor
 
-		output_reshaped = network_output.view(-1, ň*ř, Ḡ)	# reshape the data into num_of_samples x data dimension x num_of_groups 
-		output_positive = torch.nn.Softplus()(output_reshaped)
+		##	This one repeat gumbel on a larger network output and reshape them and multiply by permutation matrix							# Change here
+		#network_output = self.θˢ(Z) 
+		##network_output = self.θˢ.predict(Z)		# RFF network
 
-		Gˢ = gumbel(output_positive, device=db['device'])		# Group matrix
-		return Gˢ
+		#output_reshaped = network_output.view(-1, ň*ř, Ḡ)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+		#output_positive = torch.nn.Softplus()(output_reshaped)
+
+		#Gˢ = gumbel(output_positive, device=db['device'])		# Group matrix
+		#return Gˢ
 
 	def loss(self, x, y, ind):		# this function is not working currently
+		return 0
 
-		S = self.get_Selector(x)	
-		x̂ = x*S
-		ŷ = self.θᴼ(x̂)
+		#S = self.get_Selector(x)	
+		#x̂ = x*S
+		#ŷ = self.θᴼ(x̂)
 
-		regularizer = db['L2X_λ']*torch.sum(S)
-    	loss = torch.sum(weight * (input - target) ** 2)
+		#regularizer = db['L2X_λ']*torch.sum(S)
+    	#loss = torch.sum(weight * (input - target) ** 2)
 
-		return loss
+		#return loss
 
 	def train(self, print_status=True):
+		trainLoader = self.data.get_data_as('DataLoader')
+
 		joint_model_parameters = list(self.θˢ.parameters()) + list(self.θᴼ.parameters())
 		optimizer = torch.optim.Adam(joint_model_parameters, lr=self.lr)	
 		scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
@@ -48,8 +55,9 @@ class l2x:
 		for epoch in range(self.max_epoch):
 	
 			loss_list = []	
-			for (i, data) in enumerate(self.trainLoader):
+			for (i, data) in enumerate(trainLoader):
 				[x, y, ind] = data
+				import pdb; pdb.set_trace()
 
 				x = Variable(x.type(self.X_dataType), requires_grad=False)
 				y = Variable(y.type(self.Y_dataType), requires_grad=False)

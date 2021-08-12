@@ -1,6 +1,6 @@
 from .preprocess import *
 from .data_loading import *
-from .basicNetwork import basicNetwork
+from .basicNetwork import *
 from .string_manipulate import *
 from .opt_gaussian import *
 from .data_stats import *
@@ -10,3 +10,4 @@ from .DManager import *
 from .imputation import *
 from .type_check import *
 from .kde import *
+from .L2X import *

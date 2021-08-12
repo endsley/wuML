@@ -55,7 +55,7 @@ class basicNetwork:
 		self.costFunction = costFunction
 		self.NetStructure = networkStructure
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-		self.model = flexable_Model(X.shape[1], networkStructure, learning_rate=0.001)
+		self.model = flexable_Model(X.shape[1], networkStructure)
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'
