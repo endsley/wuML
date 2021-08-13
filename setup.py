@@ -2,15 +2,18 @@
 from setuptools import setup
 import os
 
-def read_file(filename):
-	with open(filename) as file:
-		return file.read()
+#def read_file(filename):
+#	with open(filename) as file:
+#		return file.read()
 
+def read_file(filename):
+	with open(os.path.join(os.path.dirname(__file__), filename)) as file:
+		return file.read()
 
 setup(
   name = 'wuml',         # How you named your package folder (MyLib)
   packages = ['wuml'],   # Chose the same as "name"
-  version = '0.022',      # Start with a small number and increase it with every change you make
+  version = '0.023',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A library that simplifies some basic ML stuff.',   # Give a short description about your library
   #long_description='test',
@@ -19,7 +22,7 @@ setup(
   author = 'Chieh Wu',                   # Type in your name
   author_email = 'chieh.t.wu@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/endsley/wuML.git',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/endsley/wuML/archive/refs/tags/0.022.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/endsley/wuML/archive/refs/tags/0.023.tar.gz',    # I explain this later on
   keywords = ['ML', 'data analysis'],   # Keywords that define your package best
   include_package_data=False,
   install_requires=[            # I get to this in a second
