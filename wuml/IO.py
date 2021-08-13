@@ -4,6 +4,7 @@ import os
 import sys
 import types
 import torch
+import pickle
 import numpy as np
 from pathlib import Path
 
@@ -87,7 +88,6 @@ def clear_current_line():
 def write_to_current_line(txt):
 	clear_current_line()
 	sys.stdout.write(txt)
-	#print(txt)
 
 def clear_previous_line():
 	clear_current_line()

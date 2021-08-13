@@ -10,7 +10,8 @@ from torch.autograd import Variable
 class l2x:
 	def __init__(self, data, max_epoch=2000, learning_rate=0.001, data_imbalance_weights=None,
 					X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, regularizer_weight=0,
-					selector_network_structure=None, predictor_network_structure=None):
+					selector_network_structure=None, predictor_network_structure=None, 
+					pre_trained_file=None):
 		self.data = data
 		self.d = d = data.shape[1]
 		self.max_epoch = max_epoch
@@ -20,23 +21,33 @@ class l2x:
 		self.Y_dataType = Y_dataType
 		self.regularizer_weight = regularizer_weight
 
-		if selector_network_structure is None:
-			self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(d*2,'none')])
+		if pre_trained_file is None:
+			if selector_network_structure is None:
+				self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(d*2,'none')])
+			else:
+				self.θˢ = wuml.flexable_Model(d, selector_network_structure)
+	
+			if predictor_network_structure is None:
+				self.θᴼ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(1,'none')])
+			else:
+				self.θᴼ = wuml.flexable_Model(d, predictor_network_structure)
 		else:
-			self.θˢ = wuml.flexable_Model(d, selector_network_structure)
-
-
-		if predictor_network_structure is None:
-			self.θᴼ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(1,'none')])
-		else:
-			self.θᴼ = wuml.flexable_Model(d, predictor_network_structure)
-
+			θ = wuml.pickle_load(pre_trained_file)
+			self.θˢ = θ['θˢ']
+			self.θᴼ = θ['θᴼ']
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'
 			self.θˢ.to(self.device)		# store the network weights in gpu or cpu device
 			self.θᴼ.to(self.device)		# store the network weights in gpu or cpu device
 		else: self.device = 'cpu'
+
+	def export_network(self, save_path):
+		network = {}
+		network['θᴼ'] = self.θᴼ
+		network['θˢ'] = self.θˢ
+
+		wuml.pickle_dump(network, save_path)
 
 
 	def info(self, save_path=None):
