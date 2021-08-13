@@ -4,6 +4,7 @@ import os
 import time
 
 os.system('rm -r dist/')
+os.system('pip install -U setuptools')
 os.system('python setup.py sdist')
 os.system('twine upload dist/*')
 time.sleep(2)
