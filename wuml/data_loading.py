@@ -3,9 +3,10 @@ from sklearn import preprocessing
 import sys
 import wuml
 import pandas as pd
+import torch
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-import torch
+from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 
 class wData:
@@ -47,6 +48,9 @@ class wData:
 		self.torchDataType = torchDataType				
 		self.torchloader = None
 
+		if torch.cuda.is_available(): self.device = 'cuda'
+		else: self.device = 'cpu'
+
 	def delete_column(self, column_name):
 		if type(column_name) == type([]):
 			for name in column_name:
@@ -60,6 +64,11 @@ class wData:
 
 	def get_data_as(self, data_type): #'DataFrame', 'read_csv', 'Tensor'
 		if data_type == 'wData': return self
+		if data_type == 'Tensor': 
+			x = torch.from_numpy(self.df.values)
+			x = Variable(x.type(self.torchDataType), requires_grad=False)
+			X = x.to(self.device, non_blocking=True )
+			return X
 		if data_type == 'DataFrame': return self.df
 		if data_type == 'ndarray': 
 			#self.df.values[subset]

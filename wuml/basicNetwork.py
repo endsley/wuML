@@ -14,6 +14,7 @@ class flexable_Model(torch.nn.Module):
 	def __init__(self, dataDim, networkStructure):
 		super(flexable_Model, self).__init__()
 
+		self.networkStructure = networkStructure
 		inDim = dataDim
 		for l, Layer_info in enumerate(networkStructure):
 			layer_width, activation_function = Layer_info

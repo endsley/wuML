@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+from wplotlib import histograms
 import numpy as np
+import wuml
 import torch
 
 def pretty_np_array(m, front_tab='', verticalize=False):
@@ -44,6 +46,29 @@ def block_string_concatenate(strList, spacing='\t'):
 
 	return all_concat
 
+def output_regression_result(y, ŷ, write_path=None):
+	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
+	ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
+
+	if y.shape[0] == 1: y = y.T
+	if ŷ.shape[0] == 1: ŷ = ŷ.T
+	
+	# Draw Histogram
+	Δy = np.absolute(ŷ - y)
+
+	H = histograms()
+	H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
+				xlabel='Error Amount', ylabel='Error count',
+				facecolor='blue', α=0.5, path=None)
+
+
+	A = pretty_np_array(np.array([['y', 'ŷ']]))
+	B = pretty_np_array(np.hstack((y, ŷ)))
+	C = A + B
+
+	if write_path is not None: wuml.write_to(C, write_path)
+
+	return C
 
 if __name__ == "__main__":
 	str1 = 'Hello world\nA interesting string'
