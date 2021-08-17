@@ -33,9 +33,9 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 	n = X.shape[0]
 	d = X.shape[1]
 
-	pth = './results/Preprocessing/'
+	pth = './results/'
 	ensure_path_exists('./results')
-	ensure_path_exists(pth)
+	#ensure_path_exists(pth)
 
 	#	Obtain a decimated dataframe
 	limitPer = int(d * threshold)
@@ -74,9 +74,9 @@ def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDa
 	n = X.shape[0]
 	d = X.shape[1]
 
-	pth = './results/Preprocessing/'
+	pth = './results/'
 	ensure_path_exists('./results')
-	ensure_path_exists(pth)
+	#ensure_path_exists(pth)
 
 	#	Obtain a decimated dataframe
 	limitPer = int(n * threshold)
