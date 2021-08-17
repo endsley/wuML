@@ -4,6 +4,17 @@ import numpy as np
 import wuml
 import torch
 
+'''
+	Notes : https://github.com/endsley/math_notebook/blob/master/neural_network/Gumbel_Softmax.pdf
+
+	The gumbel softmax generates samples based on a categorial distribution
+	that can be incorporated into a neural network. 
+	Given a categorical distribution of {pᑊ pᒾ pᶾ ...}, it will generate one-hot vectors given these probabilities.
+
+	Implement: Make sure that the rows add up to 1
+'''
+
+
 X = np.array([[0.4405, 0.4045, 0.0754, 0.0796],			# The rows should add up to 1
 				[0.2287, 0.2234, 0.2676, 0.2802],
 				[0.2518, 0.2524, 0.1696, 0.3262],
