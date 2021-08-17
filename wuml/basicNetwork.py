@@ -65,6 +65,7 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 			else:
 				loss = loss_function(x, y, ind)
 			
+			if torch.isnan(loss): import pdb; pdb.set_trace()
 			loss.backward()
 			optimizer.step()
 

@@ -4,7 +4,7 @@ import numpy as np
 import wuml
 import torch
 from torch.autograd import Variable
-
+import torch.nn.functional as f
 
 
 class l2x:
@@ -58,6 +58,7 @@ class l2x:
 
 		txt = 'L2X Regression\n'
 		txt += '\tDevice: %s\n'%(self.device)
+		txt += '\tBatch size: %d\n'%(self.data.batch_size)
 		txt += '\tData Dimension: %d x %d\n'%(self.data.shape[0], self.data.shape[1])
 		txt += '\tMax num of Epochs: %d\n'%(self.max_epoch)
 		txt += '\tInitial Learning Rate: %.7f\n'%(self.lr)
@@ -84,11 +85,17 @@ class l2x:
 			q = int(xᵃ.shape[1]/d)
 			xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
 			xᶜ = torch.nn.Softplus()(xᵇ)
+			xᶜ = f.normalize(xᶜ, p=1, dim=2)
 			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
-			#S = xᵈ[:,:,0]
+			
 			[S,ind] = torch.max(xᵈ, dim=1)
-			print(torch.round(S))
-			import pdb; pdb.set_trace()
+
+			#print(torch.round(S[0]))
+			#import pdb; pdb.set_trace()
+
+		if torch.isnan(S[0,0]): 
+			print('Nan detected within get_Selector function in L2X')
+			import pdb; pdb.set_trace() 
 
 		if round_result: S = torch.round(S)
 		return S
@@ -120,13 +127,25 @@ class l2x:
 		ŷ = self.θᴼ(x̂)
 		ŷ = torch.squeeze(ŷ)
 
-		regularizer = λ*torch.sum(S)
-		loss = torch.sum(W*((y - ŷ)** 2))/n + regularizer
+		if λ == 0:
+			regularizer = λ*torch.sum(S)
+			loss = torch.sum(W*((y - ŷ)** 2))/n + regularizer
+		else:
+			loss = torch.sum(W*((y - ŷ)** 2))/n
+
+		if torch.isnan(loss): import pdb; pdb.set_trace()
 		return loss
 
 	def on_new_epoch_call_back(self, loss_avg, epoch, lr):
-		pass
-		#if epoch%500 == 0:
+		if epoch%2 == 0:
+			for param in self.θˢ.parameters(): 
+				print(param[0:10,0:10], '\n')
+				break
+
+			#for param in self.θᴼ.parameters(): 
+			#	print(param[0:10,0:10])
+			#	break
+
 		#	S = self.get_Selector(self.data.X, round_result=True)
 		#	import pdb; pdb.set_trace()
 

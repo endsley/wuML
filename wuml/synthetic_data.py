@@ -24,8 +24,9 @@ def L2X_data_A(N, xpath=None, ypath=None, Block_path=None):
 	for n in range(N):
 		X = np.vstack((X,gen_sample()))
 
-	O = np.ones((50,2))
-	Z = np.zeros((50,2))
+	
+	O = np.ones((int(N/2),2))
+	Z = np.zeros((int(N/2),2))
 	B = np.block([[O, Z],[Z,O]])
 	y = (X*B).dot(b)
 
@@ -35,4 +36,4 @@ def L2X_data_A(N, xpath=None, ypath=None, Block_path=None):
 
 	return [X,y,b]
 	
-X = L2X_data_A(100, xpath='l2x_synthetic.csv', ypath='l2x_synthetic_label.csv', Block_path='l2x_synthetic_blocks.csv')
+X = L2X_data_A(3000, xpath='l2x_synthetic.csv', ypath='l2x_synthetic_label.csv', Block_path='l2x_synthetic_blocks.csv')
