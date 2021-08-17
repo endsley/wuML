@@ -18,7 +18,7 @@ torch.set_printoptions(sci_mode=False)
 
 
 
-def gumbel(pᵢ, τ=0.1):		#The rows should add up to 1
+def gumbel(pᵢ, τ=0.1, device='cpu'):		#The rows should add up to 1
 	'''
 		Notes : https://github.com/endsley/math_notebook/blob/master/neural_network/Gumbel_Softmax.pdf
 
