@@ -41,7 +41,8 @@ class flexable_Model(torch.nn.Module):
 
 def run_SGD(loss_function, model_parameters, trainLoader, device, 
 				X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor,
-				model=None, lr=0.001, print_status=True, max_epoch=1000):
+				model=None, lr=0.001, print_status=True, max_epoch=1000,
+				on_new_epoch_call_back=None):
 
 	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
 	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
@@ -75,6 +76,8 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 			txt = '\tepoch: %d, Avg Loss: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, scheduler._last_lr[0])
 			write_to_current_line(txt)
 
+		if on_new_epoch_call_back is not None:
+			on_new_epoch_call_back(loss_avg, (epoch+1), scheduler._last_lr[0])
 
 		if model is not None:
 			if "on_new_epoch" in dir(model):
@@ -146,7 +149,9 @@ class basicNetwork:
 		[ℓ, TL, mE, Dev] = [self.costFunction, self.trainLoader, self.max_epoch, self.device]
 		[Xtype, Ytype] = [self.X_dataType, self.Y_dataType]
 
-		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype)
+		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, 
+				max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype, 
+				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
 
 

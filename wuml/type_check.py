@@ -38,6 +38,11 @@ def ensure_tensor(data, dataType=torch.FloatTensor):
 		X = data.values
 	elif np.isscalar(data):
 		X = np.array([[data]])
+	elif type(data).__name__ == 'Tensor': 
+		x = Variable(data.type(dataType), requires_grad=False)
+		X = x.to(device, non_blocking=True )
+	else:
+		raise ValueError('Unknown dataType %s'%type(data).__name__)
 
 	return X
 

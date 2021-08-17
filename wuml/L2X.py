@@ -23,12 +23,13 @@ class l2x:
 
 		if pre_trained_file is None:
 			if selector_network_structure is None:
-				self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(d*2,'none')])
+				#self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(1000,'relu'),(1000,'relu'),(d*2,'none')])
+				self.θˢ = wuml.flexable_Model(d, [(d,'relu'),(1000,'relu'),(1000,'relu'),(d*d,'none')])
 			else:
 				self.θˢ = wuml.flexable_Model(d, selector_network_structure)
 	
 			if predictor_network_structure is None:
-				self.θᴼ = wuml.flexable_Model(d, [(d,'relu'),(100,'relu'),(100,'relu'),(1,'none')])
+				self.θᴼ = wuml.flexable_Model(d, [(d,'relu'),(1000,'relu'),(1000,'relu'),(1,'none')])
 			else:
 				self.θᴼ = wuml.flexable_Model(d, predictor_network_structure)
 		else:
@@ -41,6 +42,7 @@ class l2x:
 			self.θˢ.to(self.device)		# store the network weights in gpu or cpu device
 			self.θᴼ.to(self.device)		# store the network weights in gpu or cpu device
 		else: self.device = 'cpu'
+		self.info()
 
 	def export_network(self, save_path):
 		network = {}
@@ -56,24 +58,38 @@ class l2x:
 
 		txt = 'L2X Regression\n'
 		txt += '\tDevice: %s\n'%(self.device)
-		txt += '\tData Dimension: %d x %d\n'%(data.shape[0], data.shape[1])
+		txt += '\tData Dimension: %d x %d\n'%(self.data.shape[0], self.data.shape[1])
 		txt += '\tMax num of Epochs: %d\n'%(self.max_epoch)
 		txt += '\tInitial Learning Rate: %.7f\n'%(self.lr)
 		txt += '\tUsing weighted Samples: %r\n'%(using_weights)
 		txt += '\tθˢ structure: %s\n'%(str(self.θˢ.networkStructure))
 		txt += '\tθᴼ structure: %s\n'%(str(self.θᴼ.networkStructure))
-
+		print(txt)
 		#save_path
 
 
 	def get_Selector(self, x, round_result=False):
+		x = wuml.ensure_tensor(x)
 		[d, device] = [self.d, self.device]
+		use_binary = False
 
-		xᵃ = self.θˢ(x)
-		xᵇ = xᵃ.view(-1, d, 2)	# reshape the data into num_of_samples x data dimension x num_of_groups 
-		xᶜ = torch.nn.Softplus()(xᵇ)
-		xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
-		S = xᵈ[:,:,0]
+		if use_binary:
+			xᵃ = self.θˢ(x)
+			xᵇ = xᵃ.view(-1, d, 2)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+			xᶜ = torch.nn.Softplus()(xᵇ)
+			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
+			S = xᵈ[:,:,0]
+		else:
+			xᵃ = self.θˢ(x)
+			q = int(xᵃ.shape[1]/d)
+			xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+			xᶜ = torch.nn.Softplus()(xᵇ)
+			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
+			#S = xᵈ[:,:,0]
+			[S,ind] = torch.max(xᵈ, dim=1)
+			print(torch.round(S))
+			import pdb; pdb.set_trace()
+
 		if round_result: S = torch.round(S)
 		return S
 
@@ -105,8 +121,14 @@ class l2x:
 		ŷ = torch.squeeze(ŷ)
 
 		regularizer = λ*torch.sum(S)
-		loss = torch.sum(W*(y - ŷ)** 2)/n + regularizer
+		loss = torch.sum(W*((y - ŷ)** 2))/n + regularizer
 		return loss
+
+	def on_new_epoch_call_back(self, loss_avg, epoch, lr):
+		pass
+		#if epoch%500 == 0:
+		#	S = self.get_Selector(self.data.X, round_result=True)
+		#	import pdb; pdb.set_trace()
 
 	def train(self, print_status=True):
 		trainLoader = self.data.get_data_as('DataLoader')
@@ -114,6 +136,8 @@ class l2x:
 		[ℓ, TL, mE, Dev] = [self.loss, trainLoader, self.max_epoch, self.device]
 		[Xtype, Ytype] = [self.X_dataType, self.Y_dataType]
 
-		wuml.run_SGD(ℓ, param, TL, Dev, lr=self.lr, max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype)
+		wuml.run_SGD(ℓ, param, TL, Dev, lr=self.lr, 
+					max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype,
+					on_new_epoch_call_back=self.on_new_epoch_call_back)
 
 
