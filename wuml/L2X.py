@@ -94,7 +94,7 @@ class l2x:
 			#import pdb; pdb.set_trace()
 
 		if torch.isnan(S[0,0]): 
-			print('Nan detected within get_Selector function in L2X')
+			print('\n\nNan detected within get_Selector function in L2X')
 			import pdb; pdb.set_trace() 
 
 		if round_result: S = torch.round(S)
@@ -137,10 +137,12 @@ class l2x:
 		return loss
 
 	def on_new_epoch_call_back(self, loss_avg, epoch, lr):
-		if epoch%2 == 0:
-			for param in self.θˢ.parameters(): 
-				print(param[0:10,0:10], '\n')
-				break
+		pass
+
+		#if epoch%2 == 0:
+		#	for param in self.θˢ.parameters(): 
+		#		print(param[0:10,0:10], '\n')
+		#		break
 
 			#for param in self.θᴼ.parameters(): 
 			#	print(param[0:10,0:10])
