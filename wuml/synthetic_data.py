@@ -52,17 +52,17 @@ def L2X_data_B(N, xpath=None, ypath=None, Block_path=None):
 		Standard regression cannot zero out half of the samples
 	'''
 	def gen_samples_A():
-		X1 = np.random.beta(0.5,0.5)
-		X2 = np.random.beta(0.5,0.5) + 1
-		X3 = np.random.exponential(scale=1.0) + 20
-		X4 = np.random.rayleigh()
+		X1 = np.random.beta(0.5,0.5) + 10
+		X2 = np.random.beta(0.5,0.5) + 10
+		X3 = np.random.beta(0.5,0.5) + 10
+		X4 = np.random.rayleigh() + 10
 	
 		return np.array([[X1,X2,X3,X4]])
 
 
 	def gen_samples_B():
-		X1 = np.random.uniform(0,2) + 5
-		X2 = np.random.uniform(0,2) + 5
+		X1 = 2*np.random.uniform(0,2) 
+		X2 = 2*np.random.uniform(0,2) 
 		X3 = np.random.exponential(scale=1.0)
 		X4 = np.random.randn()
 	

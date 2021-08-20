@@ -36,6 +36,11 @@ class flexable_Model(torch.nn.Module):
 			else:
 				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
 			exec(cmd)
+
+		if torch.isnan(self.yout).any():
+			print('\n nan was detected inside a network forward\n')
+			import pdb; pdb.set_trace()
+
 		return self.yout
 
 
@@ -64,8 +69,10 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 				loss = loss_function(x, y, ŷ, ind)
 			else:
 				loss = loss_function(x, y, ind)
-			
+		
+
 			if torch.isnan(loss): import pdb; pdb.set_trace()
+
 			loss.backward()
 			optimizer.step()
 

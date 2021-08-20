@@ -6,6 +6,7 @@ import torch
 from torch.autograd import Variable
 import torch.nn.functional as f
 
+#torch.autograd.set_detect_anomaly(True)
 
 class l2x:
 	def __init__(self, data, max_epoch=2000, learning_rate=0.001, data_imbalance_weights=None,
@@ -84,6 +85,10 @@ class l2x:
 			xᵃ = self.θˢ(x)
 			q = int(xᵃ.shape[1]/d)
 			xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+
+			#sM = torch.nn.Softmax(dim=2)
+			#xᶜ = sM(xᵇ)
+			
 			xᶜ = torch.nn.Softplus()(xᵇ)
 			xᶜ = f.normalize(xᶜ, p=1, dim=2)
 			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
@@ -132,6 +137,9 @@ class l2x:
 			loss = torch.sum(W*((y - ŷ)** 2))/n + regularizer
 		else:
 			loss = torch.sum(W*((y - ŷ)** 2))/n
+
+		#if loss < 0.01:
+		#	import pdb; pdb.set_trace()
 
 		if torch.isnan(loss): import pdb; pdb.set_trace()
 		return loss

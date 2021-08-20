@@ -41,9 +41,9 @@ def gumbel(pᵢ, τ=0.1, device='cpu'):		#The rows should add up to 1
 
 	elif type(pᵢ).__name__ == 'Tensor':	#The rows should add up to 1
 		pᵢ = pᵢ.to(device, non_blocking=True)
-
+		pᵢ += 0.00001			# Note: log(0) will give a NaN value so add noise
 		logit = torch.log(pᵢ)
-	
+
 		uniform_dist = Uniform(1e-30, 1.0, )	
 		uniform = uniform_dist.rsample(sample_shape=logit.size())
 		uniform = uniform.to(device, non_blocking=True )
@@ -51,7 +51,11 @@ def gumbel(pᵢ, τ=0.1, device='cpu'):		#The rows should add up to 1
 	
 		noisy_logits = (ε + logit) / τ
 		C = torch.nn.Softmax(dim=-1)(noisy_logits)
-	
+
+		if torch.isnan(C).any():
+			print('\n nan was detected inside gumbel\n')
+			import pdb; pdb.set_trace()
+
 		return C
 
 if __name__ == "__main__": 
