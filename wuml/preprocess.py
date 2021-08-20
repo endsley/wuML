@@ -6,6 +6,7 @@ from wuml.data_stats import *
 from wuml.data_loading import *
 from wuml.type_check import *
 
+from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn import preprocessing
 import pandas as pd
@@ -172,6 +173,23 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 	return X, ignore_column_with_0_σ
 
+def split_training_test(wData, data_name, data_path='./data/', test_percentage=0.2, xdata_type="%.4f", ydata_type="%d"):
+	X = wData.X
+	Y = wData.Y
+
+	X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
+
+	Train_dat = data_path + data_name + '_train.csv'
+	Train_label_dat = data_path + data_name + '_train_label.csv'
+
+	Test_dat = data_path + data_name + '_test.csv'
+	Test_label_dat = data_path + data_name + '_test_label.csv'
+
+	np.savetxt(Train_dat, X_train, delimiter=',', fmt=xdata_type) 
+	np.savetxt(Train_label_dat, y_train, delimiter=',', fmt=ydata_type) 
+
+	np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
+	np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
 
 def gen_10_fold_data(data_name, data_path='./data/'):
 

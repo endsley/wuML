@@ -61,10 +61,10 @@ def L2X_data_B(N, xpath=None, ypath=None, Block_path=None):
 
 
 	def gen_samples_B():
-		X1 = 2*np.random.uniform(0,2) 
-		X2 = 2*np.random.uniform(0,2) 
-		X3 = np.random.exponential(scale=1.0)
-		X4 = np.random.randn()
+		X1 = 3*np.random.uniform(0,2) 
+		X2 = 3*np.random.uniform(0,2) 
+		X3 = 3*np.random.exponential(scale=1.0)
+		X4 = 3*np.random.randn()
 	
 		return np.array([[X1,X2,X3,X4]])
 
@@ -88,4 +88,4 @@ def L2X_data_B(N, xpath=None, ypath=None, Block_path=None):
 
 	return [X,y,b]
 
-X = L2X_data_B(40, xpath='l2x_synthetic.csv', ypath='l2x_synthetic_label.csv', Block_path='l2x_synthetic_blocks.csv')
+X = L2X_data_B(5000, xpath='l2x_synthetic.csv', ypath='l2x_synthetic_label.csv', Block_path='l2x_synthetic_blocks.csv')

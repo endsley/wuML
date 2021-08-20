@@ -12,7 +12,7 @@ class l2x:
 	def __init__(self, data, max_epoch=2000, learning_rate=0.001, data_imbalance_weights=None,
 					X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, regularizer_weight=0,
 					selector_network_structure=None, predictor_network_structure=None, 
-					pre_trained_file=None):
+					pre_trained_file=None, use_binary=True):
 		self.data = data
 		self.d = d = data.shape[1]
 		self.max_epoch = max_epoch
@@ -21,6 +21,8 @@ class l2x:
 		self.X_dataType = X_dataType
 		self.Y_dataType = Y_dataType
 		self.regularizer_weight = regularizer_weight
+		self.use_binary = use_binary
+		self.pre_trained_file = pre_trained_file
 
 		if pre_trained_file is None:
 			if selector_network_structure is None:
@@ -61,6 +63,8 @@ class l2x:
 		txt += '\tDevice: %s\n'%(self.device)
 		txt += '\tBatch size: %d\n'%(self.data.batch_size)
 		txt += '\tData Dimension: %d x %d\n'%(self.data.shape[0], self.data.shape[1])
+		txt += '\tUse Binary One Hot: %r\n'%(self.use_binary)
+		txt += '\tUse Pre-train File: %s\n'%(str(self.pre_trained_file))
 		txt += '\tMax num of Epochs: %d\n'%(self.max_epoch)
 		txt += '\tInitial Learning Rate: %.7f\n'%(self.lr)
 		txt += '\tUsing weighted Samples: %r\n'%(using_weights)
@@ -70,33 +74,48 @@ class l2x:
 		#save_path
 
 
-	def get_Selector(self, x, round_result=False):
+	def get_Selector(self, x, round_result=False, test_phase=False):
 		x = wuml.ensure_tensor(x)
 		[d, device] = [self.d, self.device]
-		use_binary = False
 
-		if use_binary:
-			xᵃ = self.θˢ(x)
-			xᵇ = xᵃ.view(-1, d, 2)	# reshape the data into num_of_samples x data dimension x num_of_groups 
-			xᶜ = torch.nn.Softplus()(xᵇ)
-			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
-			S = xᵈ[:,:,0]
+		if test_phase:
+			if self.use_binary:
+				xᵃ = self.θˢ(x)
+				xᵇ = xᵃ.view(-1, d, 2)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+				xᶜ = torch.nn.Softplus()(xᵇ)
+
+				S = torch.argmin(xᶜ, dim=2)
+			else:
+				xᵃ = self.θˢ(x)
+				q = int(xᵃ.shape[1]/d)
+				xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+				xᶜ = torch.nn.Softplus()(xᵇ)
+				xᶜ = f.normalize(xᶜ, p=1, dim=2)
+
+				[S,ind] = torch.max(xᶜ, dim=1)
 		else:
-			xᵃ = self.θˢ(x)
-			q = int(xᵃ.shape[1]/d)
-			xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+			if self.use_binary:
+				xᵃ = self.θˢ(x)
+				xᵇ = xᵃ.view(-1, d, 2)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+				xᶜ = torch.nn.Softplus()(xᵇ)
+				xᶜ = f.normalize(xᶜ, p=1, dim=2)
+	
+				xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
+				S = xᵈ[:,:,0]
+			else:
+				xᵃ = self.θˢ(x)
+				q = int(xᵃ.shape[1]/d)
+				xᵇ = xᵃ.view(-1, q, d)	# reshape the data into num_of_samples x data dimension x num_of_groups 
+	
+				xᶜ = torch.nn.Softplus()(xᵇ)
+				xᶜ = f.normalize(xᶜ, p=1, dim=2)
+				xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
+				
+				[S,ind] = torch.max(xᵈ, dim=1)
 
-			#sM = torch.nn.Softmax(dim=2)
-			#xᶜ = sM(xᵇ)
-			
-			xᶜ = torch.nn.Softplus()(xᵇ)
-			xᶜ = f.normalize(xᶜ, p=1, dim=2)
-			xᵈ = wuml.gumbel(xᶜ, device=device)		# Group matrix
-			
-			[S,ind] = torch.max(xᵈ, dim=1)
 
-			#print(torch.round(S[0]))
-			#import pdb; pdb.set_trace()
+
+
 
 		if torch.isnan(S[0,0]): 
 			print('\n\nNan detected within get_Selector function in L2X')

@@ -142,6 +142,8 @@ class basicNetwork:
 		elif type(data).__name__ == 'Tensor': 
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
 			x= x.to(self.device, non_blocking=True )
+		elif type(data).__name__ == 'wData': 
+			x = data.get_data_as('Tensor')
 		else:
 			raise
 
