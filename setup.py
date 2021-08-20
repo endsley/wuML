@@ -11,27 +11,27 @@ from os import path
 #	with open(os.path.join(os.path.dirname(__file__), filename)) as file:
 #		return file.read()
 
-#this_directory = path.abspath(path.dirname(__file__))
-#with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-#	long_description = f.read()
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+	long_description = f.read()
 
 
 
 setup(
   name = 'wuml',         # How you named your package folder (MyLib)
   packages = ['wuml'],   # Chose the same as "name"
-  version = '0.032',      # Start with a small number and increase it with every change you make
+  version = '0.033',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A library that simplifies some basic ML stuff.',   # Give a short description about your library
   long_description='Go to https://github.com/endsley/wuML for documentation',
-  #long_description=read_file('README.md'),
+  long_description=read_file('README.md'),
   #long_description=long_description,
   #long_description = file: README.md,
   long_description_content_type='text/markdown',  
   author = 'Chieh Wu',                   # Type in your name
   author_email = 'chieh.t.wu@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/endsley/wuML.git',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/endsley/wuML/archive/refs/tags/0.032.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/endsley/wuML/archive/refs/tags/0.033.tar.gz',    # I explain this later on
   keywords = ['ML', 'data analysis'],   # Keywords that define your package best
   include_package_data=False,
   install_requires=[            # I get to this in a second
