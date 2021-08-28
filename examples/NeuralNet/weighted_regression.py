@@ -11,11 +11,11 @@ from torch.autograd import Variable
 	
 '''
  
-data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
+data = wuml.wData(xpath='../data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
 
-weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
+weights = wuml.wData(xpath='../data/Chem_sample_weights.csv')
 weights = weights.get_data_as('Tensor')
 
 def costFunction(x, y, ŷ, ind):
