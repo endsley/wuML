@@ -1,5 +1,41 @@
 #!/usr/bin/env python
 
+import wuml
+import numpy as np
+import torch
+import wplotlib
+from torch.autograd import Variable
+
+''' Weighted Regression
+	Each sample is weighted based on its likelihood to balance the data
+	
+'''
+ 
+data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
+					label_type='continuous', label_column_name='finalga_best', 
+					row_id_with_label=0, columns_to_ignore=['id'])
+
+weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
+weights = weights.get_data_as('Tensor')
+
+def costFunction(x, y, ŷ, ind):
+	W = torch.squeeze(weights[ind])
+
+	n = len(ind)
+	ŷ = torch.squeeze(ŷ)
+	return torch.sum(W*((y - ŷ)**2))/n
+
+bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=3000, learning_rate=0.001)
+bNet.train()
+
+Ŷ = bNet(data, output_type='ndarray')
+output = wuml.output_regression_result(data.Y, Ŷ)
+print(output)
+
+import pdb; pdb.set_trace()
+
+
+
 #import wuml 
 #import torch
 #import numpy as np
@@ -33,46 +69,46 @@
 
 
 
-import wuml
-import numpy as np
-import torch
-import wplotlib
-
-
-#	Splits the data into training and test
-
-data = wuml.wData(xpath='examples/data/regress.csv', ypath='examples/data/regress_label.csv', batch_size=20, label_type='continuous')
-wuml.split_training_test(data, data_name='regress', data_path='./examples/data/', xdata_type="%.4f", ydata_type="%.4f", test_percentage=0.2)
-
-
-def costFunction(x, y, ŷ, ind):
-	ŷ = torch.squeeze(ŷ)
-	return torch.sum((y- ŷ) ** 2)	
-
-
-
-data_train = wuml.wData(xpath='examples/data/regress_train.csv', ypath='examples/data/regress_train_label.csv', batch_size=20, label_type='continuous')
-data_test = wuml.wData(xpath='examples/data/regress_test.csv', ypath='examples/data/regress_test_label.csv', batch_size=20, label_type='continuous')
-
-bNet = wuml.basicNetwork(costFunction, data_train, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001)
-bNet.train()
-
-Ŷ_train = bNet(data_train, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
-Ŷ_test = bNet(data_test, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
-
-newX = np.expand_dims(np.arange(0,5,0.1),1)
-Ŷ_line = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
-
-
-#	plot the results out
-splot = wplotlib.scatter()
-splot.add_plot(data_train.X, data_train.Y, marker='o', color='blue')
-splot.add_plot(data_test.X, data_test.Y, marker='o', color='red')
-
-lp = wplotlib.lines()	
-lp.add_plot(newX, Ŷ_line)
-
-splot.show(title='Train/Test Network Regression', xlabel='x-axis', ylabel='y-axis',
-			imgText='Blue dot:Training Data\nRed dot: Test Data')
-
-import pdb; pdb.set_trace()
+#import wuml
+#import numpy as np
+#import torch
+#import wplotlib
+#
+#
+##	Splits the data into training and test
+#
+#data = wuml.wData(xpath='examples/data/regress.csv', ypath='examples/data/regress_label.csv', batch_size=20, label_type='continuous')
+#wuml.split_training_test(data, data_name='regress', data_path='./examples/data/', xdata_type="%.4f", ydata_type="%.4f", test_percentage=0.2)
+#
+#
+#def costFunction(x, y, ŷ, ind):
+#	ŷ = torch.squeeze(ŷ)
+#	return torch.sum((y- ŷ) ** 2)	
+#
+#data_train = wuml.wData(xpath='examples/data/regress_train.csv', ypath='examples/data/regress_train_label.csv', batch_size=20, label_type='continuous')
+#data_test = wuml.wData(xpath='examples/data/regress_test.csv', ypath='examples/data/regress_test_label.csv', batch_size=20, label_type='continuous')
+#
+## costFunction can be a function or string: mse, L1
+#bNet = wuml.basicNetwork('mse', data_train, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001)
+#bNet.train()
+#
+#
+#Ŷ_train = bNet(data_train, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+#Ŷ_test = bNet(data_test, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+#
+#newX = np.expand_dims(np.arange(0,5,0.1),1)
+#Ŷ_line = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+#
+#
+##	plot the results out
+#splot = wplotlib.scatter()
+#splot.add_plot(data_train.X, data_train.Y, marker='o', color='blue')
+#splot.add_plot(data_test.X, data_test.Y, marker='o', color='red')
+#
+#lp = wplotlib.lines()	
+#lp.add_plot(newX, Ŷ_line)
+#
+#splot.show(title='Train/Test Network Regression', xlabel='x-axis', ylabel='y-axis',
+#			imgText='Blue dot:Training Data\nRed dot: Test Data')
+#
+#import pdb; pdb.set_trace()

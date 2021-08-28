@@ -38,9 +38,7 @@ class wData:
 			if label_type == 'discrete': self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
 			self.delete_column(label_column_name)
 
-		if type(columns_to_ignore) == type([]):
-			for column_name in columns_to_ignore:
-				self.delete_column(column_name)
+		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
 
 		self.X = self.df.values
 		self.batch_size = batch_size

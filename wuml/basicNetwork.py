@@ -7,7 +7,9 @@ from wuml.IO import *
 from sklearn import linear_model
 from torch import nn
 from torch.autograd import Variable
+from inspect import signature
 import torch.nn.functional as F
+import torch.nn as nn
 import collections
 
 class flexable_Model(torch.nn.Module):
@@ -51,6 +53,14 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 
 	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
 	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+	paramLen = len(signature(loss_function).parameters) # number of arguments
+
+	if type(loss_function).__name__ == 'str':
+		if loss_function == 'mse':
+			loss_function = nn.MSELoss()
+		elif loss_function == 'L1':
+			loss_function = nn.L1Loss()
+
 
 	for epoch in range(max_epoch):
 
@@ -66,10 +76,19 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 			
 			if model is not None:
 				ŷ = model(x)
-				loss = loss_function(x, y, ŷ, ind)
+
+				if paramLen == 4:
+					loss = loss_function(x, y, ŷ, ind)
+				elif paramLen == 3:
+					loss = loss_function(x, y, ind)
+				elif paramLen == 2:
+					ŷ = torch.squeeze(ŷ)
+					loss = loss_function(y, ŷ)
 			else:
-				loss = loss_function(x, y, ind)
-		
+				try:
+					loss = loss_function(x, y, ind)
+				except:
+					loss = loss_function(x, y)
 
 			if torch.isnan(loss): import pdb; pdb.set_trace()
 
@@ -125,6 +144,8 @@ class basicNetwork:
 		print('Network Info:')
 		print('\tLearning rate: %.3f'%self.lr)
 		print('\tMax number of epochs: %d'%self.max_epoch)
+		print('\tCost Function: %s'%str(self.costFunction))
+		print('\tTrain Loop Callback: %s'%str(self.on_new_epoch_call_back))
 		print('\tCuda Available: %r'%torch.cuda.is_available())
 		print('\tNetwork Structure')
 		for i in self.model.children():
