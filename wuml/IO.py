@@ -118,6 +118,7 @@ def dictionary_to_str(dic):
 
 	return outstr
 
+
 def output_regression_result(y, ŷ, write_path=None):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 	ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
@@ -127,6 +128,7 @@ def output_regression_result(y, ŷ, write_path=None):
 	
 	# Draw Histogram
 	Δy = np.absolute(ŷ - y)
+	avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
 
 	H = wplotlib.histograms()
 	H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
@@ -136,10 +138,44 @@ def output_regression_result(y, ŷ, write_path=None):
 
 	A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
 	B = wuml.pretty_np_array(np.hstack((y, ŷ)))
-	C = A + B
+	C = avg_Δ + A + B
 
 	if write_path is not None: wuml.write_to(C, write_path)
 
 	return C
 
+
+class summarize_regression_result:
+	def __init__(self, y, ŷ):
+		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
+		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
+	
+		if y.shape[0] == 1: y = y.T
+		if ŷ.shape[0] == 1: ŷ = ŷ.T
+		
+		self.y = y
+		self.ŷ = ŷ
+
+	def avg_error(self):
+		Δy = np.absolute(self.ŷ - self.y)
+		avg_Δ = np.sum(Δy)/Δy.shape[0]
+		return avg_Δ
+
+	def error_histogram(self):
+		# Draw Histogram
+		Δy = np.absolute(ŷ - y)
+		avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
+	
+		H = wplotlib.histograms()
+		H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
+					xlabel='Error Amount', ylabel='Error count',
+					facecolor='blue', α=0.5, path=None)
+		
+	def true_vs_predict(self, write_path=None):
+		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
+		B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
+		C = avg_Δ + A + B
+	
+		if write_path is not None: wuml.write_to(C, write_path)
+	
 
