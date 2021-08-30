@@ -6,63 +6,37 @@ import torch
 import wplotlib
 from torch.autograd import Variable
 
-''' Weighted Regression
-	Each sample is weighted based on its likelihood to balance the data
+
+import wuml 
+import torch
+import numpy as np
+import scipy.stats
+from wplotlib import histograms
+from wplotlib import lines
 	
-'''
- 
-data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
-					label_type='continuous', label_column_name='finalga_best', 
-					row_id_with_label=0, columns_to_ignore=['id'])
+#l2x_synthetic_blocks.csv  l2x_synthetic.csv         l2x_synthetic_label.csv
 
-weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
-weights = weights.get_data_as('Tensor')
+wuml.set_terminal_print_options(precision=2)
+data = wuml.wData(xpath='examples/data/l2x_synthetic.csv', ypath='examples/data/l2x_synthetic_label.csv', label_type='continuous', batch_size=20)
+data = wuml.center_and_scale(data)
+d = data.X.shape[1]
 
-def costFunction(x, y, ŷ, ind):
-	W = torch.squeeze(weights[ind])
-
-	n = len(ind)
-	ŷ = torch.squeeze(ŷ)
-	return torch.sum(W*((y - ŷ)**2))/n
-
-bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=3000, learning_rate=0.001)
-bNet.train()
-
-Ŷ = bNet(data, output_type='ndarray')
-output = wuml.output_regression_result(data.Y, Ŷ)
-print(output)
-
-import pdb; pdb.set_trace()
-
-
-
-#import wuml 
-#import torch
-#import numpy as np
-#import scipy.stats
-#from wplotlib import histograms
-#from wplotlib import lines
-#	
-##l2x_synthetic_blocks.csv  l2x_synthetic.csv         l2x_synthetic_label.csv
-#
-#wuml.set_terminal_print_options(precision=2)
-#data = wuml.wData(xpath='examples/data/l2x_synthetic.csv', ypath='examples/data/l2x_synthetic_label.csv', label_type='continuous', batch_size=20)
-#data = wuml.center_and_scale(data)
-#d = data.X.shape[1]
-#
+θˢ = [(2000,'relu'),(2000,'relu'),(2000,'relu'),(d*2,'none')]
 #θˢ = [(2000,'relu'),(2000,'relu'),(2000,'relu'),(d*2,'none')]
-##θˢ = [(2000,'relu'),(2000,'relu'),(2000,'relu'),(d*2,'none')]
-#θᴾ = [(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')]
-##θᴾ = [(1,'none')]
-#
-#P = wuml.l2x(data, max_epoch=20, learning_rate=0.001, use_binary=True,
-#				selector_network_structure=θˢ,predictor_network_structure=θᴾ)
-#P.train()
-#ŷ = P(data.X)
-#
-#S = P.get_Selector(data.X, test_phase=True)
-#import pdb; pdb.set_trace()
-##out = wuml.output_regression_result(data.Y, ŷ)
+θᴾ = [(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')]
+#θᴾ = [(1,'none')]
+
+P = wuml.l2x(data, max_epoch=100, learning_rate=0.001, use_binary=True,
+				selector_network_structure=θˢ,predictor_network_structure=θᴾ)
+P.train()
+ŷ = P(data.X)
+
+
+wuml.output_regression_result(data.Y, ŷ)
+
+S = P(data.X, test_phase=True)
+import pdb; pdb.set_trace()
+#out = wuml.output_regression_result(data.Y, ŷ)
 
 
 

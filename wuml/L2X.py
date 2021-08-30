@@ -127,7 +127,7 @@ class l2x:
 	def __call__(self, x):
 		x = wuml.ensure_tensor(x)
 
-		S = self.get_Selector(x)
+		S = self.get_Selector(x, test_phase=True)
 		x̂ = x*S
 		ŷ = self.θᴼ(x̂)
 		return ŷ
