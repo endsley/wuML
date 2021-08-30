@@ -12,4 +12,5 @@ from .type_check import *
 from .kde import *
 from .L2X import *
 from .gumbel import *
-from .run_10_fold_on_function import *
+from .run_k_fold_on_function import *
+from .classifiers import *

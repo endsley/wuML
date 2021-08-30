@@ -144,6 +144,7 @@ def center_and_scale(wuData):
 	X = wuData.get_data_as('ndarray')
 	X = preprocessing.scale(X)
 	wuData.df = pd.DataFrame(X)
+	wuData.X = wuData.df.values
 	return wuData
 
 

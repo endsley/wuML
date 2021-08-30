@@ -18,7 +18,6 @@ def ensure_numpy(data, rounding=None):
 	elif np.isscalar(data):
 		X = np.array([[data]])
 
-	print(rounding)
 	if rounding is not None: X = np.round(X, rounding)
 	return X
 

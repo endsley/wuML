@@ -92,6 +92,8 @@ def accuracy(Y, Ŷ):
 		print('Error: Y must be numpy array or Tensor')
 		exit()
 
+	Y = np.squeeze(Y)
+	Ŷ = np.squeeze(Ŷ)
 	return accuracy_score(Y, Ŷ)
 
 
