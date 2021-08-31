@@ -117,21 +117,46 @@ class basicNetwork:
 	def __init__(self, costFunction, X, 
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
-						Y_dataType=torch.FloatTensor, learning_rate=0.001):
+						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None):
 		'''
 			possible activation functions: softmax, relu, tanh, sigmoid, none
+			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 		'''
-		#	X should be in wuml format
-		self.trainLoader = X.get_data_as('DataLoader')
+#		self.trainLoader = X.get_data_as('DataLoader')
+#
+#		self.lr = learning_rate
+#		self.max_epoch = max_epoch
+#		self.X_dataType = X_dataType
+#		self.Y_dataType = Y_dataType
+#		self.costFunction = costFunction
+#		self.NetStructure = networkStructure
+#		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
+#		self.model = flexable_Model(X.shape[1], networkStructure)
 
-		self.lr = learning_rate
-		self.max_epoch = max_epoch
-		self.X_dataType = X_dataType
-		self.Y_dataType = Y_dataType
-		self.costFunction = costFunction
-		self.NetStructure = networkStructure
-		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-		self.model = flexable_Model(X.shape[1], networkStructure)
+		if simplify_network_for_storage is None:
+			#	X should be in wuml format
+			self.trainLoader = X.get_data_as('DataLoader')
+	
+			self.lr = learning_rate
+			self.max_epoch = max_epoch
+			self.X_dataType = X_dataType
+			self.Y_dataType = Y_dataType
+			self.costFunction = costFunction
+			self.NetStructure = networkStructure
+			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
+			self.model = flexable_Model(X.shape[1], networkStructure)
+		else:
+			self.costFunction = costFunction
+			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
+
+			θ = simplify_network_for_storage
+			self.lr = θ.lr
+			self.max_epoch = θ.max_epoch
+			self.X_dataType = θ.X_dataType
+			self.Y_dataType = θ.Y_dataType
+			self.NetStructure = θ.NetStructure
+			self.model = θ.model
+
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'

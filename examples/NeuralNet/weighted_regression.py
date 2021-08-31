@@ -4,6 +4,7 @@ import wuml
 import numpy as np
 import torch
 import wplotlib
+import torch.nn as nn
 from torch.autograd import Variable
 
 ''' Weighted Regression
@@ -26,6 +27,7 @@ def costFunction(x, y, ŷ, ind):
 	W = torch.squeeze(weights[ind])
 	n = len(ind)
 	ŷ = torch.squeeze(ŷ)
+	y = torch.squeeze(y)
 
 	penalty = torch.sum(relu(W*(ŷ - y)))/n	# This will penalize predictions higher than true labels
 	return torch.sum(W*((y - ŷ)**2))/n + 0.8*penalty

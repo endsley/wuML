@@ -8,8 +8,6 @@ import wplotlib
 from torch.autograd import Variable
 
 
-
-
 data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
@@ -29,19 +27,20 @@ def run_each_fold(fold_id, one_fold_data_list):
 	single_fold_train_data = wuml.wData( X_npArray=X_train, Y_npArray=Y_train, label_type='continuous')
 	single_fold_test_data = wuml.wData( X_npArray=X_test, Y_npArray=Y_test, label_type='continuous')
 	W_train = wuml.ensure_tensor(W_train)
-
+	
 	def costFunction(x, y, ŷ, ind):
 		relu = nn.ReLU()
 	
 		W = torch.squeeze(W_train[ind])
 		n = len(ind)
 		ŷ = torch.squeeze(ŷ)
+		y = torch.squeeze(y)
 
 		penalty = torch.sum(relu(W*(ŷ - y)))/n
 		return torch.sum(W*((y - ŷ)**2))/n + 0.8*penalty
 
 	
-	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')], max_epoch=6000, learning_rate=0.001)
+	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(200,'relu'),(200,'relu'),(1,'none')], max_epoch=5000, learning_rate=0.001)
 	bNet.train()
 
 	Ŷ_train = bNet(single_fold_train_data, output_type='ndarray')
@@ -54,6 +53,35 @@ def run_each_fold(fold_id, one_fold_data_list):
 	test_avg_error = test_result.avg_error()
 	print('\n\nFold %d, train error: %.4f, test error: %.4f'%(fold_id, train_avg_error, test_avg_error))
 
-	return [train_avg_error, test_avg_error]
+	return [train_result, test_result, bNet] # <- all_results is a list of these lists
 
-all_results = wuml.run_K_fold_on_function(10, [data.X, data.Y, weights.X], run_each_fold, {}) 
+
+if __name__=="__main__":
+	all_results = wuml.run_K_fold_on_function(10, [data.X, data.Y, weights.X], run_each_fold, {}) 
+	
+	lowest_error = 100
+	outStr = ''
+	lowest = ''
+	avg_train_error = []
+	avg_test_error = []
+	for idx, single_result in enumerate(all_results):
+		[train_result, test_result, bNet] = single_result
+		ε1 = train_result.avg_error()
+		ε2 = test_result.avg_error()
+		avg_train_error.append(ε1)
+		avg_test_error.append(ε2)
+	
+		outStr += 'Fold %d, train error: %.4f, test error: %.4f\n'%(idx, ε1, ε2)
+	
+		if lowest_error > test_result.avg_error():
+			lowest_error = test_result.avg_error()
+			lowest = 'Lowest Error : Fold %d, train error: %.4f, test error: %.4f\n\n'%(idx, ε1, ε2)
+			bN = wuml.basicNetwork(None, None, simplify_network_for_storage=bNet)
+			bN.train_result = train_result
+			bN.test_result = test_result
+			wuml.pickle_dump(bN, 'best_network.pk')
+
+	Avg_train = np.mean(np.array(avg_train_error))
+	Avg_test = np.mean(np.array(avg_test_error))
+	Topline = 'Average Train Error: %.4f, Average Test Error: %.4f\n'%(Avg_train, Avg_test)
+	wuml.write_to(Topline + lowest + outStr, './10_fold_summary.txt')

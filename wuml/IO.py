@@ -156,14 +156,15 @@ class summarize_regression_result:
 		self.y = y
 		self.ŷ = ŷ
 
+		self.Δy = np.absolute(self.ŷ - self.y)
+
 	def avg_error(self):
-		Δy = np.absolute(self.ŷ - self.y)
+		Δy = self.Δy
 		avg_Δ = np.sum(Δy)/Δy.shape[0]
 		return avg_Δ
 
 	def error_histogram(self):
-		# Draw Histogram
-		Δy = np.absolute(ŷ - y)
+		Δy = self.Δy
 		avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
 	
 		H = wplotlib.histograms()
@@ -174,6 +175,8 @@ class summarize_regression_result:
 	def true_vs_predict(self, write_path=None):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
 		B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
+		avg_Δ = self.avg_error()
+
 		C = avg_Δ + A + B
 	
 		if write_path is not None: wuml.write_to(C, write_path)
