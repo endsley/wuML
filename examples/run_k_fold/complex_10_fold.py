@@ -14,8 +14,9 @@ data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=2
 data = wuml.center_and_scale(data)
 
 weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
+#weights = weights.get_data_as('Tensor')
 
-#Define how to run each fold
+
 #You must have the first 2 variables included (fold_id, one_fold_data_list)
 def run_each_fold(fold_id, one_fold_data_list):
 	[X_train, X_test] = one_fold_data_list[0]
@@ -26,7 +27,6 @@ def run_each_fold(fold_id, one_fold_data_list):
 	single_fold_test_data = wuml.wData( X_npArray=X_test, Y_npArray=Y_test, label_type='continuous')
 	W_train = wuml.ensure_tensor(W_train)
 	
-	#	Since I am running a neural network, I need to define a cost function
 	def costFunction(x, y, ŷ, ind):
 		relu = nn.ReLU()
 	
@@ -39,7 +39,7 @@ def run_each_fold(fold_id, one_fold_data_list):
 		return torch.sum(W*((y - ŷ)**2))/n + 0.8*penalty
 
 	
-	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(200,'relu'),(200,'relu'),(1,'none')], max_epoch=5000, learning_rate=0.001)
+	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(400,'relu'),(400,'relu'),(400,'relu'),(1,'none')], max_epoch=8000, learning_rate=0.001)
 	bNet.train()
 
 	Ŷ_train = bNet(single_fold_train_data, output_type='ndarray')
@@ -56,7 +56,12 @@ def run_each_fold(fold_id, one_fold_data_list):
 
 
 if __name__=="__main__":
+	Fn = wuml.gen_random_string()
+	foldName = './tmp/' + Fn + '/'
+	print(foldName)
+
 	all_results = wuml.run_K_fold_on_function(10, [data.X, data.Y, weights.X], run_each_fold, {}) 
+	wuml.ensure_path_exists(foldName)
 	
 	lowest_error = 100
 	outStr = ''
@@ -78,18 +83,11 @@ if __name__=="__main__":
 			bN = wuml.basicNetwork(None, None, simplify_network_for_storage=bNet)
 			bN.train_result = train_result
 			bN.test_result = test_result
-			wuml.pickle_dump(bN, 'best_network.pk')
+			wuml.pickle_dump(bN, foldName + 'best_network.pk')
+			wuml.write_to(bNet.info(printOut=False), foldName + 'best_network_info.txt')
+
 
 	Avg_train = np.mean(np.array(avg_train_error))
 	Avg_test = np.mean(np.array(avg_test_error))
 	Topline = 'Average Train Error: %.4f, Average Test Error: %.4f\n'%(Avg_train, Avg_test)
-	wuml.write_to(Topline + lowest + outStr, './10_fold_summary.txt')
-
-
-	#	Using the following code can reload the network
-
-	#bN = wuml.pickle_load('best_network.pk')
-	#Ŷ = bN(data)
-	#output = wuml.output_regression_result(data.Y, Ŷ, write_path='YvŶ.txt')
-	#import pdb; pdb.set_trace()
-
+	wuml.write_to(Topline + lowest + outStr, foldName + '10_fold_summary.txt')

@@ -165,20 +165,22 @@ class basicNetwork:
 
 		self.info()
 
-	def info(self):
-		print('Network Info:')
-		print('\tLearning rate: %.3f'%self.lr)
-		print('\tMax number of epochs: %d'%self.max_epoch)
-		print('\tCost Function: %s'%str(self.costFunction))
-		print('\tTrain Loop Callback: %s'%str(self.on_new_epoch_call_back))
-		print('\tCuda Available: %r'%torch.cuda.is_available())
-		print('\tNetwork Structure')
+	def info(self, printOut=True):
+		 
+		info_str ='Network Info:\n'
+		info_str += '\tLearning rate: %.3f\n'%self.lr
+		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
+		info_str += '\tCost Function: %s\n'%str(self.costFunction)
+		info_str += '\tTrain Loop Callback: %s\n'%str(self.on_new_epoch_call_back)
+		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
+		info_str += '\tNetwork Structure\n'
 		for i in self.model.children():
 			try:
-				print('\t\t%s , %s'%(i,i.activation))
+				info_str += ('\t\t%s , %s\n'%(i,i.activation))
 			except:
-				print('\t\t%s '%(i))
-
+				info_str += ('\t\t%s \n'%(i))
+		if printOut: print(info_str)
+		return info_str
 
 	def __call__(self, data, output_type='Tensor'):
 		if type(data).__name__ == 'ndarray': 

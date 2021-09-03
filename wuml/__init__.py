@@ -14,3 +14,6 @@ from .L2X import *
 from .gumbel import *
 from .run_k_fold_on_function import *
 from .classifiers import *
+from .sampling import *
+from .distribution_modeling import *
+from .operations import *
