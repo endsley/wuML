@@ -20,6 +20,6 @@ class model_as_exponential: #Assuming that data is 1 dimension
 		return S
 
 	def cdf(self,x):
-		A = wuml.integrate(self.__call__, 0, x)
-		return A
+		[Area, error] = wuml.integrate(self.__call__, 0, x)
+		return Area
 
