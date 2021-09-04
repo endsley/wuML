@@ -5,22 +5,30 @@ import wplotlib
 import numpy as np
 
 
-X = wuml.gen_exponential(λ=2, size=3000)	# generates 2 exp(-2x)
-E = wuml.model_as_exponential(X)
+data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
+					label_type='continuous', label_column_name='finalga_best', 
+					row_id_with_label=0, columns_to_ignore=['id'])
+data = wuml.center_and_scale(data)
 
-Xp = np.arange(0.05,8,0.05)
-Q = 2*np.exp(-2*Xp)							# theoretical true distribution
-P = E(Xp)									# estimated distribution via MSE
+bN= wuml.pickle_load('./tmp/4496/best_network.pk')
+Ŷ = np.squeeze(bN(data, output_type='ndarray'))
+ε = np.absolute(data.Y - Ŷ)
+E = wuml.model_as_exponential(ε)
+
+Xp = np.arange(0.1,5,0.05)
+probs = E(Xp)
+
+e1 = 1 - E.cdf(1)
+e2 = 1 - E.cdf(2)
+
+msg = ('P(X > 1) = %.3f\n'%e1)
+msg += ('P(X > 2) =  %.3f'%(e2))
 
 
 H = wplotlib.histograms()
 l = wplotlib.lines()
-H.histogram(X, num_bins=20, title='Basic Histogram', xlabel='value', ylabel='count', facecolor='blue', α=0.5, path=None, normalize=True, showImg=False )
-l.add_plot(Xp,Q, color='red', marker=',')
-l.add_text(Xp, Q, 'Red: true distribution\nBlue: Estimated distribution', α=0.35, β=0.95)
-l.plot_line(Xp, P, 'Histogram and Modeled Distribution', 'X', 'Probability')
+H.histogram(ε, num_bins=40, title='Basic Histogram', xlabel='value', ylabel='count', facecolor='blue', α=0.5, path=None, normalize=True, showImg=False )
+l.add_text(Xp, probs, msg, α=0.35, β=0.95)
+l.plot_line(Xp, probs, 'Histogram and Distribution Modeled via MLE', 'Gestational Age Error', 'Probability Distribution')
 
 
-A = E.cdf(1)
-print('True cdf to 1: %.3f, Approximated cdf to 1: %.3f'%(0.865, A))
-import pdb; pdb.set_trace()

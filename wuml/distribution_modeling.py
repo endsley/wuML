@@ -20,6 +20,9 @@ class model_as_exponential: #Assuming that data is 1 dimension
 		return S
 
 	def cdf(self,x):
-		[Area, error] = wuml.integrate(self.__call__, 0, x)
-		return Area
+		λ = self.λ
+		return (1 - np.exp(-λ*x))
+
+		#[Area, error] = wuml.integrate(self.__call__, 0, x)
+		#return Area
 
