@@ -1,13 +1,13 @@
-Average Train Error: 0.2923, Average Test Error: 2.3594
-Lowest Error : Fold 1, train error: 0.2473, test error: 2.1616
+Average Train Error: 0.0947, Average Test Error: 2.3167
+Lowest Error : Fold 6, train error: 0.1089, test error: 2.1623
 
-Fold 0, train error: 0.3072, test error: 2.2679
-Fold 1, train error: 0.2473, test error: 2.1616
-Fold 2, train error: 0.2788, test error: 2.5049
-Fold 3, train error: 0.2646, test error: 2.3598
-Fold 4, train error: 0.3173, test error: 2.4696
-Fold 5, train error: 0.3068, test error: 2.3645
-Fold 6, train error: 0.2881, test error: 2.3333
-Fold 7, train error: 0.3788, test error: 2.2797
-Fold 8, train error: 0.2586, test error: 2.4150
-Fold 9, train error: 0.2752, test error: 2.4381
+Fold 0, train error: 0.1252, test error: 2.2815
+Fold 1, train error: 0.0971, test error: 2.5386
+Fold 2, train error: 0.1241, test error: 2.3556
+Fold 3, train error: 0.1004, test error: 2.3942
+Fold 4, train error: 0.0655, test error: 2.2729
+Fold 5, train error: 0.0826, test error: 2.3064
+Fold 6, train error: 0.1089, test error: 2.1623
+Fold 7, train error: 0.0889, test error: 2.2980
+Fold 8, train error: 0.0816, test error: 2.2730
+Fold 9, train error: 0.0730, test error: 2.2844
