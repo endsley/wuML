@@ -1,0 +1,11 @@
+Network Info:
+	Learning rate: 0.001
+	Max number of epochs: 8000
+	Cost Function: <function run_each_fold.<locals>.costFunction at 0x7f2e10479a70>
+	Train Loop Callback: None
+	Cuda Available: True
+	Network Structure
+		Linear(in_features=21, out_features=400, bias=True) , relu
+		Linear(in_features=400, out_features=400, bias=True) , relu
+		Linear(in_features=400, out_features=400, bias=True) , relu
+		Linear(in_features=400, out_features=1, bias=True) , none

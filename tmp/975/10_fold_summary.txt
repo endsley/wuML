@@ -1,0 +1,13 @@
+Average Train Error: 1.2981, Average Test Error: 2.1703
+Lowest Error : Fold 9, train error: 1.3111, test error: 1.9396
+
+Fold 0, train error: 1.3339, test error: 2.1573
+Fold 1, train error: 1.2950, test error: 2.3948
+Fold 2, train error: 1.3121, test error: 2.3928
+Fold 3, train error: 1.2347, test error: 2.2255
+Fold 4, train error: 1.3004, test error: 2.1510
+Fold 5, train error: 1.2228, test error: 2.3524
+Fold 6, train error: 1.3091, test error: 2.1180
+Fold 7, train error: 1.2939, test error: 2.0032
+Fold 8, train error: 1.3682, test error: 1.9686
+Fold 9, train error: 1.3111, test error: 1.9396

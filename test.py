@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import wuml
+import sklearn
+import shap
 import wplotlib
 import numpy as np
 
@@ -10,25 +12,23 @@ data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=2
 					row_id_with_label=0, columns_to_ignore=['id'])
 data = wuml.center_and_scale(data)
 
-bN= wuml.pickle_load('./tmp/4496/best_network.pk')
-Ŷ = np.squeeze(bN(data, output_type='ndarray'))
-ε = np.absolute(data.Y - Ŷ)
-E = wuml.model_as_exponential(ε)
+bNet= wuml.pickle_load('./tmp/4496/best_network_updated.pk')
 
-Xp = np.arange(0.1,5,0.05)
-probs = E(Xp)
+##	update the network to new code
+#bN = wuml.basicNetwork(None, None, simplify_network_for_storage=bNet, flatten_network_output_during_usage=True)
+#bN.train_result = bNet.train_result
+#bN.test_result = bNet.test_result
+#wuml.pickle_dump(bN, './tmp/4496/best_network_updated.pk')
 
-e1 = 1 - E.cdf(1)
-e2 = 1 - E.cdf(2)
-
-msg = ('P(X > 1) = %.3f\n'%e1)
-msg += ('P(X > 2) =  %.3f'%(e2))
+#Y2 = bNet(data)
+#import pdb; pdb.set_trace()
 
 
-H = wplotlib.histograms()
-l = wplotlib.lines()
-H.histogram(ε, num_bins=40, title='Basic Histogram', xlabel='value', ylabel='count', facecolor='blue', α=0.5, path=None, normalize=True, showImg=False )
-l.add_text(Xp, probs, msg, α=0.35, β=0.95)
-l.plot_line(Xp, probs, 'Histogram and Distribution Modeled via MLE', 'Gestational Age Error', 'Probability Distribution')
+## use Kernel SHAP to explain test set predictions
+explainer = shap.KernelExplainer(bNet, data.df, link="logit")
+shap_values = explainer.shap_values(data.df, nsamples='auto')
+import pdb; pdb.set_trace()
 
 
+# plot the SHAP values for the Setosa output of the first instance
+#shap.force_plot(explainer.expected_value[0], shap_values[0][0,:], X_test.iloc[0,:], link="logit")
