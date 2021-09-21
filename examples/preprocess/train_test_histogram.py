@@ -11,8 +11,6 @@ from wplotlib import histograms
 data = wuml.wData(xpath='../data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
-data = wuml.center_and_scale(data)
-
 X_train, X_test, y_train, y_test = wuml.split_training_test(data, 'gestAge', data_path='../data/', 
 															test_percentage=0.2, xdata_type="%.4f", ydata_type="%d")
 

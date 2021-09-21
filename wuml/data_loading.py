@@ -55,10 +55,12 @@ class wData:
 	def delete_column(self, column_name):
 		if type(column_name) == type([]):
 			for name in column_name:
-				del self.df[name]
+				if name in self.df.columns:
+					del self.df[name]
 
 		elif type(column_name) == type(''):
-			del self.df[column_name]
+			if column_name in self.df.columns:
+				del self.df[column_name]
 
 	def info(self):
 		print(self.df.info())

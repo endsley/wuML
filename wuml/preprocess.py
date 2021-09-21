@@ -175,7 +175,7 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 	return X, ignore_column_with_0_σ
 
-def split_training_test(wData, data_name, data_path='./data/', test_percentage=0.2, xdata_type="%.4f", ydata_type="%d"):
+def split_training_test(wData, data_name, data_path='./data/', save_as='ndarray', test_percentage=0.2, xdata_type="%.4f", ydata_type="%d"):
 	X = wData.X
 	Y = wData.Y
 
@@ -187,11 +187,22 @@ def split_training_test(wData, data_name, data_path='./data/', test_percentage=0
 	Test_dat = data_path + data_name + '_test.csv'
 	Test_label_dat = data_path + data_name + '_test_label.csv'
 
-	np.savetxt(Train_dat, X_train, delimiter=',', fmt=xdata_type) 
-	np.savetxt(Train_label_dat, y_train, delimiter=',', fmt=ydata_type) 
 
-	np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
-	np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
+	if save_as == 'ndarray':
+		np.savetxt(Train_dat, X_train, delimiter=',', fmt=xdata_type) 
+		np.savetxt(Train_label_dat, y_train, delimiter=',', fmt=ydata_type) 
+
+		np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
+		np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
+	elif save_as == 'DataFrame':
+		XTrain_df = pd.DataFrame(data=X_train, columns=wData.df.columns)
+		XTest_df =  pd.DataFrame(data=X_test, columns=wData.df.columns)
+
+		XTrain_df['label'] = y_train
+		XTest_df['label'] = y_test
+
+		XTrain_df.to_csv(Train_dat, index=False, header=True)
+		XTest_df.to_csv(Test_dat, index=False, header=True)
 
 	return [X_train, X_test, y_train, y_test]
 

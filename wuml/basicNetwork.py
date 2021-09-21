@@ -218,6 +218,9 @@ class basicNetwork:
 
 		return yout
 
+	def eval(self):		#	Turn this on to run test results
+		self.model.eval()
+
 	def train(self, print_status=True):
 		param = self.model.parameters()
 		[ℓ, TL, mE, Dev] = [self.costFunction, self.trainLoader, self.max_epoch, self.device]
