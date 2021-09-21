@@ -17,3 +17,4 @@ from .classifiers import *
 from .sampling import *
 from .distribution_modeling import *
 from .operations import *
+from .matrix_manipulate import *

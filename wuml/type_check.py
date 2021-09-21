@@ -3,6 +3,22 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
+
+def ensure_DataFrame(data):
+	if type(data).__name__ == 'ndarray': 
+		df = pd.DataFrame(data)
+	elif type(data).__name__ == 'wData': 
+		df = data.df
+	elif type(data).__name__ == 'DataFrame': 
+		df = data
+	elif type(data).__name__ == 'Tensor': 
+		X = data.detach().cpu().numpy()
+		df = pd.DataFrame(X)
+
+	return df
+
+
+
 def ensure_numpy(data, rounding=None):
 	if type(data).__name__ == 'ndarray': 
 		if len(data.shape) == 1:
