@@ -118,10 +118,11 @@ class basicNetwork:
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
-						flatten_network_output_during_usage=False):
+						network_usage_output_type='Tensor', network_usage_output_dim='none'): 
 		'''
 			possible activation functions: softmax, relu, tanh, sigmoid, none
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
+			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
 #		self.trainLoader = X.get_data_as('DataLoader')
 #
@@ -133,6 +134,9 @@ class basicNetwork:
 #		self.NetStructure = networkStructure
 #		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 #		self.model = flexable_Model(X.shape[1], networkStructure)
+
+		self.network_usage_output_type = network_usage_output_type
+		self.network_usage_output_dim = network_usage_output_dim
 
 		if simplify_network_for_storage is None:
 			#	X should be in wuml format
@@ -147,7 +151,6 @@ class basicNetwork:
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 			self.model = flexable_Model(X.shape[1], networkStructure)
 			self.network_output_in_CPU_during_usage = False
-			self.flatten_network_output_during_usage = flatten_network_output_during_usage
 		else:
 			self.costFunction = costFunction
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
@@ -160,7 +163,6 @@ class basicNetwork:
 			self.NetStructure = θ.NetStructure
 			self.model = θ.model
 			self.network_output_in_CPU_during_usage = True
-			self.flatten_network_output_during_usage = flatten_network_output_during_usage
 
 
 		if torch.cuda.is_available(): 
@@ -202,10 +204,13 @@ class basicNetwork:
 
 		yout = self.model(x)
 
-		if self.flatten_network_output_during_usage:
+		if self.network_usage_output_dim == 0 or self.network_usage_output_dim == 1:
 			yout = torch.squeeze(yout)
+		if self.network_usage_output_dim == 2:
+			yout = torch.atleast_2d(yout)
 
-		if output_type == 'ndarray':
+
+		if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
 			return yout.detach().cpu().numpy()
 		elif self.network_output_in_CPU_during_usage:
 			return yout.detach().cpu()

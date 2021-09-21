@@ -143,7 +143,8 @@ def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_thre
 def center_and_scale(wuData):
 	X = wuData.get_data_as('ndarray')
 	X = preprocessing.scale(X)
-	wuData.df = pd.DataFrame(X)
+
+	wuData.df = pd.DataFrame(data=X, columns=wuData.df.columns)
 	wuData.X = wuData.df.values
 	return wuData
 
@@ -192,6 +193,8 @@ def split_training_test(wData, data_name, data_path='./data/', test_percentage=0
 	np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
 	np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
 
+	return [X_train, X_test, y_train, y_test]
+
 def gen_10_fold_data(data_name, data_path='./data/'):
 
 	xpath = data_path + data_name
@@ -204,17 +207,6 @@ def gen_10_fold_data(data_name, data_path='./data/'):
 		pass
 	else:
 		os.mkdir(fold_path)
-
-
-	#if os.path.exists(fold_path): 
-	#	txt = input("There's already a 10 fold data for %s, generate a new set? (y/N)"%data_name)
-	#	if txt == 'y':
-	#		pass
-	#	else:
-	#		return
-	#else:
-	#	os.mkdir(fold_path)
-
 
 	kf = KFold(n_splits=10, shuffle=True)
 	kf.get_n_splits(X)
