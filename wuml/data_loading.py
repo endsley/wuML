@@ -76,7 +76,7 @@ class wData:
 		if data_type == 'ndarray': 
 			#self.df.values[subset]
 			return self.df.values
-		if data_type == 'DataLoader' and self.torchloader is None: 
+		if data_type == 'DataLoader':		# and self.torchloader is None 
 			self.DM = wuml.DManager(self.df.values, self.Y)
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader

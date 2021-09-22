@@ -1,6 +1,0 @@
-Original dataFrame dimension : 1177 samples,  24 dimensions
-Deciated dataFrame dimension : 1122 samples,  24 dimensions
-Removed Rows missing at least these percentage of entries : 0.100
-
-ID of Removed Rows
-{1032, 2316, 3084, 2064, 3093, 1046, 1051, 3119, 2882, 2118, 2120, 2122, 2379, 2890, 2127, 2128, 2130, 2386, 2389, 2393, 2138, 7001, 2396, 8041, 2161, 8054, 6007, 6008, 7032, 7036, 7040, 7041, 7045, 5000, 5001, 2443, 7051, 2447, 5010, 2462, 7072, 2473, 2474, 2255, 3023, 3024, 3028, 2264, 2266, 2267, 7138, 1014, 3066, 3067, 1020}

@@ -141,7 +141,7 @@ class basicNetwork:
 		if simplify_network_for_storage is None:
 			#	X should be in wuml format
 			self.trainLoader = X.get_data_as('DataLoader')
-	
+
 			self.lr = learning_rate
 			self.max_epoch = max_epoch
 			self.X_dataType = X_dataType

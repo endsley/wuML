@@ -155,6 +155,7 @@ class summarize_regression_result:
 		
 		self.y = y
 		self.ŷ = ŷ
+		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
 
 		self.Δy = np.absolute(self.ŷ - self.y)
 
@@ -172,13 +173,18 @@ class summarize_regression_result:
 					xlabel='Error Amount', ylabel='Error count',
 					facecolor='blue', α=0.5, path=None)
 		
-	def true_vs_predict(self, write_path=None):
+	def true_vs_predict(self, write_path=None, sort_based_on_label=False):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
-		B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
-		avg_Δ = self.avg_error()
 
+		if sort_based_on_label:
+			Yjoing = np.hstack((self.y, self.ŷ))
+			sorted_df = wuml.sort_matrix_rows_by_a_column(Yjoing, 0)
+			B = wuml.pretty_np_array(sorted_df.values)
+		else: B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
+		avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
 		C = avg_Δ + A + B
 	
 		if write_path is not None: wuml.write_to(C, write_path)
+		return C
 	
 

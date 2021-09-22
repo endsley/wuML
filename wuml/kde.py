@@ -1,5 +1,5 @@
 
-
+import wuml
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -26,6 +26,9 @@ class KDE:
 	def generate_samples(self, num_of_samples):
 		return self.kde.sample(num_of_samples, random_state=0)
 
+	def integrate(self, x0, x1):	# This only works for 1D data
+		[result, error] = wuml.integrate(self, x0, x1)
+		return result
 
 	def __call__(self, data, return_log_likelihood=False):
 		X = ensure_numpy(data)
