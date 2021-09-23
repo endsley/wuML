@@ -8,10 +8,10 @@ import wuml
 #	x3 has no influence
 #	x4 has negative influence
 
-X = np.random.randn(30, 4)
+X = np.random.rand(30, 4)
 Y = []
 for m in range(X.shape[0]):
-	y = X[m,0] + X[m,1] + X[m,0]*X[m,1] - 4*X[m,3] - X[m,3]*X[m,3] + 0.2*np.random.randn()
+	y = 5*X[m,0] + X[m,1] + X[m,0]*X[m,1] - 8*X[m,3] - 2*X[m,3]*X[m,3] + 0.01*np.random.randn()
 	Y.append(y)
 
 dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
