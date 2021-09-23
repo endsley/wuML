@@ -17,4 +17,3 @@ for m in range(X.shape[0]):
 dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
 dat.to_csv('shap_regress_example.csv', add_row_indices=False, include_column_names=True)
 
-import pdb; pdb.set_trace()

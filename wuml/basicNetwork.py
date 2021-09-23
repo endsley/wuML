@@ -53,13 +53,13 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 
 	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
 	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
-	paramLen = len(signature(loss_function).parameters) # number of arguments
 
 	if type(loss_function).__name__ == 'str':
 		if loss_function == 'mse':
 			loss_function = nn.MSELoss()
 		elif loss_function == 'L1':
 			loss_function = nn.L1Loss()
+	paramLen = len(signature(loss_function).parameters) # number of arguments
 
 
 	for epoch in range(max_epoch):
@@ -124,17 +124,6 @@ class basicNetwork:
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
-#		self.trainLoader = X.get_data_as('DataLoader')
-#
-#		self.lr = learning_rate
-#		self.max_epoch = max_epoch
-#		self.X_dataType = X_dataType
-#		self.Y_dataType = Y_dataType
-#		self.costFunction = costFunction
-#		self.NetStructure = networkStructure
-#		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-#		self.model = flexable_Model(X.shape[1], networkStructure)
-
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
 
@@ -218,7 +207,8 @@ class basicNetwork:
 
 		return yout
 
-	def eval(self):		#	Turn this on to run test results
+	def eval(self, output_type='ndarray'):		#	Turn this on to run test results
+		self.network_usage_output_type = output_type
 		self.model.eval()
 
 	def train(self, print_status=True):

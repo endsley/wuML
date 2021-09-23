@@ -47,7 +47,7 @@ def initialize_empty_folder(path):
 	ensure_path_exists(path)
 	remove_files(path)
 
-def file_exists(path):
+def path_exists(path):
 	if os.path.exists(path): return True
 	return False
 
