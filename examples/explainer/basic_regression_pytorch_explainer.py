@@ -17,7 +17,7 @@ from torch.autograd import Variable
 ##	x4 has negative influence
 #
 
-data = wuml.wData(xpath='examples/data/shap_regress_example.csv', batch_size=20, 
+data = wuml.wData(xpath='../data/shap_regress_example.csv', batch_size=20, 
 					label_type='continuous', label_column_name='label', 
 					row_id_with_label=0)
 
