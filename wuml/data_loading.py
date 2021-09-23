@@ -10,7 +10,7 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 
 class wData:
-	def __init__(self, xpath=None, ypath=None, label_column_name=None, dataFrame=None, 
+	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
 					X_npArray=None, Y_npArray=None, row_id_with_label=None, sample_id_included=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None):
@@ -20,15 +20,17 @@ class wData:
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 		'''
+		self.label_column_name = label_column_name
+
 		if dataFrame is not None:
 			self.df = dataFrame
 		elif X_npArray is not None:
-			self.df = pd.DataFrame(X_npArray)
+			self.df = pd.DataFrame(X_npArray, columns=column_names)
 		else:
 			self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
 
 
-
+		self.Y = None
 		if Y_npArray is not None:
 			self.Y = Y_npArray
 		elif ypath is not None: 
@@ -81,8 +83,19 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader
 
-	def to_csv(self, path, add_row_indices=False, include_column_names=True):
-		self.df.to_csv(path, index=add_row_indices, header=include_column_names)
+	def to_csv(self, path, add_row_indices=False, include_column_names=True, float_format='%.4f'):
+		LCn = self.label_column_name
+
+		if LCn is not None:
+			self.df[LCn] = self.Y
+			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
+			self.delete_column(LCn)
+		elif self.Y is not None:
+			self.df['label'] = self.Y
+			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format )
+			self.delete_column('label')
+		else:
+			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 
 	def __getitem__(self, item):
 		return self.df.values[item]
