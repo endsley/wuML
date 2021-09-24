@@ -7,8 +7,7 @@ pip install wuml
 
 
 ## Distribution Modeling
-[website (https://stackoverflow.com)][KDE Example]
-
+[KDE Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/markdown/basicKDE_estimate.md)
 
 
 
