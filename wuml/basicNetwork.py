@@ -222,7 +222,7 @@ class basicNetwork:
 		[ℓ, TL, mE, Dev] = [self.costFunction, self.trainLoader, self.max_epoch, self.device]
 		[Xtype, Ytype] = [self.X_dataType, self.Y_dataType]
 
-		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, 
+		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, print_status=print_status,
 				max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype, 
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
