@@ -54,11 +54,17 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
 	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
 
+	# For all loss check https://neptune.ai/blog/pytorch-loss-functions
 	if type(loss_function).__name__ == 'str':
 		if loss_function == 'mse':
 			loss_function = nn.MSELoss()
 		elif loss_function == 'L1':
 			loss_function = nn.L1Loss()
+		elif loss_function == 'CE':
+			loss_function = nn.CrossEntropyLoss()
+		elif loss_function == 'hindge':
+			loss_function = nn.HingeEmbeddingLoss()
+
 	paramLen = len(signature(loss_function).parameters) # number of arguments
 
 
