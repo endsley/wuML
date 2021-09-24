@@ -101,5 +101,5 @@ class wData:
 		return self.df.values[item]
 
 	def __str__(self): 
-		print(self.df)
+		return str(self.df)
  
