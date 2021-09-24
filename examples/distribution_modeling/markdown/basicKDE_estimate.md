@@ -46,7 +46,7 @@ H.show()
 
 
     
-![png](output_0_1.png)
+![png](https://github.com/endsley/wuML/blob/main/examples/img/KDE_estimation.png?raw=true)
     
 
 

@@ -6,7 +6,12 @@ pip install wuml
 ```
 
 
-## Decimate Data with Missing data and Impute the rest
+## Distribution Modeling
+[website (https://stackoverflow.com)][KDE Example]
+
+
+
+
 ```python
 #!/usr/bin/env python
 
