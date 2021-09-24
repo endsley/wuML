@@ -8,7 +8,7 @@ pip install wuml
 
 ## Examples Usages
 
-## Distribution Modeling
+### Distribution Modeling
 [KDE Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/markdown/basicKDE_estimate.md)
 
 
