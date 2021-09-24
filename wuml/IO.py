@@ -8,9 +8,10 @@ import pickle
 import numpy as np
 import wuml
 import wplotlib
+import pandas as pd
 from pathlib import Path
 
-def set_terminal_print_options(precision=2):
+def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
 	np.set_printoptions(linewidth=400)
 	np.set_printoptions(suppress=True)
@@ -19,6 +20,9 @@ def set_terminal_print_options(precision=2):
 	torch.set_printoptions(sci_mode=False)
 	torch.set_printoptions(precision=precision)
 	torch.set_printoptions(linewidth=400)
+
+	pd.set_option("display.max_rows", 500)
+	pd.set_option("precision", precision)
 
 def read_txt_file(path):
 	f = open(path, 'r')

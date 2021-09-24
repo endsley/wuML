@@ -41,8 +41,8 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 	#	Obtain a decimated dataframe
 	limitPer = int(d * threshold)
 	df_decimated = df.dropna(thresh=limitPer, axis=0)
-	oldID = df['id'].values.tolist()
-	newID = df_decimated['id'].values.tolist()
+	oldID = df.index.values.tolist()
+	newID = df_decimated.index.values.tolist()
 	removed_samples = set(oldID).difference(newID)
 
 	#	Record the results
