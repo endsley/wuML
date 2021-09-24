@@ -1,0 +1,6 @@
+Original dataFrame dimension : 15 samples,  4 dimensions
+Deciated dataFrame dimension : 12 samples,  4 dimensions
+Removed Rows missing at least these percentage of entries : 0.300
+
+ID of Removed Rows
+{0, 13, 14}
