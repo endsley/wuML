@@ -20,19 +20,30 @@ def costFunction(x, y, ŷ, ind):
 	ŷ = torch.squeeze(ŷ)
 	return torch.sum((y- ŷ) ** 2)	
 
+#	Create network and train
 bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001)
-bNet.train()
+bNet.train(print_status=False)
+Ŷ = bNet(data, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
 
-#	Test out on test data
+
+#	Check out our predictions
+SR = wuml.summarize_regression_result(data.Y, Ŷ)
+print(SR.true_vs_predict())
+
+
+
+
+#	Draw the regression line
 newX = np.expand_dims(np.arange(0,5,0.1),1)
-Ŷ = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+Ŷline = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+
 
 #	plot the results out
 splot = wplotlib.scatter()
 splot.add_plot(data.X, data.Y, marker='o')
 
 lp = wplotlib.lines()	
-lp.add_plot(newX, Ŷ)
+lp.add_plot(newX, Ŷline)
 
 splot.show(title='Basic Network Regression', xlabel='x-axis', ylabel='y-axis')
 

@@ -177,7 +177,7 @@ class summarize_regression_result:
 					xlabel='Error Amount', ylabel='Error count',
 					facecolor='blue', α=0.5, path=None)
 		
-	def true_vs_predict(self, write_path=None, sort_based_on_label=False):
+	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=True):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
 
 		if sort_based_on_label:
@@ -188,6 +188,7 @@ class summarize_regression_result:
 		avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
 		C = avg_Δ + A + B
 	
+		if print_result: print(C)
 		if write_path is not None: wuml.write_to(C, write_path)
 		return C
 	
