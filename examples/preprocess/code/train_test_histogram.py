@@ -3,16 +3,19 @@
 import wuml
 import sklearn
 import wplotlib
-import numpy as np
 from wplotlib import histograms
 
 
-data = wuml.wData(xpath='../data/Chem_decimated_imputed.csv', batch_size=20, 
+data = wuml.wData(xpath='../../data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
-X_train, X_test, y_train, y_test = wuml.split_training_test(data, 'gestAge', data_path='../data/', save_as='DataFrame',
+
+# data_path : will save the the files gestAge_train.csv and gestAge_test.csv to ../../data folder
+# test_percentage : 0.1 implies that 90% will be training and 10% will be test
+X_train, X_test, y_train, y_test = wuml.split_training_test(data, 'gestAge', data_path='../../data/', save_as='DataFrame',
 															test_percentage=0.1, xdata_type="%.4f", ydata_type="%d")
 
+#	Here, we will plot out the histogram of labels between training and test
 H = histograms()
 H.histogram(y_train, num_bins=10, title='Training Label Distribution', 
 			subplot=121, facecolor='green', α=0.5, showImg=False, normalize=False)

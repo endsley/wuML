@@ -9,7 +9,8 @@ pip install wuml
 ## Examples Usages
 
 ### Data Preprocessing
-[Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/basicKDE_estimate.ipynb) \
+[Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
+[Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.py.ipynb) \
 
 
 
