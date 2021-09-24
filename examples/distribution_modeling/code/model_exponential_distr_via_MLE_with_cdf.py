@@ -5,12 +5,12 @@ import wplotlib
 import numpy as np
 
 
-data = wuml.wData(xpath='../data/Chem_decimated_imputed.csv', batch_size=20, 
+data = wuml.wData(xpath='../../data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
 data = wuml.center_and_scale(data)
 
-bN= wuml.pickle_load('./tmp/4496/best_network.pk')
+bN= wuml.pickle_load('./network_saved/best_network.pk')
 Ŷ = np.squeeze(bN(data, output_type='ndarray'))
 ε = np.absolute(data.Y - Ŷ)
 E = wuml.model_as_exponential(ε)
