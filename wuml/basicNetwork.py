@@ -130,6 +130,7 @@ class basicNetwork:
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
+		self.print_status_during_training = print_status_during_training
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
 

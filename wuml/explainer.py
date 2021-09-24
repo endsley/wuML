@@ -1,6 +1,7 @@
 
 
 import shap		#pip install shap
+import sys
 import wuml
 import numpy as np
 
@@ -10,7 +11,7 @@ class explainer():
 						load_network_path=None,								# You can load your own pytorch network
 						loss='mse',  										#use these options if you use a default regression
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=1000, learning_rate=0.001):
+						max_epoch=1000, learning_rate=0.001, print_network_training_status=True):
 
 		'''
 			loss: Can be str : 'mse', 'L1', 'CE', 'hindge' or you can define your own loss function
@@ -21,6 +22,11 @@ class explainer():
 
 		if explainer_algorithm == 'shap':
 			if load_network_path is not None:	
+				if type(load_network_path) != type(''): 
+					print('\nError : load_network_path is a string that you load the network, it must be a basicNetwork type!!!')
+					print('\tIf you want to input a function, use model=yourFunction argument instead!!!\n')
+					sys.exit()
+					
 				self.net = wuml.pickle_load(load_network_path)
 				self.net.eval(output_type='ndarray')
 				self.Explr = shap.KernelExplainer(self.net, np.zeros((1, X.shape[1])), link=link)		
@@ -28,7 +34,7 @@ class explainer():
 				self.Explr = shap.KernelExplainer(model, np.zeros((1, X.shape[1])), link=link)
 			else:
 				self.net = wuml.basicNetwork(loss, data, networkStructure=networkStructure, max_epoch=max_epoch, learning_rate=learning_rate)
-				self.net.train()
+				self.net.train(print_status=print_network_training_status)
 				self.net.eval(output_type='ndarray')
 				self.Explr = shap.KernelExplainer(self.net, np.zeros((1, X.shape[1])), link=link)		#, l1_reg=False
 
