@@ -79,7 +79,7 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 			x= x.to(device, non_blocking=True )
 			y= y.to(device, non_blocking=True )
 			optimizer.zero_grad()
-			
+
 			if model is not None:
 				ŷ = model(x)
 
@@ -89,7 +89,8 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 					loss = loss_function(x, y, ind)
 				elif paramLen == 2:
 					ŷ = torch.squeeze(ŷ)
-					loss = loss_function(y, ŷ)
+					#loss = loss_function(y, ŷ)
+					loss = loss_function(ŷ,y)
 			else:
 				try:
 					loss = loss_function(x, y, ind)
@@ -126,6 +127,7 @@ class basicNetwork:
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
 						network_usage_output_type='Tensor', network_usage_output_dim='none'): 
 		'''
+			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 			network_usage_output_dim: network output dimension, 0, 1 or 2
@@ -167,6 +169,13 @@ class basicNetwork:
 
 		self.info()
 
+
+		#	Catch some errors
+		if costFunction == 'CE' and X.label_type == 'continuous':
+			print("\n the data label_type should not be continuous when using 'CE' as costFunction during classification!!!\n")
+		elif costFunction == 'hindge' and X.label_type == 'continuous':
+			print("\n the data label_type should not be continuous when using 'hindge' as costFunction during classification!!!\n")
+
 	def info(self, printOut=True):
 		 
 		info_str ='Network Info:\n'
@@ -184,7 +193,10 @@ class basicNetwork:
 		if printOut: print(info_str)
 		return info_str
 
-	def __call__(self, data, output_type='Tensor'):
+	def __call__(self, data, output_type='Tensor', out_structural=None):
+		'''
+			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
+		'''
 		if type(data).__name__ == 'ndarray': 
 			x = torch.from_numpy(data)
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
@@ -204,6 +216,12 @@ class basicNetwork:
 		if self.network_usage_output_dim == 2:
 			yout = torch.atleast_2d(yout)
 
+
+		if out_structural == '1d_labels':
+			_, yout = torch.max(yout, 1)
+		elif out_structural == 'one_hot':
+			_, yout = torch.max(yout, 1)
+			yout = wuml.one_hot_encoding(yout, output_data_type='same')
 
 		if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
 			return yout.detach().cpu().numpy()

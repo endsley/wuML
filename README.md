@@ -15,7 +15,10 @@ pip install wuml
 
 ### Build Neural Networks via Pytorch
 [Simple Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
-[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) 
+[Split data to Train/Test and Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/train_test_on_basic_network.ipynb) \
+[Weighted Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/weighted_regression.ipynb) \
+\
+[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) \
 
 
 ### Distribution Modeling

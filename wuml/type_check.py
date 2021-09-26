@@ -5,6 +5,19 @@ import pandas as pd
 from torch.autograd import Variable
 
 
+def data_type(data):
+	return type(data).__name__
+
+def ensure_data_type(data, type_name='ndarray'):
+
+	if type_name=='ndarray':
+		return ensure_numpy(data)
+	elif type_name=='DataFrame':
+		return ensure_DataFrame(data)
+	elif type_name=='Tensor':
+		return ensure_tensor(data)
+
+
 def ensure_DataFrame(data):
 	if type(data).__name__ == 'ndarray': 
 		df = pd.DataFrame(data)
@@ -17,7 +30,6 @@ def ensure_DataFrame(data):
 		df = pd.DataFrame(X)
 
 	return df
-
 
 
 def ensure_numpy(data, rounding=None):

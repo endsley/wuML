@@ -14,8 +14,9 @@ from sklearn.metrics import accuracy_score
 #				networkStructure=[(100,'relu'),(100,'relu'),(1,'softmax')]
 #		2. Define a cost function
 #		3. Call train()
+#		4. Display results
 
-data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', batch_size=20)
+data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv', batch_size=20, label_type='discrete')
 
 def costFunction(x, y, ŷ, ind):
 	lossFun = nn.CrossEntropyLoss() 
@@ -24,13 +25,18 @@ def costFunction(x, y, ŷ, ind):
 
 
 #It is important for pytorch that with classification, you need to define Y_dataType=torch.int64
-bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-						Y_dataType=torch.int64, max_epoch=3000, learning_rate=0.001)
-bNet.train()
-netOutput = bNet(data.X)
+#You can define a costFunction, but for classification it can be directly set to 'CE'
+#bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
+bNet = wuml.basicNetwork('CE', data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
+						Y_dataType=torch.LongTensor, max_epoch=100, learning_rate=0.001)
+bNet.train(print_status=False)
 
-#	Output Accuracy
-_, Ŷ = torch.max(netOutput, 1)
-Acc= accuracy_score(data.Y, Ŷ.cpu().numpy())
-print('Accuracy: %.3f'%Acc)
+#	Report Results
+Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
+CR = wuml.summarize_classification_result(data.Y, Ŷ)
+print('\nAve Error : %.3f\n\n'%CR.avg_error())
+CR.true_vs_predict(sort_based_on_label=True)
+import pdb; pdb.set_trace()
+
+
 

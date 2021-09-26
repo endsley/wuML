@@ -10,6 +10,7 @@ import wuml
 import wplotlib
 import pandas as pd
 from pathlib import Path
+from sklearn.metrics import accuracy_score
 
 def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
@@ -176,6 +177,51 @@ class summarize_regression_result:
 		H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
 					xlabel='Error Amount', ylabel='Error count',
 					facecolor='blue', α=0.5, path=None)
+		
+	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=True):
+		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
+
+		if sort_based_on_label:
+			Yjoing = np.hstack((self.y, self.ŷ))
+			sorted_df = wuml.sort_matrix_rows_by_a_column(Yjoing, 0)
+			B = wuml.pretty_np_array(sorted_df.values)
+		else: B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
+		avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
+		C = avg_Δ + A + B
+	
+		if print_result: print(C)
+		if write_path is not None: wuml.write_to(C, write_path)
+		return C
+	
+
+class summarize_classification_result:
+	def __init__(self, y, ŷ):
+		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
+		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
+	
+		if y.shape[0] == 1: y = y.T
+		if ŷ.shape[0] == 1: ŷ = ŷ.T
+		
+		self.y = y
+		self.ŷ = ŷ
+		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
+
+		self.Δy = np.absolute(self.ŷ - self.y)
+
+	def avg_error(self):
+		Acc= accuracy_score(self.y, self.ŷ)
+		return Acc
+
+	def error_histogram(self):
+		pass
+
+		#Δy = self.Δy
+		#avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
+	
+		#H = wplotlib.histograms()
+		#H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
+		#			xlabel='Error Amount', ylabel='Error count',
+		#			facecolor='blue', α=0.5, path=None)
 		
 	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=True):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))

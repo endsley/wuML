@@ -50,6 +50,7 @@ class wData:
 		self.shape = self.df.shape
 		self.torchDataType = torchDataType				
 		self.torchloader = None
+		self.label_type = label_type
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
