@@ -34,7 +34,7 @@ bNet.train()
 #	Report Results
 Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
 CR = wuml.summarize_classification_result(data.Y, Ŷ)
-print('\nAve Error : %.3f\n\n'%CR.avg_error())
+print('\nAccuracy : %.3f\n\n'%CR.avg_error())
 CR.true_vs_predict(sort_based_on_label=True)
 import pdb; pdb.set_trace()
 
