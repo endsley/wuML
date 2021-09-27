@@ -26,6 +26,6 @@ pip install wuml
 
 
 ### Explaining Models
-[Run Shap on data between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/regression_pytorch_explainer_uniform.ipynb) \
+[Run Shap on data between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_uniform.ipynb) \
 
 
