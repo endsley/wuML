@@ -10,16 +10,12 @@ import wuml
 '''
 
 wuml.set_terminal_print_options(precision=3)
-data = wuml.wData('../../data/missin_example.csv', row_id_with_label=0)
-print(data)
-
+data = wuml.wData('../../data/chem.exposures.csv', row_id_with_label=0)
+data.delete_column('Unnamed: 0')	# remove multiple unnecessary columns by name
 
 #	column_threshold=0.95, this will keep features that are at least 95% full
 #	Note that an id column is "required" for this process to document which rows are removes
-dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.50, row_threshold=0.70,newDataFramePath='')
-print(dataDecimated)
-
+dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.90, row_threshold=0.90,newDataFramePath='')
 X = wuml.impute(dataDecimated, ignore_first_index_column=True)		# perform mice imputation
-
-print(dataDecimated)
-
+X.to_csv('../../data/Chem_decimated_imputed.csv')	
+print(dataDecimated.shape)
