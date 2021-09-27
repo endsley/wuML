@@ -8,7 +8,7 @@ import wuml
 ##	x4 has negative influence
 #
 
-data = wuml.wData(xpath='../data/shap_regress_example.csv', batch_size=20, 
+data = wuml.wData(xpath='../../data/shap_regress_example_uniform.csv', batch_size=20, 
 					label_type='continuous', label_column_name='label', 
 					row_id_with_label=0)
 
@@ -21,9 +21,7 @@ EXP = wuml.explainer(data, 	loss='mse',		# This will create a network for regres
 # Show the regression results
 Ŷ = EXP.net(data, output_type='ndarray')
 SR_train = wuml.summarize_regression_result(data.Y, Ŷ)
-O = SR_train.true_vs_predict()
-print(O)
-
+print(SR_train.true_vs_predict())
 
 # Show the explanation results
 explanation = EXP(data)	# outputs the weight importance

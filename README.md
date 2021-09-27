@@ -15,10 +15,9 @@ pip install wuml
 
 ### Build Neural Networks via Pytorch
 [Simple Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
-[Split data to Train/Test and Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/train_test_on_basic_network.ipynb) \
 [Weighted Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/weighted_regression.ipynb) \
 \
-[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) \
+[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) 
 
 
 ### Distribution Modeling
@@ -26,5 +25,7 @@ pip install wuml
 [Maximum Likelihood on Exponential Distribution Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/basic_exponential_MLE_modeling.ipynb)
 
 
+### Explaining Models
+[Run Shap on data between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/regression_pytorch_explainer_uniform.ipynb) \
 
 
