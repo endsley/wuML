@@ -223,7 +223,7 @@ class summarize_classification_result:
 		#			xlabel='Error Amount', ylabel='Error count',
 		#			facecolor='blue', α=0.5, path=None)
 		
-	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=True):
+	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=False):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
 
 		if sort_based_on_label:

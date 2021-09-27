@@ -82,6 +82,8 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 
 			if model is not None:
 				ŷ = model(x)
+				ŷ = torch.squeeze(ŷ)
+				y = torch.squeeze(y)
 
 				if paramLen == 4:
 					loss = loss_function(x, y, ŷ, ind)

@@ -1,42 +1,32 @@
 #!/usr/bin/env python
 
-import wuml
+import wuml 
 import numpy as np
-import torch
-import torch.nn as nn
-import wplotlib
-from sklearn.metrics import accuracy_score
+import scipy.stats
+from wplotlib import histograms
+from wplotlib import lines
 
 
-#	The idea of training a neural network boils down to 3 steps
-#		1. Define a network structure
-#			Example: This is a 3 layer network with 100 node width
-#				networkStructure=[(100,'relu'),(100,'relu'),(1,'softmax')]
-#		2. Define a cost function
-#		3. Call train()
-#		4. Display results
+	
+	
+'''
+	Identifies a weight associated with each sample based on its likelihood. 
+	Given p(X1) > p(Xi) for all i
+	Using KDE if p(X1)/p(X2)=2  the weight for X1 = 1, and X2 = 2
+	This means that if X1 is the most likely samples and if X1 is 
+	2 times more likely than X2, then X1 would have a weight of 1
+	and X2 would have a weight of 2.
+	This weight can then be used to balance the sample importance for regression
 
-data = wuml.wData(xpath='./examples/data/wine.csv', ypath='./examples/data/wine_label.csv', batch_size=20, label_type='discrete')
+'''
 
-def costFunction(x, y, ŷ, ind):
-	lossFun = nn.CrossEntropyLoss() 
-	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3	
-	return loss
-
-
-#It is important for pytorch that with classification, you need to define Y_dataType=torch.int64
-#You can define a costFunction, but for classification it can be directly set to 'CE'
-#bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-bNet = wuml.basicNetwork('CE', data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-						Y_dataType=torch.LongTensor, max_epoch=100, learning_rate=0.001)
-bNet.train()
-
-#	Report Results
-Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
-CR = wuml.summarize_classification_result(data.Y, Ŷ)
-print('\nAccuracy : %.3f\n\n'%CR.avg_error())
-CR.true_vs_predict(sort_based_on_label=True)
+data = wuml.wData('examples/data/Chem_decimated_imputed.csv', row_id_with_label=0)
+data.delete_column('id')	# the id should not be part of the likelihood 
+sample_weights = wuml.get_likelihood_weight(data)
 import pdb; pdb.set_trace()
 
+H = histograms()
+H.histogram(sample_weights.X, num_bins=20, title='Sample Weight Histogram', facecolor='blue', α=0.5, path=None)
+sample_weights.to_csv('../data/Chem_sample_weights.csv', include_column_names=False)
 
 
