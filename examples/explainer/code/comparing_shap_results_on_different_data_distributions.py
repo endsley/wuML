@@ -43,7 +43,7 @@ print(explanation)
 
 
 #	Example 3
-Udata = wuml.use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData')
+Udata = wuml.use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData')
 EXP3 = wuml.explainer(Udata, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(600,'relu'),(600,'relu'),(600,'relu'),(1,'none')], 
 						max_epoch=600, learning_rate=0.001, print_network_training_status=True)

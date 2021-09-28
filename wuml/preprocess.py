@@ -259,7 +259,7 @@ def get_likelihood_weight(data):
 	return wuml.wData(X_npArray=ratios)
 
 
-def use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
+def use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 	X = ensure_numpy(data)
 	n = X.shape[0]
 	d = X.shape[1]
