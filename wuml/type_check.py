@@ -1,5 +1,6 @@
 
 import numpy as np
+import wuml
 import torch
 import pandas as pd
 from torch.autograd import Variable
@@ -16,18 +17,35 @@ def ensure_data_type(data, type_name='ndarray'):
 		return ensure_DataFrame(data)
 	elif type_name=='Tensor':
 		return ensure_tensor(data)
+	elif type_name=='wData':
+		return ensure_wData(data)
+
+def ensure_wData(data):
+	if type(data).__name__ == 'ndarray': 
+		return wuml.wData(X_npArray=data)
+	elif type(data).__name__ == 'wData': 
+		return data
+	elif type(data).__name__ == 'DataFrame': 
+		return wuml.wData(dataFrame=data, column_names=data.columns)
+	elif type(data).__name__ == 'Tensor': 
+		X = data.detach().cpu().numpy()
+		return wuml.wData(X_npArray=X)
 
 
-def ensure_DataFrame(data):
+def ensure_DataFrame(data, columns=None):
 	if type(data).__name__ == 'ndarray': 
 		df = pd.DataFrame(data)
 	elif type(data).__name__ == 'wData': 
 		df = data.df
+		df.columns = data.df.columns
 	elif type(data).__name__ == 'DataFrame': 
 		df = data
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)
+	
+	if columns is not None:
+		df.columns = columns
 
 	return df
 

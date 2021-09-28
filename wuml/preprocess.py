@@ -258,3 +258,46 @@ def get_likelihood_weight(data):
 	ratios = np.exp(max_likely - logLike)
 	return wuml.wData(X_npArray=ratios)
 
+
+def use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
+	X = ensure_numpy(data)
+	n = X.shape[0]
+	d = X.shape[1]
+
+	newX = np.zeros(X.shape)
+
+	for i in range(d):
+		column = X[:,i]
+		residual_dat = column[np.isnan(column) == False]
+		minV = np.min(residual_dat) - 3
+
+		if len(residual_dat) < 5:
+			print('Error: column %d only has %d samples, you must at least have 6 samples for kde'%(i, len(residual_dat)))
+			print('\nTry Removing this feature')
+			sys.exit()
+
+		if len(np.unique(residual_dat)) == 1:
+			newX[:,i] = np.ones(n)
+		else:
+			Pₓ = wuml.KDE(residual_dat)
+			for j, itm in enumerate(X[:,i]):
+				if np.isnan(itm):
+					newX[j,i] = np.nan
+				else:
+					newX[j,i] = Pₓ.integrate(minV, X[j,i])
+
+
+	#	This ensures that the columns labels are copied correctly
+	if type(data).__name__ == 'ndarray': 
+		df = pd.DataFrame(data)
+	elif type(data).__name__ == 'wData': 
+		df = data.df
+		df.columns = data.df.columns
+	elif type(data).__name__ == 'DataFrame': 
+		df = data
+	elif type(data).__name__ == 'Tensor': 
+		X = data.detach().cpu().numpy()
+		df = pd.DataFrame(X)
+
+	return wuml.ensure_data_type(df, type_name=output_type_name)
+

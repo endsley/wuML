@@ -29,6 +29,8 @@ class wData:
 		else:
 			self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
 
+		if type(self.df.columns).__name__ != 'RangeIndex': 	# if text column names, strip away white space
+			self.df.columns = self.df.columns.str.replace(' ','')
 
 		self.Y = None
 		if Y_npArray is not None:

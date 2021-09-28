@@ -11,7 +11,10 @@ pip install wuml
 ### Data Preprocessing
 [Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
 [Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.ipynb) \
-[Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb) 
+[Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb)\
+\
+[Use Reverse CDF to map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/use_reverse_cdf_to_map_data_to_between_0_and_1.ipynb) 
+
 
 ### Build Neural Networks via Pytorch
 [Simple Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
