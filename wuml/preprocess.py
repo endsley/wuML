@@ -289,12 +289,13 @@ def use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 
 	#	This ensures that the columns labels are copied correctly
 	if type(data).__name__ == 'ndarray': 
-		df = pd.DataFrame(data)
+		df = pd.DataFrame(newX)
 	elif type(data).__name__ == 'wData': 
-		df = data.df
+		df = pd.DataFrame(newX)
 		df.columns = data.df.columns
 	elif type(data).__name__ == 'DataFrame': 
-		df = data
+		df = pd.DataFrame(newX)
+		df.columns = data.columns
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)
