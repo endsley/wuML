@@ -300,5 +300,9 @@ def use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)
 
-	return wuml.ensure_data_type(df, type_name=output_type_name)
+	output = wuml.ensure_data_type(df, type_name=output_type_name)
+	if output_type_name=='wData': 
+		output.Y = data.Y
+		output.label_column_name = data.label_column_name
 
+	return output

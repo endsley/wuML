@@ -6,9 +6,13 @@ import wuml
 ##	x1 x2 has positive influence
 ##	x3 has no influence
 ##	x4 has negative influence
-#
+##
+##	x1 has normal distribution
+##	x2 is exponential distribution but minus 2 so it could be negative
+##	x3 is uniform but shouldn't matter
+##	x4 is categorical distribution.
 
-data = wuml.wData(xpath='examples/data/shap_regress_example_mix_distributions.csv', batch_size=20, 
+data = wuml.wData(xpath='../../data/shap_regress_example_mix_distributions.csv', batch_size=20, 
 					label_type='continuous', label_column_name='label', row_id_with_label=0)
 
 
@@ -16,7 +20,7 @@ data = wuml.wData(xpath='examples/data/shap_regress_example_mix_distributions.cs
 #	Example 1
 EXP = wuml.explainer(data, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=150, learning_rate=0.001, print_network_training_status=True)
+						max_epoch=150, learning_rate=0.001, print_network_training_status=False)
 
 # Show the explanation results
 explanation = EXP(data)	# outputs the weight importance
@@ -30,7 +34,7 @@ print(explanation)
 Cdata = wuml.center_and_scale(data)
 EXP2 = wuml.explainer(Cdata, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=150, learning_rate=0.001, print_network_training_status=True)
+						max_epoch=150, learning_rate=0.001, print_network_training_status=False)
 
 # Show the explanation results
 explanation = EXP2(Cdata)	# outputs the weight importance
@@ -42,7 +46,7 @@ print(explanation)
 Udata = wuml.use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData')
 EXP3 = wuml.explainer(Udata, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(600,'relu'),(600,'relu'),(600,'relu'),(1,'none')], 
-						max_epoch=600, learning_rate=0.001, print_network_training_status=True)
+						max_epoch=600, learning_rate=0.001, print_network_training_status=False)
 
 # Show the regression results
 Ŷ = EXP3.net(Udata, output_type='ndarray')
