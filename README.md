@@ -13,7 +13,7 @@ pip install wuml
 [Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.ipynb) \
 [Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb)\
 \
-[Use Reverse CDF to map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/use_reverse_cdf_to_map_data_to_between_0_and_1.ipynb) 
+[Use CDF to map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/use_cdf_to_map_data_to_between_0_and_1.ipynb) 
 
 
 ### Build Neural Networks via Pytorch
