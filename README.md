@@ -31,7 +31,7 @@ pip install wuml
 ### Explaining Models
 [Run Shap on data between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_uniform.ipynb) 
 	(Examples of a good result since data is between 0 and 1) \
-[Run Shap on data of Normal Distribution](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_gaussian.ipynb) \
+[Run Shap on data of Normal Distribution](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_gaussian.ipynb) 
 	(Examples of a bad result since data can be negative or positive)\
 [Run Shap on data of mixed Distributions that are mapped into distribution between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/comparing_shap_results_on_different_data_distributions.ipynb) \
 	(Examples of dealing with data of mixed distribution all map into uniform)
