@@ -20,7 +20,7 @@ data = wuml.wData(xpath='../../data/shap_regress_example_mix_distributions.csv',
 #	Example 1
 EXP = wuml.explainer(data, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=150, learning_rate=0.001, print_network_training_status=False)
+						max_epoch=150, learning_rate=0.001, print_network_training_status=True)
 
 # Show the explanation results
 explanation = EXP(data)	# outputs the weight importance
@@ -34,7 +34,7 @@ print(explanation)
 Cdata = wuml.center_and_scale(data)
 EXP2 = wuml.explainer(Cdata, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=150, learning_rate=0.001, print_network_training_status=False)
+						max_epoch=150, learning_rate=0.001, print_network_training_status=True)
 
 # Show the explanation results
 explanation = EXP2(Cdata)	# outputs the weight importance
@@ -46,7 +46,7 @@ print(explanation)
 Udata = wuml.use_reverse_cdf_to_map_data_between_0_and_1(data, output_type_name='wData')
 EXP3 = wuml.explainer(Udata, 	loss='mse',		# This will create a network for regression and explain instance wise 
 						networkStructure=[(600,'relu'),(600,'relu'),(600,'relu'),(1,'none')], 
-						max_epoch=600, learning_rate=0.001, print_network_training_status=False)
+						max_epoch=600, learning_rate=0.001, print_network_training_status=True)
 
 # Show the regression results
 Ŷ = EXP3.net(Udata, output_type='ndarray')
