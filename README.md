@@ -29,6 +29,7 @@ pip install wuml
 
 
 ### Explaining Models
+[Run Default Shap explainer](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/default_regression_explainer.ipynb) \
 [Run Shap on data between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_uniform.ipynb) 
 	(Examples of a good result since data is between 0 and 1) \
 [Run Shap on data of Normal Distribution](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_gaussian.ipynb) 

@@ -49,7 +49,7 @@ EXP3 = wuml.explainer(Udata, 	loss='mse',		# This will create a network for regr
 						max_epoch=600, learning_rate=0.001, print_network_training_status=True)
 
 # Show the regression results
-Ŷ = EXP3.net(Udata, output_type='ndarray')
+Ŷ = EXP3.model(Udata, output_type='ndarray')
 SR_train = wuml.summarize_regression_result(Udata.Y, Ŷ)
 print(SR_train.true_vs_predict())
 

@@ -16,7 +16,7 @@ data = wuml.wData(xpath='../../data/shap_regress_example.csv', batch_size=20,
 EXP = wuml.explainer(data, load_network_path='./shap_test_network.pk')	# the network should be a basicNetwork type
 
 # Show the regression results
-Ŷ = EXP.net(data, output_type='ndarray')
+Ŷ = EXP.model(data, output_type='ndarray')
 SR_train = wuml.summarize_regression_result(data.Y, Ŷ)
 O = SR_train.true_vs_predict()
 print(O)

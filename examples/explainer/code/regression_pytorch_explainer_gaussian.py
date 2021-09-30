@@ -22,7 +22,7 @@ EXP = wuml.explainer(data, 	loss='mse',		# This will create a network for regres
 
 
 # Show the regression results
-Ŷ = EXP.net(data, output_type='ndarray')
+Ŷ = EXP.model(data, output_type='ndarray')
 SR_train = wuml.summarize_regression_result(data.Y, Ŷ)
 print(SR_train.true_vs_predict())
 
@@ -32,6 +32,6 @@ print(explanation)
 
 
 # save the result
-wuml.pickle_dump(EXP.net, './shap_test_network.pk')
+wuml.pickle_dump(EXP.model, './shap_test_network.pk')
 
 

@@ -19,3 +19,4 @@ from .distribution_modeling import *
 from .operations import *
 from .matrix_manipulate import *
 from .explainer import *
+from .error import *
