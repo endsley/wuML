@@ -201,7 +201,7 @@ class basicNetwork:
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
 
-		if out_structural is not None: self.out_structural = out_structural
+		if out_structural is None: out_structural = self.out_structural
 		if type(data).__name__ == 'ndarray': 
 			x = torch.from_numpy(data)
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
@@ -222,12 +222,12 @@ class basicNetwork:
 			yout = torch.atleast_2d(yout)
 
 
-		if self.out_structural == '1d_labels':
+		if out_structural == '1d_labels':
 			_, yout = torch.max(yout, 1)
-		elif self.out_structural == 'one_hot':
+		elif out_structural == 'one_hot':
 			_, yout = torch.max(yout, 1)
 			yout = wuml.one_hot_encoding(yout, output_data_type='same')
-		elif self.out_structural == 'softmax':
+		elif out_structural == 'softmax':
 			m = nn.Softmax(dim=1)
 			yout = m(yout)
 
