@@ -162,12 +162,14 @@ class basicNetwork:
 			self.model = θ.model
 			self.network_output_in_CPU_during_usage = True
 
+		if X.label_type == 'discrete': self.Y_dataType = torch.int64		#overide datatype if discrete labels
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'
 			self.model.to(self.device)		# store the network weights in gpu or cpu device
 		else: self.device = 'cpu'
 
+		self.out_structural = None
 		self.info()
 
 
@@ -198,6 +200,8 @@ class basicNetwork:
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
+
+		if out_structural is not None: self.out_structural = out_structural
 		if type(data).__name__ == 'ndarray': 
 			x = torch.from_numpy(data)
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
@@ -218,11 +222,14 @@ class basicNetwork:
 			yout = torch.atleast_2d(yout)
 
 
-		if out_structural == '1d_labels':
+		if self.out_structural == '1d_labels':
 			_, yout = torch.max(yout, 1)
-		elif out_structural == 'one_hot':
+		elif self.out_structural == 'one_hot':
 			_, yout = torch.max(yout, 1)
 			yout = wuml.one_hot_encoding(yout, output_data_type='same')
+		elif self.out_structural == 'softmax':
+			m = nn.Softmax(dim=1)
+			yout = m(yout)
 
 		if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
 			return yout.detach().cpu().numpy()
@@ -232,8 +239,9 @@ class basicNetwork:
 
 		return yout
 
-	def eval(self, output_type='ndarray'):		#	Turn this on to run test results
+	def eval(self, output_type='ndarray', out_structural=None):		#	Turn this on to run test results
 		self.network_usage_output_type = output_type
+		if out_structural is not None: self.out_structural = out_structural
 		self.model.eval()
 
 	def train(self, print_status=True):

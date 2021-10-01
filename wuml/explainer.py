@@ -33,16 +33,25 @@ class explainer():
 					sys.exit()
 					
 				self.model = wuml.pickle_load(load_network_path)
-				self.model.eval(output_type='ndarray')
-				self.Explr = shap.KernelExplainer(self.model, np.zeros((1, X.shape[1])), link=link)		
+				if data.label_type == 'continuous': 
+					self.model.eval(output_type='ndarray')
+					self.Explr = shap.KernelExplainer(self.model, np.zeros((1, X.shape[1])), link=link)		
+				else: 
+					self.model.eval(output_type='ndarray', out_structural='softmax')
+					self.Explr = shap.KernelExplainer(self.model, X, link=link)		
 			elif model is not None:
 				self.model = model
 				self.Explr = shap.KernelExplainer(model, np.zeros((1, X.shape[1])), link=link)
 			else:
 				self.model = wuml.basicNetwork(loss, data, networkStructure=networkStructure, max_epoch=max_epoch, learning_rate=learning_rate)
 				self.model.train(print_status=print_network_training_status)
-				self.model.eval(output_type='ndarray')
-				self.Explr = shap.KernelExplainer(self.model, np.zeros((1, X.shape[1])), link=link)		#, l1_reg=False
+				if data.label_type == 'continuous': 
+					self.model.eval(output_type='ndarray')		# If classification, output softmax
+					self.Explr = shap.KernelExplainer(self.model, np.zeros((1, X.shape[1])), link=link)		#, l1_reg=False
+				else: 
+					self.model.eval(output_type='ndarray', out_structural='softmax')
+					self.Explr = shap.KernelExplainer(self.model, X, link=link)		#, l1_reg=False
+
 
 		elif explainer_algorithm == 'XGBRegressor':
 			self.model = xgboost.XGBRegressor().fit(data.df, data.Y)
