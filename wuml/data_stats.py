@@ -38,7 +38,7 @@ def identify_missing_data_per_feature(df):
 	return mdp
 
 def missing_data_stats(data, save_plots=False): 
-	df = ensure_DataFrame(data)
+	df = wuml.ensure_DataFrame(data)
 
 	if save_plots:
 		header = './results/DatStats/'
