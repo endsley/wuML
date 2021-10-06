@@ -4,20 +4,22 @@ import wuml
 import numpy as np
 import torch
 import wplotlib
-import torch.nn as nn
-from torch.autograd import Variable
- 
+
 data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
 					label_type='continuous', label_column_name='finalga_best', 
 					row_id_with_label=0, columns_to_ignore=['id'])
 
-data = wuml.center_and_scale(data)
+[X_train, X_test, y_train, y_test] = wuml.split_training_test(data, data_name='Chem_decimated_imputed', 
+										data_path='examples/data/', save_as='no saving',
+										xdata_type="%.4f", ydata_type="%.4f", test_percentage=0.1)
 
-weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
+
+X_train = wuml.center_and_scale(X_train)
+weights = wuml.get_likelihood_weight(y_train)
 weights = weights.get_data_as('Tensor')
 
 def costFunction(x, y, ŷ, ind):
-	relu = nn.ReLU()
+	relu = torch.nn.ReLU()
 
 	W = torch.squeeze(weights[ind])
 	n = len(ind)
@@ -29,11 +31,16 @@ def costFunction(x, y, ŷ, ind):
 	return loss
 
 
-bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')], max_epoch=6000, learning_rate=0.001)
+bNet = wuml.basicNetwork(costFunction, X_train, networkStructure=[(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')], max_epoch=6000, learning_rate=0.001)
 bNet.train()
 
-Ŷ = bNet(data, output_type='ndarray')
-output = wuml.output_regression_result(data.Y, Ŷ)
-print(output)
+Ŷ_train = bNet(X_train, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+Ŷ_test = bNet(X_test, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
+
+SR = wuml.summarize_regression_result(X_train.Y, Ŷ_train)
+print(SR.true_vs_predict(sort_based_on_label=True))
+import pdb; pdb.set_trace()
+
+
 
 

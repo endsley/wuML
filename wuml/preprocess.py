@@ -204,6 +204,12 @@ def split_training_test(wData, data_name, data_path='./data/', save_as='ndarray'
 		XTrain_df.to_csv(Train_dat, index=False, header=True)
 		XTest_df.to_csv(Test_dat, index=False, header=True)
 
+	X_train = wuml.ensure_wData(X_train, column_names=wData.df.columns)
+	X_train.Y = y_train
+
+	X_test = wuml.ensure_wData(X_test, column_names=wData.df.columns)
+	X_test.Y = y_test
+
 	return [X_train, X_test, y_train, y_test]
 
 def gen_10_fold_data(data_name, data_path='./data/'):

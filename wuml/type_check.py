@@ -20,16 +20,16 @@ def ensure_data_type(data, type_name='ndarray'):
 	elif type_name=='wData':
 		return ensure_wData(data)
 
-def ensure_wData(data):
+def ensure_wData(data, column_names=None):
 	if type(data).__name__ == 'ndarray': 
-		return wuml.wData(X_npArray=data)
+		return wuml.wData(X_npArray=data, column_names=column_names)
 	elif type(data).__name__ == 'wData': 
 		return data
 	elif type(data).__name__ == 'DataFrame': 
-		return wuml.wData(dataFrame=data, column_names=data.columns)
+		return wuml.wData(dataFrame=data, column_names=column_names)
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
-		return wuml.wData(X_npArray=X)
+		return wuml.wData(X_npArray=X, column_names=column_names)
 
 
 def ensure_DataFrame(data, columns=None):
