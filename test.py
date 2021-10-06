@@ -1,46 +1,39 @@
 #!/usr/bin/env python
 
-import wuml 
+import wuml
 import numpy as np
-import scipy.stats
-from wplotlib import histograms
-from wplotlib import lines
+import torch
+import wplotlib
+import torch.nn as nn
+from torch.autograd import Variable
+ 
+data = wuml.wData(xpath='examples/data/Chem_decimated_imputed.csv', batch_size=20, 
+					label_type='continuous', label_column_name='finalga_best', 
+					row_id_with_label=0, columns_to_ignore=['id'])
+
+data = wuml.center_and_scale(data)
+
+weights = wuml.wData(xpath='examples/data/Chem_sample_weights.csv')
+weights = weights.get_data_as('Tensor')
+
+def costFunction(x, y, ŷ, ind):
+	relu = nn.ReLU()
+
+	W = torch.squeeze(weights[ind])
+	n = len(ind)
+	ŷ = torch.squeeze(ŷ)
+	y = torch.squeeze(y)
+
+	penalty = torch.sum(relu(W*(ŷ - y)))/n	# This will penalize predictions higher than true labels
+	loss = torch.sum(W*((y - ŷ)**2))/n + 0.8*penalty
+	return loss
 
 
-data = wuml.wData('examples/data/Chem_decimated_imputed.csv', label_column_name='finalga_best', 
-					label_type='continuous', row_id_with_label=0)
+bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(200,'relu'),(200,'relu'),(200,'relu'),(1,'none')], max_epoch=6000, learning_rate=0.001)
+bNet.train()
 
-H1 = histograms()
-H1.histogram(data.Y, num_bins=20, title='Gestational Age Histogram', facecolor='blue', α=0.5, path=None)
+Ŷ = bNet(data, output_type='ndarray')
+output = wuml.output_regression_result(data.Y, Ŷ)
+print(output)
 
-
-sample_weights = wuml.get_likelihood_weight(data.Y)
-H = histograms()
-H.histogram(sample_weights.X, num_bins=20, title='Sample Weight Histogram', facecolor='blue', α=0.5, path=None, ylogScale=True )
-
-print(wuml.output_two_columns_side_by_side(data.Y, sample_weights.X, labels=['Y','W'], rounding=3))
-sample_weights.to_csv('../data/Chem_sample_weights.csv', include_column_names=False)
-
-
-
-
-
-
-
-##!/usr/bin/env python
-#import wuml
-#
-#data = wuml.wData(xpath='examples/data/shap_classifier_example_uniform.csv',  label_type='discrete', 
-#					label_column_name='label', row_id_with_label=0)
-#
-#EXP = wuml.explainer(data, loss='CE', explainer_algorithm='shap', link='logit', max_epoch=20, 
-#					networkStructure=[(100,'relu'),(100,'relu'),(2,'none')]	)
-#
-#Ŷ = EXP.model(data, out_structural='1d_labels')
-#SC = wuml.summarize_classification_result(data.Y, Ŷ)
-#res = SC.true_vs_predict(sort_based_on_label=True, print_result=False)
-#print(res)
-#
-#shapV = EXP(data.X)
-#print(shapV)
 
