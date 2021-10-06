@@ -64,6 +64,8 @@ def ensure_numpy(data, rounding=None):
 		X = data.detach().cpu().numpy()
 	elif np.isscalar(data):
 		X = np.array([[data]])
+	else:
+		raise ValueError('Unknown dataType %s'%type(data).__name__)
 
 	if rounding is not None: X = np.round(X, rounding)
 	return X

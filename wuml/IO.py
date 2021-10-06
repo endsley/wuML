@@ -123,6 +123,18 @@ def dictionary_to_str(dic):
 
 	return outstr
 
+def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
+	col_1 = np.atleast_2d(wuml.ensure_numpy(col_1, rounding=rounding))
+	col_2 = np.atleast_2d(wuml.ensure_numpy(col_2, rounding=rounding))
+
+	if col_1.shape[0] == 1: col_1 = col_1.T
+	if col_2.shape[0] == 1: col_2 = col_2.T
+
+	output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
+	if labels is not None:
+		output = wuml.pretty_np_array(labels) + output
+
+	return output
 
 def output_regression_result(y, ŷ, write_path=None):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
