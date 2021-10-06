@@ -37,33 +37,54 @@ def identify_missing_data_per_feature(df):
 
 	return mdp
 
-def missing_data_stats(df): 
-	if type(df).__name__ != 'DataFrame': 
-		df = df.get_data_as('DataFrame')
+def missing_data_stats(data, save_plots=False): 
+	df = ensure_DataFrame(data)
 
-	header = './results/DatStats/'
-	wuml.ensure_path_exists('./results')
-	wuml.ensure_path_exists(header)
+	if save_plots:
+		header = './results/DatStats/'
+		wuml.ensure_path_exists('./results')
+		wuml.ensure_path_exists(header)
+	
+		mdp = identify_missing_data_per_feature(df)
+		mdp = np.array(mdp)
+		textstr = ''
+		x = np.arange(1, len(mdp)+1)
+	
+		lp = lines()
+		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=textstr, outpath= header + 'feature_missing_percentage.png')
+	
+		X2 = np.isnan(df.values).astype(int)
+		hMap = heatMap()
+		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
+								xlabel='Feature ID', ylabel='Sample ID',
+								path= header + 'missing_data_heatMap.png')
+	
+		buffer = io.StringIO()
+		df.info(buf=buffer, verbose=True)
+		s = buffer.getvalue()
+		wuml.write_to(s, header + 'feature_stats.txt')
+	else:
+		mdp = identify_missing_data_per_feature(df)
+		mdp = np.array(mdp)
+		textstr = ''
+		x = np.arange(1, len(mdp)+1)
+	
+		lp = lines()
+		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=textstr, outpath='')
+	
+		X2 = np.isnan(df.values).astype(int)
+		hMap = heatMap()
+		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
+								xlabel='Feature ID', ylabel='Sample ID',
+								path='')
+	
+		buffer = io.StringIO()
+		df.info(buf=buffer, verbose=True)
+		s = buffer.getvalue()
 
-	mdp = identify_missing_data_per_feature(df)
-	mdp = np.array(mdp)
-	textstr = ''
-	x = np.arange(1, len(mdp)+1)
 
-	lp = lines()
-	lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
-				imgText=textstr, outpath= header + 'feature_missing_percentage.png')
-
-	X2 = np.isnan(df.values).astype(int)
-	hMap = heatMap()
-	hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
-							xlabel='Feature ID', ylabel='Sample ID',
-							path= header + 'missing_data_heatMap.png')
-
-	buffer = io.StringIO()
-	df.info(buf=buffer, verbose=True)
-	s = buffer.getvalue()
-	wuml.write_to(s, header + 'feature_stats.txt')
-
+	return s
 
 
