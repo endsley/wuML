@@ -20,12 +20,11 @@ from wplotlib import lines
 
 '''
 
-data = wuml.wData('../data/Chem_decimated_imputed.csv', row_id_with_label=0)
+data = wuml.wData('../../data/Chem_decimated_imputed.csv', row_id_with_label=0)
 data.delete_column('id')	# the id should not be part of the likelihood 
-sample_weights = wuml.get_likelihood_weight(data)
 
-H = histograms()
-H.histogram(sample_weights.X, num_bins=20, title='Sample Weight Histogram', facecolor='blue', α=0.5, path=None)
-sample_weights.to_csv('../data/Chem_sample_weights.csv', include_column_names=False)
+sample_weights = wuml.get_likelihood_weight(data['finalga_best'])
+print(wuml.output_two_columns_side_by_side(data['finalga_best'], sample_weights, labels=['age','weight'], rounding=3))
+
 
 

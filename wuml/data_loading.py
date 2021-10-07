@@ -21,7 +21,7 @@ class wData:
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 		'''
 		self.label_column_name = label_column_name
-
+	
 		if dataFrame is not None:
 			self.df = dataFrame
 		elif X_npArray is not None:
@@ -101,7 +101,8 @@ class wData:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 
 	def __getitem__(self, item):
-		return self.df.values[item]
+		if type(item).__name__ == 'str': return self.df[item]
+		else: return self.df.values[item]
 
 	def __str__(self): 
 		return str(self.df)

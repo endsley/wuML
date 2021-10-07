@@ -62,6 +62,8 @@ def ensure_numpy(data, rounding=None):
 		X = data.values
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
+	elif type(data).__name__ == 'Series': 
+		X = data.values
 	elif np.isscalar(data):
 		X = np.array([[data]])
 	else:

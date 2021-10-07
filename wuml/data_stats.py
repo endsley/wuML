@@ -13,13 +13,16 @@ import seaborn as sns; sns.set_theme()
 import random
 
 
-def get_feature_histograms(X, path=None, title=''):
-	header = './results/DatStats/'
-	wuml.ensure_path_exists('./results')
-	wuml.ensure_path_exists(header)
+def get_feature_histograms(X, path=None, title='', ylogScale=False):
+	X = wuml.ensure_numpy(X)
+
+	if path is not None:
+		header = './results/DatStats/'
+		wuml.ensure_path_exists('./results')
+		wuml.ensure_path_exists(header)
 
 	H = histograms()
-	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None)
+	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None, ylogScale=ylogScale)
 
 def identify_missing_data_per_feature(df):
 	if type(df).__name__ != 'DataFrame': 
