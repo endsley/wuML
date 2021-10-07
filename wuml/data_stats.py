@@ -79,11 +79,10 @@ def missing_data_stats(data, save_plots=False):
 		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
 								xlabel='Feature ID', ylabel='Sample ID')
 	
-		buffer = io.StringIO()
-		df.info(buf=buffer, verbose=True)
-		s = buffer.getvalue()
+#		buffer = io.StringIO()
+#		df.info(buf=buffer, verbose=True)
+#		s = buffer.getvalue()
 
 
-	return s
 
 
