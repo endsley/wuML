@@ -8,8 +8,11 @@ pip install wuml
 
 ## Examples Usages
 
-### Data Preprocessing
+### Data Statistics
 [Learn about missing data stats](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/get_stats_on_data_with_missing_entries.ipynb) \
+[Feature wise Correlation Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_correlation.ipynb) \
+
+### Data Preprocessing
 [Obtain sample weight based on label likelihood](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/weight_sample_by_rarity.ipynb) \
 [Show histogram of a feature](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/show_feature_histogram.ipynb) \
 [Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
