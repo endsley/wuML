@@ -87,5 +87,38 @@ def missing_data_stats(data, save_plots=False):
 #		s = buffer.getvalue()
 
 
+def get_redundant_pairs(df):
+	'''Get diagonal and lower triangular pairs of correlation matrix'''
+	pairs_to_drop = set()
+	cols = df.columns
+	for i in range(0, df.shape[1]):
+		for j in range(0, i+1):
+			pairs_to_drop.add((cols[i], cols[j]))
+	return pairs_to_drop
 
 
+def get_top_abs_correlations(df, n=5):
+	#au_corr = df.corr().abs().unstack()
+	au_corr = df.unstack()
+	labels_to_drop = get_redundant_pairs(df)
+	au_corr = au_corr.drop(labels=labels_to_drop).sort_values(ascending=False, key=abs)
+	return au_corr[0:n]
+
+def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=False):
+	'''
+		if label_name is label string, then it only compares the features against the label
+	'''
+
+	df = wuml.ensure_DataFrame(data)
+	corrMatrix = df.corr()
+	if not get_top_corr_pairs: return corrMatrix
+	if n > corrMatrix.shape[0]: n = corrMatrix.shape[0]
+
+	if label_name is None:
+		outDF = get_top_abs_correlations(corrMatrix, n=n).to_frame()
+	else:
+		corrVector = corrMatrix[label_name].to_frame()
+		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
+		outDF = SortedcorrVector[0:n]
+
+	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
