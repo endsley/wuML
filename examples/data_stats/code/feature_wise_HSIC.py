@@ -7,7 +7,7 @@ from wplotlib import histograms
 from wplotlib import lines
 
 
-data = wuml.wData('examples/data/shap_regress_example_uniform.csv', row_id_with_label=0)
+data = wuml.wData('../../data/shap_regress_example_uniform.csv', row_id_with_label=0)
 
 print(wuml.feature_wise_HSIC(data))
 print('\n\n')

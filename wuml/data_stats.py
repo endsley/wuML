@@ -10,6 +10,7 @@ import io
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set_theme()
+import itertools
 import random
 
 
@@ -111,7 +112,9 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 
 	df = wuml.ensure_DataFrame(data)
 	corrMatrix = df.corr()
-	if not get_top_corr_pairs: return corrMatrix
+	if not get_top_corr_pairs: 
+		return wuml.ensure_data_type(corrMatrix, type_name=type(data).__name__)
+
 	if n > corrMatrix.shape[0]: n = corrMatrix.shape[0]
 
 	if label_name is None:
@@ -122,3 +125,38 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 		outDF = SortedcorrVector[0:n]
 
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
+
+
+def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False):
+	X = wuml.ensure_numpy(data)
+	df = wuml.ensure_DataFrame(data)
+	d = X.shape[1]
+
+	if n > d: n = d
+	if d > 2000:
+		raise ValueError('Error : Too many features to compute, cannot be > 2000')
+
+	if np.any(np.isnan(X)):
+		raise ValueError('Error : the input data cannot have nan entries.')
+
+	lst = list(range(d))
+	pair_order_list = itertools.combinations(lst,2)
+	depMatrix = np.eye(d)
+	for α, β in list(pair_order_list):
+		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(X[:,α], X[:,β])
+
+	df = wuml.ensure_DataFrame(depMatrix, columns=df.columns)
+	df.index = df.columns
+
+	if not get_top_dependent_pairs: 
+		return wuml.ensure_data_type(df, type_name=type(data).__name__)
+
+	if label_name is None:
+		outDF = get_top_abs_correlations(df, n=n).to_frame()
+	else:
+		corrVector = df[label_name].to_frame()
+		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
+		outDF = SortedcorrVector[0:n]
+
+	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
+

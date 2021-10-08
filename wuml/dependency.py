@@ -13,11 +13,15 @@ from wuml.opt_gaussian import *
 import pandas as pd
 import numpy as np
 import ppscore as pps
+import wuml
 
 # compute normalized HSIC between X,Y
 # if sigma_type = mpd, it uses median of pairwise distance
 # if sigma_type = opt, it uses optimal
 def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+	X = wuml.ensure_numpy(X)
+	Y = wuml.ensure_numpy(Y)
+
 	def get_γ(X,Y, sigma_type):
 		if sigma_type == 'mpd': 
 			σᵪ = np.median(sklearn.metrics.pairwise_distances(X))		
