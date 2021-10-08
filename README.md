@@ -11,6 +11,11 @@ pip install wuml
 ### Data Statistics
 [Learn about missing data stats](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/get_stats_on_data_with_missing_entries.ipynb) \
 [Feature wise Correlation Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_correlation.ipynb) \
+[Feature wise HSIC Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_HSIC.ipynb) 
+
+### Dependency Measures
+[Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/comparing_HSIC_to_correlation.ipynb)
+
 
 ### Data Preprocessing
 [Obtain sample weight based on label likelihood](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/weight_sample_by_rarity.ipynb) \
