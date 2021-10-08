@@ -14,7 +14,7 @@ pip install wuml
 [Feature wise HSIC Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_HSIC.ipynb) 
 
 ### Dependency Measures
-[Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/comparing_HSIC_to_correlation.ipynb)
+[Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/comparing_HSIC_to_correlation.ipynb)
 
 
 ### Data Preprocessing
