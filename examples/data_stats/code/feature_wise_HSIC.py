@@ -22,6 +22,4 @@ print(data)
 
 print(wuml.feature_wise_HSIC(data))
 print(wuml.feature_wise_HSIC(data, get_top_dependent_pairs=True))
-print(wuml.feature_wise_HSIC(data, label_name='label', get_top_dependent_pairs=True))
-
 

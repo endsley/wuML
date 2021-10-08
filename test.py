@@ -7,10 +7,9 @@ from wplotlib import histograms
 from wplotlib import lines
 
 
-data = wuml.wData('../../data/missin_example.csv', row_id_with_label=0)
+data = wuml.wData('examples/data/missin_example.csv', row_id_with_label=0)
 print(data)
 
 print(wuml.feature_wise_HSIC(data))
 print(wuml.feature_wise_HSIC(data, get_top_dependent_pairs=True))
-print(wuml.feature_wise_HSIC(data, label_name='label', get_top_dependent_pairs=True))
 
