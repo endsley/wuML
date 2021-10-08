@@ -12,5 +12,5 @@ data = wuml.wData('../../data/shap_regress_example_uniform.csv', row_id_with_lab
 print(wuml.feature_wise_correlation(data), '\n\n')
 print(wuml.feature_wise_correlation(data, get_top_corr_pairs=True), '\n\n')
 print(wuml.feature_wise_correlation(data, label_name='label', get_top_corr_pairs=True), '\n\n')
-import pdb; pdb.set_trace()
+
 

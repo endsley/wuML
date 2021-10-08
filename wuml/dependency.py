@@ -26,6 +26,9 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 		if sigma_type == 'mpd': 
 			σᵪ = np.median(sklearn.metrics.pairwise_distances(X))		
 			σᵧ = np.median(sklearn.metrics.pairwise_distances(Y))
+			
+			if σᵪ == 0: σᵪ = 0.1
+			if σᵧ == 0: σᵧ = 0.1
 		else: 
 			optimizer = opt_gaussian(X,Y, Y_kernel=Y_kernel)
 			optimizer.minimize_H()
@@ -75,6 +78,7 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 	HKᵧ = Kᵧ - np.mean(Kᵧ, axis=0)                  # equivalent to		HKᵧ = H.dot(Kᵧ)
 	Hᵪᵧ= np.sum(HKᵪ.T*HKᵧ)							# same as HKᵪH = double_center(Kᵪ)
                                                     #		  Hᵪᵧ = np.sum(HKᵪH*Kᵧ)
+	if Hᵪᵧ == 0: return 0
 	if not normalize_hsic: return Hᵪᵧ/(n*n)
 
 	Hᵪ = np.linalg.norm(HKᵪ)						# equivalent to 	np.sqrt(np.sum(KᵪH*KᵪH))

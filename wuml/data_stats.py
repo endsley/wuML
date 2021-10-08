@@ -136,14 +136,17 @@ def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False
 	if d > 2000:
 		raise ValueError('Error : Too many features to compute, cannot be > 2000')
 
-	if np.any(np.isnan(X)):
-		raise ValueError('Error : the input data cannot have nan entries.')
-
 	lst = list(range(d))
 	pair_order_list = itertools.combinations(lst,2)
 	depMatrix = np.eye(d)
 	for α, β in list(pair_order_list):
-		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(X[:,α], X[:,β])
+		x1 = np.atleast_2d(X[:,α]).T
+		x2 = np.atleast_2d(X[:,β]).T
+
+		joinX = wuml.ensure_DataFrame(np.hstack((x1,x2)))
+		joinX = joinX.dropna()
+		withoutNan = joinX.values
+		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(withoutNan[:,0], withoutNan[:,1], sigma_type='mpd')
 
 	df = wuml.ensure_DataFrame(depMatrix, columns=df.columns)
 	df.index = df.columns
