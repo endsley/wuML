@@ -116,7 +116,6 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 		return wuml.ensure_data_type(corrMatrix, type_name=type(data).__name__)
 
 	if n > corrMatrix.shape[0]: n = corrMatrix.shape[0]
-
 	if label_name is None:
 		outDF = get_top_abs_correlations(corrMatrix, n=n).to_frame()
 	else:
