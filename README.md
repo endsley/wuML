@@ -51,6 +51,6 @@ pip install wuml
 [Run Shap Classification](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/classification_pytorch_explainer_uniform.ipynb) 
 
 
-### Explaining Models
+### Dimension Reduction
 [Run Several Dimension Reduction Examples](https://github.com/endsley/wuML/blob/main/examples/dimension_reduction/ipynb/DR_examples.ipynb) \
 
