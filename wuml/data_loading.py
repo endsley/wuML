@@ -104,11 +104,15 @@ class wData:
 		if type(item).__name__ == 'str': return self.df[item]
 		else: return self.df.values[item]
 
-	def display(self):
-		if isnotebook():
-			self.df.style
-		else:
-			print(self)
+#	def display(self):
+#		print('aa')
+#		if wuml.isnotebook():
+#			print('kk')
+#			st = self.df.style
+#			st.render()
+#		else:
+#			print('bb')
+#			print(self)
 
 	def __str__(self): 
 		return str(self.df)
