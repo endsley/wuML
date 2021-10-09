@@ -49,3 +49,8 @@ pip install wuml
 	(Examples of dealing with data of mixed distribution all map into uniform)\
 \
 [Run Shap Classification](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/classification_pytorch_explainer_uniform.ipynb) 
+
+
+### Explaining Models
+[Run Several Dimension Reduction Examples](https://github.com/endsley/wuML/blob/main/examples/dimension_reduction/ipynb/DR_examples.ipynb) \
+
