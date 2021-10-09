@@ -86,6 +86,9 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader
 
+	def display_as_html_table_in_notebook(self):
+		self.df.style	
+
 	def to_csv(self, path, add_row_indices=False, include_column_names=True, float_format='%.4f'):
 		LCn = self.label_column_name
 
