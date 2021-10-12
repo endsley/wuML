@@ -30,7 +30,7 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 		out_str = t1 + '\n' + out_str
 
 	if auto_print: print(out_str)
-	return out_str
+	else: return out_str
 
 def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_print=False):
 	str1 = str(str1)
@@ -58,7 +58,7 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 		outS += ('%-' + str(max_width) + 's' + spacing + l2 + '\n') % l1
 
 	if auto_print: print(outS)
-	return outS
+	else: return outS
 
 
 def block_string_concatenate(strList, spacing='\t'):
