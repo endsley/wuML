@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from numpy import genfromtxt
 from wuml.IO import *
 from wuml.data_stats import *
 from wuml.data_loading import *
