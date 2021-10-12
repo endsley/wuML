@@ -57,4 +57,5 @@ pip install wuml
 
 ### Math Operations
 [EigenDecomposition](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) 
+[Integrate a univariate function](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/integrate_function.ipynb) 
 

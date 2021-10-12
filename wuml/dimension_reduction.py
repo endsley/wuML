@@ -19,8 +19,8 @@ class dimension_reduction:
 		X = wuml.ensure_numpy(data)
 		if method == 'PCA':
 			model = PCA(n_components=X.shape[1])
-			self.eigen_vectors = model.fit_transform(X)
-			self.Ӽ = self.eigen_vectors[:,0:n_components]
+			use_all_dims = model.fit_transform(X)
+			self.Ӽ = use_all_dims[:,0:n_components]
 
 			self.normalized_eigs = model.explained_variance_ratio_
 			self.eigen_values = model.singular_values_
