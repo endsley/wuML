@@ -3,6 +3,16 @@ import numpy as np
 import random
 import string
 
+
+def gen_squared_symmetric_matrix(length, distribution='Gaussian'):
+	if distribution == 'Gaussian':
+		X = np.random.randn(length, length)
+	elif distribution == 'Uniform':
+		X = np.random.rand(length, length)
+
+	X = X.dot(X.T)
+	return X
+
 def gen_random_string(str_len=5, letters=string.ascii_letters):
 	#letters = string.ascii_lowercase
 	#letters = string.ascii_letters

@@ -4,14 +4,15 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
+def get_np_column(data, column_id):
+	X = wuml.ensure_numpy(data)
+	return np.atleast_2d(X[:,column_id]).T
 
 def sort_matrix_rows_by_a_column(X, column_names):
 	df = wuml.ensure_DataFrame(X)
 	sorted_df = df.sort_values(by=column_names)
 
 	return sorted_df
-
-
 
 def one_hot_encoding(Y, output_data_type='same'): 
 	'''
@@ -36,6 +37,6 @@ def one_hot_to_label(Yₒ):
 	return Y
 
 
-Y = np.array([0,0,1,1,2,2,3,3])
-Yₒ = one_hot_encoding(Y)
-Y2 = one_hot_to_label(Yₒ)
+#Y = np.array([0,0,1,1,2,2,3,3])
+#Yₒ = one_hot_encoding(Y)
+#Y2 = one_hot_to_label(Yₒ)

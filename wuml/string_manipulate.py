@@ -5,7 +5,14 @@ import numpy as np
 import wuml
 import torch
 
-def pretty_np_array(m, front_tab='', verticalize=False):
+
+#str.ljust(s, width[, fillchar])
+#str.rjust(s, width[, fillchar])
+#str.center(s, width[, fillchar])
+
+def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False):
+	m = str(m)
+
 	if type(m) == type(torch.tensor([])):
 		m = m.cpu().detach().numpy()
 
@@ -14,11 +21,21 @@ def pretty_np_array(m, front_tab='', verticalize=False):
 			m = np.atleast_2d(m).T
 
 	out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + '\n'
-	#out_str = str(out_str).replace('. ',' ')
 	out_str = str(out_str).replace('.]',']')
+
+	if type(title).__name__ == 'str':
+		L1 = out_str.split('\n')
+		L1_max_width = len(max(L1, key=len))
+		t1 = str.center(title, L1_max_width)
+		out_str = t1 + '\n' + out_str
+
+	if auto_print: print(out_str)
 	return out_str
 
-def block_two_string_concatenate(str1, str2, spacing='\t'):
+def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_print=False):
+	str1 = str(str1)
+	str2 = str(str2)
+
 	L1 = str1.split('\n')
 	L2 = str2.strip().split('\n')
 
@@ -27,11 +44,20 @@ def block_two_string_concatenate(str1, str2, spacing='\t'):
 		for ι in range(Δ):
 			L2.append('\n')
 
+	if len(add_titles) == 2:
+		L1_max_width = len(max(L1, key=len))
+		L2_max_width = len(max(L2, key=len))
+		t1 = str.center(add_titles[0], L1_max_width)
+		t2 = str.center(add_titles[1], L2_max_width)
+		L1.insert(0,t1)
+		L2.insert(0,t2)
+
 	max_width = len(max(L1, key=len))
 	outS = ''
 	for l1, l2 in zip(L1,L2):
 		outS += ('%-' + str(max_width) + 's' + spacing + l2 + '\n') % l1
 
+	if auto_print: print(outS)
 	return outS
 
 

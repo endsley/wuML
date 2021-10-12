@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score
 from wuml.opt_gaussian import *
 import pandas as pd
 import numpy as np
-import ppscore as pps
+#import ppscore as pps
 import wuml
 
 # compute normalized HSIC between X,Y
