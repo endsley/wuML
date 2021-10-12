@@ -24,6 +24,8 @@ class dimension_reduction:
 
 			self.normalized_eigs = model.explained_variance_ratio_
 			self.eigen_values = model.singular_values_
+			self.cumulative_eigs = np.cumsum(self.eigen_values)/np.sum(self.eigen_values)
+
 		elif method == 'TSNE':
 			model = TSNE(n_components=n_components, learning_rate=learning_rate)
 			self.Ӽ = model.fit_transform(X)

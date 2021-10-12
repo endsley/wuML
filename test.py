@@ -8,6 +8,7 @@ X_test = np.random.randn(2,4)
 
 DR = wuml.dimension_reduction(X, method='PCA', show_plot=True)
 
+print(DR.cumulative_eigs)
 print(DR.normalized_eigs)
 print(DR)
 print(DR.eigen_vectors)

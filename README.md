@@ -52,9 +52,9 @@ pip install wuml
 
 
 ### Dimension Reduction
-[Run Several Dimension Reduction Examples](https://github.com/endsley/wuML/blob/main/examples/dimension_reduction/ipynb/DR_examples.ipynb) \
+[Run Several Dimension Reduction Examples](https://github.com/endsley/wuML/blob/main/examples/dimension_reduction/ipynb/DR_examples.ipynb) 
 
 
 ### Math Operations
-[EigenDecomposition](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) \
+[EigenDecomposition](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) 
 
