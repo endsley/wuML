@@ -18,10 +18,12 @@ class dimension_reduction:
 
 		X = wuml.ensure_numpy(data)
 		if method == 'PCA':
-			model = PCA(n_components=n_components)
-			self.Ӽ = model.fit_transform(X)
+			model = PCA(n_components=X.shape[1])
+			self.eigen_vectors = model.fit_transform(X)
+			self.Ӽ = self.eigen_vectors[:,0:n_components]
+
 			self.normalized_eigs = model.explained_variance_ratio_
-			self.eigs = model.singular_values_
+			self.eigen_values = model.singular_values_
 		elif method == 'TSNE':
 			model = TSNE(n_components=n_components, learning_rate=learning_rate)
 			self.Ӽ = model.fit_transform(X)
