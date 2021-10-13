@@ -115,30 +115,40 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 	df = wuml.ensure_DataFrame(data)
 	if n > df.shape[1]: n = df.shape[1]
 
+	if label_name is not None and label_name not in df.columns:
+		raise ValueError('Error : %s is an unrecognized column name. \nThe list of names are %s'%(label_name, str(df.columns)))
+
 	corrMatrix = df.corr()
 	topCorr = get_top_abs_correlations(corrMatrix, n=n).to_frame()
-	if not get_top_corr_pairs: 
+	if not get_top_corr_pairs and label_name not in df.columns: 
 		outDF = corrMatrix
 	elif label_name is None:
 		outDF = topCorr
 	else:
 		corrVector = corrMatrix[label_name].to_frame()
 		topCorr = corrVector.sort_values(label_name, key=abs, ascending=False)
-		outDF = topCorr[0:n]
-
+		topCorr = topCorr[1:n]
+		outDF = topCorr
 
 	if num_of_top_dependent_pairs_to_plot>0:
 		subTopCorr = topCorr.head(num_of_top_dependent_pairs_to_plot)
 		idx = subTopCorr.index
 		idx = idx.to_frame().values
-		for i, item in enumerate(idx):
-			α, β = item
 		
-			A = df[α].to_numpy()
-			B = df[β].to_numpy()
+		for i, item in enumerate(idx):
+			if len(item) == 1:
+				α = item
+				β = label_name
+				A = df[α].to_numpy()
+				B = df[label_name].to_numpy()
 
+			elif len(item) == 2:
+				α, β = item
+			
+				A = df[α].to_numpy()
+				B = df[β].to_numpy()
+	
 			corV = subTopCorr.values[i]
-
 			textstr = r'Order ID: %d, Correlation : %.3f' % (i+1, corV)
 			lp = scatter(figsize=(10,5))		# (width, height)
 			lp.plot_scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr)

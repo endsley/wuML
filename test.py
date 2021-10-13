@@ -8,5 +8,6 @@ from wplotlib import lines
 
 
 data = wuml.wData('examples/data/shap_regress_example_uniform.csv', row_id_with_label=0)
-FC = wuml.feature_wise_correlation(data, num_of_top_dependent_pairs_to_plot=2)
+FC = wuml.feature_wise_correlation(data, num_of_top_dependent_pairs_to_plot=2, label_name='label')
+print(FC)
 
