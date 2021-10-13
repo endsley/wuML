@@ -3,6 +3,7 @@ import numpy as np; np.random.seed(0)
 from wplotlib import lines		#pip install wplotlib
 from wplotlib import heatMap
 from wplotlib import histograms
+from wplotlib import scatter
 import wuml 
 from wuml.data_loading import wData
 
@@ -105,23 +106,43 @@ def get_top_abs_correlations(df, n=5):
 	au_corr = au_corr.drop(labels=labels_to_drop).sort_values(ascending=False, key=abs)
 	return au_corr[0:n]
 
-def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=False):
+def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=False, num_of_top_dependent_pairs_to_plot=0):
 	'''
 		if label_name is label string, then it only compares the features against the label
+		num_of_top_dependent_pairs_to_plot: if > 0, it will plot out the most correlated pairs
 	'''
 
 	df = wuml.ensure_DataFrame(data)
-	corrMatrix = df.corr()
-	if not get_top_corr_pairs: 
-		return wuml.ensure_data_type(corrMatrix, type_name=type(data).__name__)
+	if n > df.shape[1]: n = df.shape[1]
 
-	if n > corrMatrix.shape[0]: n = corrMatrix.shape[0]
-	if label_name is None:
-		outDF = get_top_abs_correlations(corrMatrix, n=n).to_frame()
+	corrMatrix = df.corr()
+	topCorr = get_top_abs_correlations(corrMatrix, n=n).to_frame()
+	if not get_top_corr_pairs: 
+		outDF = corrMatrix
+	elif label_name is None:
+		outDF = topCorr
 	else:
 		corrVector = corrMatrix[label_name].to_frame()
-		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
-		outDF = SortedcorrVector[0:n]
+		topCorr = corrVector.sort_values(label_name, key=abs, ascending=False)
+		outDF = topCorr[0:n]
+
+
+	if num_of_top_dependent_pairs_to_plot>0:
+		subTopCorr = topCorr.head(num_of_top_dependent_pairs_to_plot)
+		idx = subTopCorr.index
+		idx = idx.to_frame().values
+		for i, item in enumerate(idx):
+			α, β = item
+		
+			A = df[α].to_numpy()
+			B = df[β].to_numpy()
+
+			corV = subTopCorr.values[i]
+
+			textstr = r'Order ID: %d, Correlation : %.3f' % (i+1, corV)
+			lp = scatter(figsize=(10,5))		# (width, height)
+			lp.plot_scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr)
+
 
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
 

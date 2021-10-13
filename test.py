@@ -2,15 +2,11 @@
 
 import wuml 
 import numpy as np
+import scipy.stats
+from wplotlib import histograms
+from wplotlib import lines
 
-X = np.vstack((np.random.randn(10,4), np.random.randn(10,4) + 10))
-X_test = np.random.randn(2,4)
 
-DR = wuml.dimension_reduction(X, method='PCA', show_plot=True)
+data = wuml.wData('examples/data/shap_regress_example_uniform.csv', row_id_with_label=0)
+FC = wuml.feature_wise_correlation(data, num_of_top_dependent_pairs_to_plot=2)
 
-print(DR.cumulative_eigs)
-print(DR.normalized_eigs)
-print(DR)
-print(DR.eigen_vectors)
-
-import pdb; pdb.set_trace()
