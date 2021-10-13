@@ -32,20 +32,25 @@ def ensure_wData(data, column_names=None):
 		return wuml.wData(X_npArray=X, column_names=column_names)
 
 
-def ensure_DataFrame(data, columns=None):
+def ensure_DataFrame(data, columns=None, index=None):
 	if type(data).__name__ == 'ndarray': 
-		df = pd.DataFrame(data)
+		df = pd.DataFrame(data, columns=columns, index=index)
 	elif type(data).__name__ == 'wData': 
 		df = data.df
 		df.columns = data.df.columns
+		df.index = data.df.index
 	elif type(data).__name__ == 'DataFrame': 
 		df = data
+		df.columns = data.df.columns
+		df.index = data.df.index
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)
-	
-	if columns is not None:
-		df.columns = columns
+		df.columns = data.df.columns
+		df.index = data.df.index
+
+	#if columns is not None:
+	#	df.columns = columns
 
 	return df
 

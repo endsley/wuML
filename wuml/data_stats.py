@@ -157,14 +157,19 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
 
 
-def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False):
+def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False, num_of_top_dependent_pairs_to_plot=0):
+	'''
+		if label_name is label string, then it only compares the features against the label
+		num_of_top_dependent_pairs_to_plot: if > 0, it will plot out the most correlated pairs
+	'''
 	X = wuml.ensure_numpy(data)
 	df = wuml.ensure_DataFrame(data)
 	d = X.shape[1]
 
-	if n > d: n = d
-	if d > 2000:
-		raise ValueError('Error : Too many features to compute, cannot be > 2000')
+	if n > df.shape[1]: n = df.shape[1]
+	if label_name is not None and label_name not in df.columns:
+		raise ValueError('Error : %s is an unrecognized column name. \nThe list of names are %s'%(label_name, str(df.columns)))
+
 
 	lst = list(range(d))
 	pair_order_list = itertools.combinations(lst,2)
@@ -178,18 +183,78 @@ def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False
 		withoutNan = joinX.values
 		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(withoutNan[:,0], withoutNan[:,1], sigma_type='mpd')
 
-	df = wuml.ensure_DataFrame(depMatrix, columns=df.columns)
-	df.index = df.columns
-
-	if not get_top_dependent_pairs: 
-		return wuml.ensure_data_type(df, type_name=type(data).__name__)
-
-	if label_name is None:
-		outDF = get_top_abs_correlations(df, n=n).to_frame()
+	depM_DF = wuml.ensure_DataFrame(depMatrix, columns=df.columns, index=df.columns)
+	topCorr = get_top_abs_correlations(depM_DF, n=n).to_frame()
+	if not get_top_dependent_pairs and label_name not in df.columns: 
+		outDF = depM_DF
+	elif label_name is None:
+		outDF = topCorr
 	else:
-		corrVector = df[label_name].to_frame()
-		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
-		outDF = SortedcorrVector[0:n]
+		corrVector = depM_DF[label_name].to_frame()
+		topCorr = corrVector.sort_values(label_name, key=abs, ascending=False)
+		topCorr = topCorr[1:n]
+		outDF = topCorr
+
+	if num_of_top_dependent_pairs_to_plot>0:
+		subTopCorr = topCorr.head(num_of_top_dependent_pairs_to_plot)
+		idx = subTopCorr.index
+		idx = idx.to_frame().values
+		
+		for i, item in enumerate(idx):
+			if len(item) == 1:
+				α = item
+				β = label_name
+				A = df[α].to_numpy()
+				B = df[label_name].to_numpy()
+
+			elif len(item) == 2:
+				α, β = item
+			
+				A = df[α].to_numpy()
+				B = df[β].to_numpy()
+	
+			corV = subTopCorr.values[i]
+			textstr = r'Order ID: %d, Correlation : %.3f' % (i+1, corV)
+			lp = scatter(figsize=(10,5))		# (width, height)
+			lp.plot_scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr)
+
 
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
+
+
+
+#	X = wuml.ensure_numpy(data)
+#	df = wuml.ensure_DataFrame(data)
+#	d = X.shape[1]
+#
+#	if n > d: n = d
+#	if d > 2000:
+#		raise ValueError('Error : Too many features to compute, cannot be > 2000')
+#
+#	lst = list(range(d))
+#	pair_order_list = itertools.combinations(lst,2)
+#	depMatrix = np.eye(d)
+#	for α, β in list(pair_order_list):
+#		x1 = np.atleast_2d(X[:,α]).T
+#		x2 = np.atleast_2d(X[:,β]).T
+#
+#		joinX = wuml.ensure_DataFrame(np.hstack((x1,x2)))
+#		joinX = joinX.dropna()
+#		withoutNan = joinX.values
+#		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(withoutNan[:,0], withoutNan[:,1], sigma_type='mpd')
+#
+#	df = wuml.ensure_DataFrame(depMatrix, columns=df.columns)
+#	df.index = df.columns
+#
+#	if not get_top_dependent_pairs: 
+#		return wuml.ensure_data_type(df, type_name=type(data).__name__)
+#
+#	if label_name is None:
+#		outDF = get_top_abs_correlations(df, n=n).to_frame()
+#	else:
+#		corrVector = df[label_name].to_frame()
+#		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
+#		outDF = SortedcorrVector[0:n]
+#
+#	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
 
