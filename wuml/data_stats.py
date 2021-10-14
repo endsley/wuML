@@ -223,38 +223,23 @@ def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False
 
 
 
-#	X = wuml.ensure_numpy(data)
-#	df = wuml.ensure_DataFrame(data)
-#	d = X.shape[1]
-#
-#	if n > d: n = d
-#	if d > 2000:
-#		raise ValueError('Error : Too many features to compute, cannot be > 2000')
-#
-#	lst = list(range(d))
-#	pair_order_list = itertools.combinations(lst,2)
-#	depMatrix = np.eye(d)
-#	for α, β in list(pair_order_list):
-#		x1 = np.atleast_2d(X[:,α]).T
-#		x2 = np.atleast_2d(X[:,β]).T
-#
-#		joinX = wuml.ensure_DataFrame(np.hstack((x1,x2)))
-#		joinX = joinX.dropna()
-#		withoutNan = joinX.values
-#		depMatrix[α,β] = depMatrix[β,α] = wuml.HSIC(withoutNan[:,0], withoutNan[:,1], sigma_type='mpd')
-#
-#	df = wuml.ensure_DataFrame(depMatrix, columns=df.columns)
-#	df.index = df.columns
-#
-#	if not get_top_dependent_pairs: 
-#		return wuml.ensure_data_type(df, type_name=type(data).__name__)
-#
-#	if label_name is None:
-#		outDF = get_top_abs_correlations(df, n=n).to_frame()
-#	else:
-#		corrVector = df[label_name].to_frame()
-#		SortedcorrVector = corrVector.sort_values(label_name, key=abs, ascending=False)
-#		outDF = SortedcorrVector[0:n]
-#
-#	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
+def HSIC_of_feature_groups_vs_label_list(data, data_compared_to):
+	'''
+		Compare the entire "data" to each column of "data_compared_to"
+	'''
+	
+	X = wuml.ensure_numpy(data)
+	Ys = wuml.ensure_numpy(data_compared_to)
+	Ys_df = wuml.ensure_DataFrame(data_compared_to)
+	num_of_Ys = Ys.shape[1]
 
+	hsic_list = []
+	for i in range(num_of_Ys):
+		hsic_list.append(wuml.HSIC(X, Ys[:,i])) #, sigma_type='mpd'
+
+	df = wuml.ensure_DataFrame(np.array(hsic_list))
+	df.index = Ys_df.columns
+	df.columns = ['feature_group']
+	df = df.sort_values('feature_group', axis=0, ascending=False)
+	
+	return wuml.ensure_wData(df)

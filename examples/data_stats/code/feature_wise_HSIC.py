@@ -22,3 +22,9 @@ print(data)
 print('\n\n')
 print(wuml.feature_wise_HSIC(data))
 
+
+X = data[:,0:3]
+Ys = data[:,3:5]
+depList = wuml.HSIC_of_feature_groups_vs_label_list(X, Ys)
+print(depList)
+

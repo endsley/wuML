@@ -32,6 +32,7 @@ class wData:
 		if type(self.df.columns).__name__ == 'str': 	# if text column names, strip away white space
 			self.df.columns = self.df.columns.str.replace(' ','')
 
+		self.columns = self.df.columns
 		self.Y = None
 		if Y_npArray is not None:
 			self.Y = Y_npArray
@@ -102,17 +103,13 @@ class wData:
 
 	def __getitem__(self, item):
 		if type(item).__name__ == 'str': return self.df[item]
-		else: return self.df.values[item]
+		else: 
+			return wuml.ensure_wData(self.df.iloc[item])
 
-#	def display(self):
-#		print('aa')
-#		if wuml.isnotebook():
-#			print('kk')
-#			st = self.df.style
-#			st.render()
-#		else:
-#			print('bb')
-#			print(self)
+			#if return_data_as == 'DataFrame': return self.df.iloc[item]
+			#if return_data_as == 'ndarray': return self.df.values[item]
+			#if return_data_as == 'wData': return wuml.ensure_wData(self.df.iloc[item])
+
 
 	def __str__(self): 
 		return str(self.df)
