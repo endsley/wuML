@@ -11,6 +11,6 @@ data = wuml.wData('examples/data/shap_regress_example_uniform.csv', label_column
 
 
 print('\n\nRun all regressors sorted by least test error')
-result = wuml.run_every_regressor(data)
+result = wuml.run_every_regressor(data, order_by='Test mse')
 print(result)
 
