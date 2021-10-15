@@ -13,7 +13,8 @@ class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
 					X_npArray=None, Y_npArray=None, row_id_with_label=None, sample_id_included=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
-					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None):
+					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None,
+					replace_this_entry_with_nan=None):
 		'''
 			row_id_with_label :  None = no labels, 0 = top row is the label
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
@@ -28,6 +29,9 @@ class wData:
 			self.df = pd.DataFrame(X_npArray, columns=column_names)
 		else:
 			self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
+
+		if replace_this_entry_with_nan is not None:
+			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
 
 		if type(self.df.columns).__name__ == 'str': 	# if text column names, strip away white space
 			self.df.columns = self.df.columns.str.replace(' ','')

@@ -41,8 +41,8 @@ def ensure_DataFrame(data, columns=None, index=None):
 		df.index = data.df.index
 	elif type(data).__name__ == 'DataFrame': 
 		df = data
-		df.columns = data.df.columns
-		df.index = data.df.index
+		#df.columns = data.df.columns
+		#df.index = data.df.index
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)

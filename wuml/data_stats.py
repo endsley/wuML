@@ -26,9 +26,8 @@ def get_feature_histograms(X, path=None, title='', ylogScale=False):
 	H = histograms()
 	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None, ylogScale=ylogScale)
 
-def identify_missing_data_per_feature(df):
-	if type(df).__name__ != 'DataFrame': 
-		df = df.get_data_as('DataFrame')
+def identify_missing_data_per_feature(data):
+	df = wuml.ensure_DataFrame(data)
 
 	X = df.values
 	n = X.shape[0]
@@ -57,8 +56,9 @@ def missing_data_stats(data, save_plots=False):
 	
 		lp = lines()
 		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=textstr, outpath= header + 'feature_missing_percentage.png')
-	
+					imgText=textstr, outpath= header + 'feature_missing_percentage.png', 
+					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()
 		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
@@ -76,8 +76,8 @@ def missing_data_stats(data, save_plots=False):
 		x = np.arange(1, len(mdp)+1)
 	
 		lp = lines()
-		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=textstr)
+		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
+					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
 	
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()

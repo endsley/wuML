@@ -19,15 +19,15 @@ np.set_printoptions(linewidth=300)
 np.set_printoptions(suppress=True)
 np.set_printoptions(threshold=sys.maxsize)
 
-def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataFramePath=''):
+def remove_rows_with_too_much_missing_entries(data, threshold=0.6, newDataFramePath=''):
 	'''
 		If a row is kept if it has more than "threshold" percentage of normal data
-		dataFrame is a pandas format, it can be converted this way
+		data is a pandas format, it can be converted this way
 		pd.DataFrame(data=data[1:,1:],    # values
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = dataFrame.get_data_as('DataFrame')
+	df = wuml.ensure_DataFrame(data)
 
 	X = df.values
 	n = X.shape[0]
@@ -60,15 +60,15 @@ def remove_rows_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataF
 	return df_decimated
 
 
-def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDataFramePath=''):
+def remove_columns_with_too_much_missing_entries(data, threshold=0.6, newDataFramePath=''):
 	'''
 		If a column is kept if it has more than "threshold" percentage of normal data
-		dataFrame is a pandas format, it can be converted this way
+		data is a pandas format, it can be converted this way
 		pd.DataFrame(data=data[1:,1:],    # values
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = dataFrame.get_data_as('DataFrame')
+	df = wuml.ensure_DataFrame(data)
 
 	X = df.values
 	n = X.shape[0]
@@ -86,46 +86,52 @@ def remove_columns_with_too_much_missing_entries(dataFrame, threshold=0.6, newDa
 	removed_columns = set(oldColumns).difference(newColumns)
 
 	#	Record the results
-	output_str = 'Original dataFrame dimension : %d samples,  %d dimensions\n'%(n, d)
-	output_str += 'Deciated dataFrame dimension : %d samples,  %d dimensions\n'%(df_decimated.values.shape[0], df_decimated.values.shape[1])
+	output_str = 'Original data dimension : %d samples,  %d dimensions\n'%(n, d)
+	output_str += 'Deciated data dimension : %d samples,  %d dimensions\n'%(df_decimated.values.shape[0], df_decimated.values.shape[1])
 	output_str += 'Removed Columns missing at least these percentage of entries : %.3f\n'%(1-threshold)
 
 	#	Record the removed features 
 	output_str += '\nRemoved Columns + Missing Percentage'
-	max_width = len(max(removed_columns, key=len))
-	for column in removed_columns:
-		x = df[column].values
-		missing_percentage = np.sum(np.isnan(x))/n
-		output_str += (('\n\t%-' + str(max_width) + 's\t%.2f')%(column, missing_percentage))
 
-	#	Record the retained features 
-	output_str += '\n\nRetained Columns + Missing Percentage'
-	for column in df_decimated:
-		x = df_decimated[column].values
-		missing_percentage = np.sum(np.isnan(x))/n
-		output_str += (('\n\t%-' + str(max_width) + 's\t%.2f')%(column, missing_percentage))
+	if len(removed_columns) > 0:
+		max_width = len(max(removed_columns, key=len))
+		for column in removed_columns:
+			x = df[column].values
+			missing_percentage = np.sum(np.isnan(x))/n
+			output_str += (('\n\t%-' + str(max_width) + 's\t%.2f')%(column, missing_percentage))
+	
+		#	Record the retained features 
+		output_str += '\n\nRetained Columns + Missing Percentage'
+		for column in df_decimated:
+			x = df_decimated[column].values
+			missing_percentage = np.sum(np.isnan(x))/n
+			output_str += (('\n\t%-' + str(max_width) + 's\t%.2f')%(column, missing_percentage))
+	else:
+		output_str += '\n\tNo columns were removed.'
+		
 
 	write_to(output_str, pth + 'column_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
 
-	df_decimated = wData(dataFrame=df_decimated)
-	return df_decimated
+	return wuml.ensure_data_type(df_decimated, type_name=type(data).__name__)
 
-def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_threshold=0.6,newDataFramePath=''):
+def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold=0.6,newDataFramePath=''):
 	'''
 		It will automatically remove rows and columns of a dataFrame with missing entries.
 	'''
-	df = dataFrame.get_data_as('DataFrame')
-	dfSize = 'Data size:' + str(df.shape)
 
-	mdp = np.array(identify_missing_data_per_feature(dataFrame))
+	dfo = wuml.ensure_DataFrame(data)
+	dfSize = 'Data size:' + str(dfo.shape)
+
+	mdp = np.array(identify_missing_data_per_feature(dfo))
 	x = np.arange(1, len(mdp)+1)
 
 	lp = lines(figsize=(10,5))
 	lp.plot_line(x, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=121, ylim=[0,1], xTextLoc=0, yTextLoc=0.9)
+					imgText=dfSize, subplot=121, ylim=[0,1], xTextLoc=0, yTextLoc=0.9,
+					xtick_locations=x, xtick_labels=dfo.columns.to_numpy(), xticker_rotate=90)
 
-	df = remove_columns_with_too_much_missing_entries(dataFrame, threshold=column_threshold)
+	df = remove_columns_with_too_much_missing_entries(dfo, threshold=column_threshold)
 	df_decimated = remove_rows_with_too_much_missing_entries(df, threshold=row_threshold, newDataFramePath=newDataFramePath)
 	dfSize = 'Data size:' + str(df_decimated.shape)
 
@@ -133,7 +139,8 @@ def decimate_data_with_missing_entries(dataFrame, column_threshold=0.6, row_thre
 	x = np.arange(1, len(mdp)+1)
 
 	lp.plot_line(x, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=122, ylim=[0,1], xTextLoc=0, yTextLoc=0.9)
+					imgText=dfSize, subplot=122, ylim=[0,1], xTextLoc=0, yTextLoc=0.9,
+					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
 	lp.show()
 
 	return df_decimated
