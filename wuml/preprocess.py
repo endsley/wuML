@@ -181,39 +181,43 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 	return X, ignore_column_with_0_σ
 
-def split_training_test(wData, data_name, data_path='./data/', save_as='ndarray', test_percentage=0.2, xdata_type="%.4f", ydata_type="%d"):
-	X = wData.X
-	Y = wData.Y
+def split_training_test(data, label=None, data_name=None, data_path=None, save_as='ndarray', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
+	
+	X = wuml.ensure_numpy(data)
+	if type(data).__name__ == 'wData': Y = data.Y
+	else: Y = label
+	if Y is None: raise ValueError('Error: The label Y is currently None, did you define it?')
 
 	X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
 
-	Train_dat = data_path + data_name + '_train.csv'
-	Train_label_dat = data_path + data_name + '_train_label.csv'
+	if data_path is not None:
+		Train_dat = data_path + data_name + '_train.csv'
+		Train_label_dat = data_path + data_name + '_train_label.csv'
+	
+		Test_dat = data_path + data_name + '_test.csv'
+		Test_label_dat = data_path + data_name + '_test_label.csv'
+	
+	
+		if save_as == 'ndarray':
+			np.savetxt(Train_dat, X_train, delimiter=',', fmt=xdata_type) 
+			np.savetxt(Train_label_dat, y_train, delimiter=',', fmt=ydata_type) 
+	
+			np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
+			np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
+		elif save_as == 'DataFrame':
+			XTrain_df = pd.DataFrame(data=X_train, columns=data.df.columns)
+			XTest_df =  pd.DataFrame(data=X_test, columns=data.df.columns)
+	
+			XTrain_df['label'] = y_train
+			XTest_df['label'] = y_test
+	
+			XTrain_df.to_csv(Train_dat, index=False, header=True)
+			XTest_df.to_csv(Test_dat, index=False, header=True)
 
-	Test_dat = data_path + data_name + '_test.csv'
-	Test_label_dat = data_path + data_name + '_test_label.csv'
-
-
-	if save_as == 'ndarray':
-		np.savetxt(Train_dat, X_train, delimiter=',', fmt=xdata_type) 
-		np.savetxt(Train_label_dat, y_train, delimiter=',', fmt=ydata_type) 
-
-		np.savetxt(Test_dat, X_test, delimiter=',', fmt=xdata_type) 
-		np.savetxt(Test_label_dat, y_test, delimiter=',', fmt=ydata_type) 
-	elif save_as == 'DataFrame':
-		XTrain_df = pd.DataFrame(data=X_train, columns=wData.df.columns)
-		XTest_df =  pd.DataFrame(data=X_test, columns=wData.df.columns)
-
-		XTrain_df['label'] = y_train
-		XTest_df['label'] = y_test
-
-		XTrain_df.to_csv(Train_dat, index=False, header=True)
-		XTest_df.to_csv(Test_dat, index=False, header=True)
-
-	X_train = wuml.ensure_wData(X_train, column_names=wData.df.columns)
+	X_train = wuml.ensure_wData(X_train, column_names=data.df.columns)
 	X_train.Y = y_train
 
-	X_test = wuml.ensure_wData(X_test, column_names=wData.df.columns)
+	X_test = wuml.ensure_wData(X_test, column_names=data.df.columns)
 	X_test.Y = y_test
 
 	return [X_train, X_test, y_train, y_test]
