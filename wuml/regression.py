@@ -107,7 +107,7 @@ def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse'):
 
 	df = pd.DataFrame()
 	for reg in regressors:
-		reg = regression(data, regressor=reg)
+		reg = regression(data, y=y, regressor=reg)
 		df = df.append(reg.result_summary(print_out=False))
 
 	df = df.sort_values(order_by, ascending=True)
