@@ -16,11 +16,13 @@ class regression:
 	Automatically run regression on data
 
 	data: can be any data type
-	regressor='GP', 'linear', 'NeuralNet', 'kernel ridge', 'AdaBoost', 'Elastic net', 'RandomForest'
+	regressor='GP', 'linear', 'NeuralNet', 'kernel ridge', 'AdaBoost', 'Elastic net', 'RandomForest', 'Predef_NeuralNet'
+				if 'Predef_NeuralNet' is used, you can additionally set arguments : networkStructure, max_epoch, learning_rate
 	split_train_test: automatically splits the data, default is true
 	'''
 
-	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP', kernel=None):
+	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP', kernel=None, 
+				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
 
@@ -53,10 +55,16 @@ class regression:
 			model = MLPRegressor(random_state=1, max_iter=1000)
 		elif regressor == 'RandomForest':
 			model = RandomForestRegressor(max_depth=3, random_state=0)
+		elif regressor == 'Predef_NeuralNet':
+			Xt = wuml.ensure_wData(X_train)
+			model = wuml.basicNetwork('mse', Xt, Y=S(NP(y_train)), networkStructure=networkStructure, 
+										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=False)
 
 		model.fit(NP(X_train), S(NP(y_train)))
 		try: [self.ŷ_train, self.σ] = model.predict(NP(X_train), return_std=True)
-		except: self.ŷ_train = model.predict(NP(X_train))
+		except: 
+			self.ŷ_train = model.predict(NP(X_train))
+
 		self.mse_train = mean_squared_error(S(NP(y_train)), self.ŷ_train)
 
 		if split_train_test:
@@ -103,7 +111,7 @@ def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse'):
 	'''
 	order_by: 'Test mse', 'Train mse'
 	'''
-	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest']
+	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet']
 
 	df = pd.DataFrame()
 	for reg in regressors:

@@ -126,7 +126,7 @@ class basicNetwork:
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
-						network_usage_output_type='Tensor', network_usage_output_dim='none'): 
+						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True): 
 		'''
 			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
@@ -170,7 +170,7 @@ class basicNetwork:
 		else: self.device = 'cpu'
 
 		self.out_structural = None
-		self.info()
+		self.info(printOut=network_info_print)
 
 
 		#	Catch some errors
@@ -196,6 +196,9 @@ class basicNetwork:
 		if printOut: print(info_str)
 		return info_str
 
+	def predict(self, data):
+		return self.__call__(data, output_type='ndarray')
+
 	def __call__(self, data, output_type='Tensor', out_structural=None):
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
@@ -213,7 +216,6 @@ class basicNetwork:
 			x = data.get_data_as('Tensor')
 		else:
 			raise
-
 		yout = self.model(x)
 
 		if self.network_usage_output_dim == 0 or self.network_usage_output_dim == 1:
@@ -236,7 +238,6 @@ class basicNetwork:
 		elif self.network_output_in_CPU_during_usage:
 			return yout.detach().cpu()
 
-
 		return yout
 
 	def eval(self, output_type='ndarray', out_structural=None):		#	Turn this on to run test results
@@ -253,6 +254,6 @@ class basicNetwork:
 				max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype, 
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
-
-
+	def fit(self, X,Y):
+		self.train(print_status=False)
 
