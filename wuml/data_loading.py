@@ -1,5 +1,6 @@
 
 from sklearn import preprocessing
+from wuml.type_check import *
 import sys
 import wuml
 import pandas as pd
@@ -66,6 +67,11 @@ class wData:
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 
+	def get_columns(self, columns):
+		columns = ensure_list(columns)
+		subColumns = self.df[columns]
+		return ensure_wData(subColumns)
+
 	def update_DataFrame(self, df):
 		self.df = df
 		self.columns = self.df.columns
@@ -74,7 +80,7 @@ class wData:
 	
 
 	def append_columns(self, new_data):
-		df = wuml.ensure_DataFrame(new_data)
+		df = ensure_DataFrame(new_data)
 		self.update_DataFrame(pd.concat([self.df,df], axis=1))
 
 	def rename_columns(self, column_names):
@@ -130,11 +136,11 @@ class wData:
 	def __getitem__(self, item):
 		if type(item).__name__ == 'str': return self.df[item]
 		else: 
-			return wuml.ensure_wData(self.df.iloc[item])
+			return ensure_wData(self.df.iloc[item])
 
 			#if return_data_as == 'DataFrame': return self.df.iloc[item]
 			#if return_data_as == 'ndarray': return self.df.values[item]
-			#if return_data_as == 'wData': return wuml.ensure_wData(self.df.iloc[item])
+			#if return_data_as == 'wData': return ensure_wData(self.df.iloc[item])
 
 
 	def __str__(self): 

@@ -320,7 +320,9 @@ def use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 
 	output = ensure_data_type(df, type_name=output_type_name)
 	if output_type_name=='wData': 
-		if data.Y is not None: output.Y = data.Y
-		output.label_column_name = data.label_column_name
+		try: 
+			output.Y = data.Y
+			output.label_column_name = data.label_column_name
+		except: pass
 
 	return output
