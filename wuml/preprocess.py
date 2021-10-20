@@ -182,10 +182,11 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 	return X, ignore_column_with_0_σ
 
 def split_training_test(data, label=None, data_name=None, data_path=None, save_as='ndarray', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
-	
 	X = ensure_numpy(data)
-	if type(data).__name__ == 'wData': Y = data.Y
-	else: Y = label
+	Y = None
+
+	if label is not None: Y = label
+	if type(data).__name__ == 'wData' and data.Y is not None: Y = data.Y
 	if Y is None: raise ValueError('Error: The label Y is currently None, did you define it?')
 
 	X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
