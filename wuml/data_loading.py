@@ -66,6 +66,24 @@ class wData:
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 
+	def update_DataFrame(self, df):
+		self.df = df
+		self.columns = self.df.columns
+		self.X = self.df.values
+		self.shape = self.df.shape
+	
+
+	def append_columns(self, new_data):
+		df = wuml.ensure_DataFrame(new_data)
+		self.update_DataFrame(pd.concat([self.df,df], axis=1))
+
+	def rename_columns(self, column_names):
+		if type(column_names).__name__ == 'str':
+			column_names = [column_names]
+
+		self.df.columns = column_names
+		self.columns = column_names
+
 	def delete_column(self, column_name):
 		if type(column_name) == type([]):
 			for name in column_name:

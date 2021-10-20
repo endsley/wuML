@@ -27,7 +27,7 @@ def remove_rows_with_too_much_missing_entries(data, threshold=0.6, newDataFrameP
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = wuml.ensure_DataFrame(data)
+	df = ensure_DataFrame(data)
 
 	X = df.values
 	n = X.shape[0]
@@ -68,7 +68,7 @@ def remove_columns_with_too_much_missing_entries(data, threshold=0.6, newDataFra
 						index=data[1:,0],    # 1st column as index
 						columns=data[0,1:])  # 1st row as the column names
 	'''
-	df = wuml.ensure_DataFrame(data)
+	df = ensure_DataFrame(data)
 
 	X = df.values
 	n = X.shape[0]
@@ -113,14 +113,14 @@ def remove_columns_with_too_much_missing_entries(data, threshold=0.6, newDataFra
 	write_to(output_str, pth + 'column_decimation_info.txt')
 	if newDataFramePath != '': df_decimated.to_csv(path_or_buf=newDataFramePath, index=False)
 
-	return wuml.ensure_data_type(df_decimated, type_name=type(data).__name__)
+	return ensure_data_type(df_decimated, type_name=type(data).__name__)
 
 def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold=0.6,newDataFramePath=''):
 	'''
 		It will automatically remove rows and columns of a dataFrame with missing entries.
 	'''
 
-	dfo = wuml.ensure_DataFrame(data)
+	dfo = ensure_DataFrame(data)
 	dfSize = 'Data size:' + str(dfo.shape)
 
 	mdp = np.array(identify_missing_data_per_feature(dfo))
@@ -183,7 +183,7 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 def split_training_test(data, label=None, data_name=None, data_path=None, save_as='ndarray', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
 	
-	X = wuml.ensure_numpy(data)
+	X = ensure_numpy(data)
 	if type(data).__name__ == 'wData': Y = data.Y
 	else: Y = label
 	if Y is None: raise ValueError('Error: The label Y is currently None, did you define it?')
@@ -214,10 +214,10 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 			XTrain_df.to_csv(Train_dat, index=False, header=True)
 			XTest_df.to_csv(Test_dat, index=False, header=True)
 
-	X_train = wuml.ensure_wData(X_train, column_names=data.df.columns)
+	X_train = ensure_wData(X_train, column_names=data.df.columns)
 	X_train.Y = y_train
 
-	X_test = wuml.ensure_wData(X_test, column_names=data.df.columns)
+	X_test = ensure_wData(X_test, column_names=data.df.columns)
 	X_test.Y = y_test
 
 	return [X_train, X_test, y_train, y_test]
@@ -265,14 +265,16 @@ def rearrange_sample_to_same_class(X,Y):
 
 #	Relating all samples to the most likely one, with p(X1) > p(Xi) for all i
 #	Given X1 X2 with p(X1)/p(X2)=2  the weight for X1 = 1, and X2 = 2
-def get_likelihood_weight(data):
+def get_likelihood_weight(data, weight_names=None):
 	X = ensure_numpy(data)
-	
+	weight_names = ensure_list(weight_names)
+
 	Pₓ = wuml.KDE(X)
 	logLike = Pₓ(X, return_log_likelihood=True)
 	max_likely = np.max(logLike)
 	ratios = np.exp(max_likely - logLike)
-	return wuml.wData(X_npArray=ratios)
+
+	return wuml.wData(X_npArray=ratios, column_names=weight_names)
 
 
 def use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
@@ -316,7 +318,7 @@ def use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 		X = data.detach().cpu().numpy()
 		df = pd.DataFrame(X)
 
-	output = wuml.ensure_data_type(df, type_name=output_type_name)
+	output = ensure_data_type(df, type_name=output_type_name)
 	if output_type_name=='wData': 
 		output.Y = data.Y
 		output.label_column_name = data.label_column_name

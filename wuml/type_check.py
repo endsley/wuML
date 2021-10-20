@@ -9,6 +9,7 @@ from torch.autograd import Variable
 def data_type(data):
 	return type(data).__name__
 
+
 def ensure_data_type(data, type_name='ndarray'):
 
 	if type_name=='ndarray':
@@ -19,6 +20,13 @@ def ensure_data_type(data, type_name='ndarray'):
 		return ensure_tensor(data)
 	elif type_name=='wData':
 		return ensure_wData(data)
+
+
+def ensure_list(data):
+	if type(data).__name__ == 'str': 
+		return [data]
+	elif type(data).__name__ == 'list': 
+		return data
 
 def ensure_wData(data, column_names=None):
 	if type(data).__name__ == 'ndarray': 
