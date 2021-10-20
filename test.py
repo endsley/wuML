@@ -3,13 +3,13 @@
 import wuml 
 
 
-data = wuml.wData('examples/data/shap_regress_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
+data = wuml.wData('examples/data/shap_classifier_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
 
-reg = wuml.regression(data, regressor='Predef_NeuralNet', max_epoch=200)
-print('Running a single regressor')
-print(reg)
+#cf = wuml.classification(data, classifier='NeuralNet')
+#print('Running a single classifier')
+#print(cf)
 
-print('\n\nRun all regressors sorted by least test error')
-result = wuml.run_every_regressor(data, y=data.Y, order_by='Test mse')
+print('\n\nRun all regressors sorted by Accuracy')
+result = wuml.run_every_classifier(data, y=data.Y, order_by='Test')
 print(result)
 

@@ -23,3 +23,4 @@ from .error import *
 from .dimension_reduction import *
 from .system import *
 from .regression import *
+from .classification import *

@@ -11,12 +11,13 @@ from torch.utils.data import Dataset, DataLoader
 
 class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
-					X_npArray=None, Y_npArray=None, first_row_is_label=False, sample_id_included=False, 
+					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, sample_id_included=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None,
 					replace_this_entry_with_nan=None):
 		'''
 			first_row_is_label :  True of False
+			row_id_with_label: None, if the label is not the first row 0, set with this
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
@@ -31,7 +32,7 @@ class wData:
 			if first_row_is_label: 
 				self.df = pd.read_csv (xpath, header=0, index_col=False)
 			else:
-				self.df = pd.read_csv (xpath, header=None, index_col=False)
+				self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
 
 		if replace_this_entry_with_nan is not None:
 			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
