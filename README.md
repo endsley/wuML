@@ -52,7 +52,7 @@ pip install wuml
 
 
 ### Regression / Classification
-[Run Several Basic Regressors](https://github.com/endsley/wuML/blob/main/examples/regression/ipynb/run_regression.ipynb) 
+[Run Several Basic Regressors](https://github.com/endsley/wuML/blob/main/examples/regression/ipynb/run_regression.ipynb) \
 [Run Several Basic Classifiers](https://github.com/endsley/wuML/blob/main/examples/classification/ipynb/classify.ipynb) 
 
 ### Dimension Reduction
