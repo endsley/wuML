@@ -3,7 +3,7 @@
 import wuml 
 
 
-data = wuml.wData('examples/data/shap_classifier_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
+data = wuml.wData('../../data/shap_classifier_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
 
 cf = wuml.classification(data, classifier='NeuralNet')
 print('Running a single classifier')
