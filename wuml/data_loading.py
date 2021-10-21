@@ -15,7 +15,7 @@ class wData:
 					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, sample_id_included=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None,
-					replace_this_entry_with_nan=None):
+					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False
 			row_id_with_label: None, if the label is not the first row 0, set with this
@@ -63,6 +63,13 @@ class wData:
 		self.torchDataType = torchDataType				
 		self.torchloader = None
 		self.label_type = label_type
+
+		if preprocess_data == 'center and scale':
+			self.X = preprocessing.scale(self.X)
+			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
+		elif preprocess_data == 'between 0 and 1':
+			self.X = wuml.use_cdf_to_map_data_between_0_and_1(self.X, output_type_name='ndarray')
+			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'

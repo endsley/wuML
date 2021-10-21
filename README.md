@@ -20,11 +20,13 @@ pip install wuml
 ### Data Preprocessing
 [Obtain sample weight based on label likelihood](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/weight_sample_by_rarity.ipynb) \
 [Show histogram of a feature](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/show_feature_histogram.ipynb) \
-[Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
 [Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.ipynb) \
 [Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb)\
 \
 [Use CDF to map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/use_cdf_to_map_data_to_between_0_and_1.ipynb) 
+\
+[Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
+[Load data + center/scaled or between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/load_data_with_preprocess.ipynb) 
 
 
 ### Build Neural Networks via Pytorch

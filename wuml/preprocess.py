@@ -146,14 +146,25 @@ def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold
 	return df_decimated
 
 
-def center_and_scale(wuData):
-	X = wuData.get_data_as('ndarray')
+def center_and_scale(wuData, return_type=None):
+	X = ensure_numpy(wuData)
 	X = preprocessing.scale(X)
 
-	wuData.df = pd.DataFrame(data=X, columns=wuData.df.columns)
-	wuData.X = wuData.df.values
-	return wuData
+	if type(wuData).__name__ == 'wData': 
+		wuData.df = pd.DataFrame(data=X, columns=wuData.df.columns)
+	elif type(wuData).__name__ == 'ndarray': 
+		wuData.df = pd.DataFrame(data=X)
+	elif type(wuData).__name__ == 'DataFrame': 
+		wuData.df = pd.DataFrame(data=X, columns=wuData.columns)
+	else:
+		raise ValueError('Error: Cannot center data since %s is not a recongized data type.'%type(wuData).__name__)
 
+	wuData.X = wuData.df.values
+
+	if return_type is None:
+		return ensure_data_type(wuData, type_name=type(wuData).__name__)
+	else:
+		return ensure_data_type(wuData, type_name=return_type)
 
 
 def center_scale_with_missing_data(X, replace_nan_with_0=False): 
