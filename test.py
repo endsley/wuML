@@ -2,18 +2,16 @@
 
 import wuml 
 
+data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', label_type='discrete', first_row_is_label=False)
 
-data = wuml.wData('examples/data/shap_regress_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
+cf = wuml.classification(data, classifier='NaiveBayes')
+print('Running a single classifier')
+print(cf)
 
-reg = wuml.regression(data, regressor='RandomForest')
-y = reg(data)
-
+print('\n\nRun all regressors sorted by Accuracy')
+results = wuml.run_every_classifier(data, y=data.Y, order_by='Test')
+Y = results['GP'](data)
+print(Y)
+print(results['Train/Test Summary'])
 import pdb; pdb.set_trace()
-print('Running a single regressor')
-print(reg)
-
-
-#print('\n\nRun all regressors sorted by least test error')
-#result = wuml.run_every_regressor(data)
-#print(result)
 
