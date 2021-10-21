@@ -12,7 +12,7 @@ class explainer():
 						load_network_path=None,								# You can load your own pytorch network
 						loss='mse',  										#use these options if you use a default regression
 						networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], 
-						max_epoch=1000, learning_rate=0.001, print_network_training_status=True):
+						max_epoch=1000, learning_rate=0.001, print_network_training_status=False):
 
 		'''
 			data : must be wData type with data.X and data.Y defined
@@ -71,13 +71,15 @@ class explainer():
 		A = self.explainer_algorithm
 		if A == 'shap':
 			X = wuml.ensure_numpy(data)
-			return self.Explr.shap_values(X, nsamples=nsamples)[0]
+			shapOut = self.Explr.shap_values(X, nsamples=nsamples)[0]
+			return wuml.ensure_DataFrame(shapOut)
+
 		elif A == 'XGBRegressor':
 			X = wuml.ensure_DataFrame(data)
 			results = self.Explr(X)
 			if output_all_results:
 				return results
 			else:
-				return results.values
+				return wuml.ensure_DataFrame(results.values)
 
 
