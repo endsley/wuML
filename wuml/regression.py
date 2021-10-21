@@ -96,10 +96,13 @@ class regression:
 	def __call__(self, data):
 		X = wuml.ensure_numpy(data)	
 
-		[self.ŷ, self.σ] = model.predict(X, return_std=True)
+		try:
+			[self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
+		except:
+			self.ŷ = self.model.predict(X)
 
-		output = self.model.predict(X, return_std=True, return_cov=False)
-		return wuml.ensure_data_type(output, type_name=type(data).__name__)
+		return wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
+
 		#else: raise ValueError('Regressor not recognized, must use regressor="GP"')
 		
 
