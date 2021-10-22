@@ -1,13 +1,13 @@
-Original dataFrame dimension : 15 samples,  6 dimensions
-Deciated dataFrame dimension : 15 samples,  4 dimensions
+Original data dimension : 15 samples,  6 dimensions
+Deciated data dimension : 15 samples,  4 dimensions
 Removed Columns missing at least these percentage of entries : 0.500
 
 Removed Columns + Missing Percentage
-	F 	0.67
-	A 	0.93
+	A	0.80
+	F	0.67
 
 Retained Columns + Missing Percentage
-	B 	0.07
-	C 	0.47
-	D 	0.47
-	E 	0.20
+	B	0.07
+	C	0.47
+	D	0.47
+	E	0.20

@@ -22,6 +22,7 @@ class wData:
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
+			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 		'''
 		self.label_column_name = label_column_name
 	
@@ -66,9 +67,13 @@ class wData:
 		if preprocess_data == 'center and scale':
 			self.X = preprocessing.scale(self.X)
 			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
-		elif preprocess_data == 'between 0 and 1':
-			self.X = wuml.use_cdf_to_map_data_between_0_and_1(self.X, output_type_name='ndarray')
+		elif preprocess_data == 'linearly between 0 and 1':
+			self.X = wuml.wuml.map_data_between_0_and_1(self.X, output_type_name='ndarray', map_type='linear')
 			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
+		elif preprocess_data == 'between 0 and 1 via cdf':
+			self.X = wuml.wuml.map_data_between_0_and_1(self.X, output_type_name='ndarray', map_type='cdf')
+			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
+
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
@@ -81,7 +86,7 @@ class wData:
 				update_col_names.append(col_name.strip())
 			else:
 				update_col_names.append(col_name)
-				self.df.columns.loc[i] = col_name.strip()
+
 		self.df.columns = update_col_names
 
 

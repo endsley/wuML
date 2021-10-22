@@ -1,22 +1,19 @@
 #!/usr/bin/env python
 
 import wuml 
+import numpy as np
 
-'''
-	This code loads data with missing entries at random as a wData type
-	It will automatically remove the features and samples that are missing too many entries
-	On the decimated data, it will perform imputation
-	It will lastly save and export the results to a csv file
-'''
+data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', 
+					label_type='discrete', first_row_is_label=False, 
+					preprocess_data='center and scale')
 
-wuml.set_terminal_print_options(precision=3)
-data = wuml.wData('examples/data/missin_example.csv', row_id_with_label=0)
-print(data)
+print('mean : ', np.mean(data.X, axis=0))
+print('std : ', np.std(data.X, axis=0))
 
-dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.50, row_threshold=0.70,newDataFramePath='')
-print(dataDecimated)
+data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', 
+					label_type='discrete', first_row_is_label=False, 
+					preprocess_data='linearly between 0 and 1')
 
-X = wuml.impute(dataDecimated, ignore_first_index_column=True)		# perform mice imputation
+print('max : ', np.max(data.X))
+print('min : ', np.std(data.X))
 
-X.plot_2_columns_as_scatter('B','C')
-import pdb; pdb.set_trace()
