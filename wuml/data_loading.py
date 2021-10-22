@@ -38,8 +38,7 @@ class wData:
 		if replace_this_entry_with_nan is not None:
 			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
 
-		if type(self.df.columns).__name__ == 'str': 	# if text column names, strip away white space
-			self.df.columns = self.df.columns.str.replace(' ','')
+		self.strip_white_space_from_column_names()
 
 		self.columns = self.df.columns
 		self.Y = None
@@ -73,6 +72,19 @@ class wData:
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
+
+	def strip_white_space_from_column_names(self):
+		# make sure to strip white space from column names
+		update_col_names = []
+		for i, col_name in enumerate(self.df.columns):
+			if type(self.df.columns[i]).__name__ == 'str':
+				update_col_names.append(col_name.strip())
+			else:
+				update_col_names.append(col_name)
+				self.df.columns.loc[i] = col_name.strip()
+		self.df.columns = update_col_names
+
+
 
 	def get_columns(self, columns):
 		columns = ensure_list(columns)
@@ -153,3 +165,10 @@ class wData:
 	def __str__(self): 
 		return str(self.df)
  
+
+	def plot_2_columns_as_scatter(self, column1, column2):
+		X = self.df[column1].to_numpy()
+		Y = self.df[column2].to_numpy()
+		
+		lp = wuml.scatter(figsize=(10,5))		# (width, height)
+		lp.plot_scatter(X, Y, column1 + ' vs ' + column2, column1, column2, ticker_fontsize=8 )

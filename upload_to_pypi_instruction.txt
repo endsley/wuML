@@ -2,6 +2,8 @@
 User Name is : Chieh.8772
 Password can be found on chrome password settings on pypi
 
+#sys.path.insert(0,'/home/chieh/code/wPlotLib')
+
 
 Go into setup.py
 

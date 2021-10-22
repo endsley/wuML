@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-from wuml.IO import *
-from wuml.data_stats import *
-from wuml.data_loading import *
-from wuml.type_check import *
-
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn import preprocessing
@@ -13,11 +8,21 @@ import numpy as np
 import sys
 import os
 
+#if os.path.exists('/home/chieh/code/wPlotLib'):
+#	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+
+from wuml.IO import *
+from wuml.data_stats import *
+from wuml.data_loading import *
+from wuml.type_check import *
+
 np.set_printoptions(precision=4)
 np.set_printoptions(threshold=30)
 np.set_printoptions(linewidth=300)
 np.set_printoptions(suppress=True)
 np.set_printoptions(threshold=sys.maxsize)
+
+#import pdb; pdb.set_trace()
 
 def remove_rows_with_too_much_missing_entries(data, threshold=0.6, newDataFramePath=''):
 	'''
@@ -124,23 +129,24 @@ def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold
 	dfSize = 'Data size:' + str(dfo.shape)
 
 	mdp = np.array(identify_missing_data_per_feature(dfo))
-	x = np.arange(1, len(mdp)+1)
+	#x = np.arange(1, len(mdp)+1)
+	colnames = dfo.columns.to_numpy()
 
-	lp = lines(figsize=(10,5))
-	lp.plot_line(x, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=121, ylim=[0,1], xTextLoc=0, yTextLoc=0.9,
-					xtick_locations=x, xtick_labels=dfo.columns.to_numpy(), xticker_rotate=90)
+	lp = wplotlib.bar(figsize=(10,5))
+	lp.plot_bar(colnames, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=dfSize, subplot=121, ylim=[0,1], 
+					xticker_rotate=90)
 
 	df = remove_columns_with_too_much_missing_entries(dfo, threshold=column_threshold)
 	df_decimated = remove_rows_with_too_much_missing_entries(df, threshold=row_threshold, newDataFramePath=newDataFramePath)
 	dfSize = 'Data size:' + str(df_decimated.shape)
 
 	mdp = np.array(identify_missing_data_per_feature(df_decimated))
-	x = np.arange(1, len(mdp)+1)
-
-	lp.plot_line(x, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=122, ylim=[0,1], xTextLoc=0, yTextLoc=0.9,
-					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+	#x = np.arange(1, len(mdp)+1)
+	colnames = df.columns.to_numpy()
+	lp.plot_bar(colnames, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=dfSize, subplot=122, ylim=[0,1], 
+					xticker_rotate=90)
 	lp.show()
 
 	return df_decimated
