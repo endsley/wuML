@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 
 import wuml 
-import numpy as np
 
-data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', 
-					label_type='discrete', first_row_is_label=False, 
-					preprocess_data='center and scale')
 
-print('mean : ', np.mean(data.X, axis=0))
-print('std : ', np.std(data.X, axis=0))
+data = wuml.wData('examples/data/shap_regress_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
 
-data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', 
-					label_type='discrete', first_row_is_label=False, 
-					preprocess_data='between 0 and 1')
+reg = wuml.regression(data, regressor='AdaBoost')
+print('Running a single regressor')
+print(reg)
 
-print('max : ', np.max(data.X))
-print('min : ', np.std(data.X))
+print('\n\nRun all regressors sorted by least test error')
+result = wuml.run_every_regressor(data)
+print(result)
 

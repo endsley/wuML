@@ -7,6 +7,9 @@ from sklearn.linear_model import ElasticNet
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import max_error
 import numpy as np
 import pandas as pd
 import wuml
@@ -36,10 +39,10 @@ class regression:
 		else: raise ValueError('Undefined label Y')
 
 		if split_train_test:
-			X_train, X_test, y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+			self.X_train, self.X_test, self.y_train, self.y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
 		else:
-			X_train = X
-			y_train = y
+			self.X_train = X
+			self.y_train = y
 
 		if regressor == 'GP':
 			model = GaussianProcessRegressor(kernel=kernel, random_state=0)
@@ -56,36 +59,71 @@ class regression:
 		elif regressor == 'RandomForest':
 			model = RandomForestRegressor(max_depth=3, random_state=0)
 		elif regressor == 'Predef_NeuralNet':
-			Xt = wuml.ensure_wData(X_train)
-			model = wuml.basicNetwork('mse', Xt, Y=S(NP(y_train)), networkStructure=networkStructure, 
+			Xt = wuml.ensure_wData(self.X_train)
+			model = wuml.basicNetwork('mse', Xt, Y=S(NP(self.y_train)), networkStructure=networkStructure, 
 										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=False)
 
-		model.fit(NP(X_train), S(NP(y_train)))
-		try: [self.ŷ_train, self.σ] = model.predict(NP(X_train), return_std=True)
+		model.fit(NP(self.X_train), S(NP(self.y_train)))
+		try: [self.ŷ_train, self.σ] = model.predict(NP(self.X_train), return_std=True)
 		except: 
-			self.ŷ_train = model.predict(NP(X_train))
+			self.ŷ_train = model.predict(NP(self.X_train))
 
-		self.mse_train = mean_squared_error(S(NP(y_train)), self.ŷ_train)
+		self.mse_train = mean_squared_error(S(NP(self.y_train)), self.ŷ_train)
 
 		if split_train_test:
-			try: [self.ŷ_test, self.σ_test] = model.predict(NP(X_test), return_std=True)
-			except: self.ŷ_test = model.predict(NP(X_test))
-			self.mse_test = mean_squared_error(S(NP(y_test)), self.ŷ_test)
+			try: [self.ŷ_test, self.σ_test] = model.predict(NP(self.X_test), return_std=True)
+			except: self.ŷ_test = model.predict(NP(self.X_test))
+			self.mse_test = mean_squared_error(S(NP(self.y_test)), self.ŷ_test)
 
 		self.split_train_test = split_train_test
 		self.model = model
 		self.regressor = regressor
 		self.kernel = kernel
 
+	def score(self, score_type='r2'):
+
+		if score_type == 'r2' or score_type == 'all scores':
+			self.train_r2_score = r2_score(self.y_train, self.ŷ_train)
+			if self.split_train_test: 
+				self.test_r2_score = r2_score(self.y_test, self.ŷ_test)
+
+		if score_type == 'mean absolute error' or score_type == 'all scores':
+			self.train_avg_abs_Δ = mean_absolute_error(self.y_train, self.ŷ_train)
+			if self.split_train_test: 
+				self.test_avg_abs_Δ = mean_absolute_error(self.y_test, self.ŷ_test)
+
+		if score_type == 'max error' or score_type == 'all scores':
+			self.train_max_abs_Δ = max_error(self.y_train, self.ŷ_train)
+			if self.split_train_test: 
+				self.test_max_abs_Δ = max_error(self.y_test, self.ŷ_test)
+
+
+
 	def result_summary(self, print_out=True):
 		NPR = np.round
+		self.score(score_type='all scores')
 
 		if self.split_train_test:
-			column_names = ['regressor', 'Train mse', 'Test mse']
-			data = np.array([[self.regressor, NPR(self.mse_train, 4) , NPR(self.mse_test, 4)]])
+			column_names = ['regressor', 	'Train mse', 'Test mse', 
+											'Train r2 Score', 'Test r2 Score', 
+											'Train avg abs error', 'Test avg abs error', 
+											'Train max error', 'Test max error' ]
+			data = np.array([[	self.regressor, NPR(self.mse_train,4), 
+												NPR(self.mse_test,4), 
+												NPR(self.train_r2_score,4), 
+												NPR(self.test_r2_score,4), 
+												NPR(self.train_avg_abs_Δ,4), 
+												NPR(self.test_avg_abs_Δ,4), 
+												NPR(self.train_max_abs_Δ,4), 
+												NPR(self.test_max_abs_Δ, 4) ]])
 		else:
-			column_names = ['regressor', 'Train mse']
-			data = np.array([[self.regressor, NPR(self.mse_train, 4)]])
+			column_names = ['regressor', 'Train mse', 'Train r2 Score',											
+											'Train avg abs error', 'Train max error']
+
+			data = np.array([[self.regressor, 	NPR(self.mse_train,4), 
+												NPR(self.train_r2_score,4), 
+												NPR(self.train_avg_abs_Δ,4), 
+												NPR(self.train_max_abs_Δ,4)]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
 		if print_out: print(df)
