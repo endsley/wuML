@@ -12,7 +12,10 @@ print('We first impute all the residual missing entries')
 print(X,'\n')
 
 
-X = wuml.use_cdf_to_map_data_between_0_and_1(X)
-print('We lastly use reverse CDF to map the data to values between 0 and 1')
-print(X,'\n')
+X = wuml.map_data_between_0_and_1(X, map_type='linear') # map_type: linear, or cdf
+print(X[0:20,:])
+
+
+X = wuml.map_data_between_0_and_1(X, map_type='cdf') # map_type: linear, or cdf
+print(X[0:20,:])
 
