@@ -32,6 +32,8 @@ class dimension_reduction:
 		elif method == 'KPCA':
 			model = KernelPCA(n_components=n_components, kernel=kernel)
 			self.Ӽ = model.fit_transform(X)
+		else:
+			raise ValueError('Error: Unrecognized Dimension Reduction Method: %s.'%method)
 
 		self.model = model
 		self.method = method

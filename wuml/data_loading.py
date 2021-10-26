@@ -103,8 +103,8 @@ class wData:
 		self.shape = self.df.shape
 	
 
-	def append_columns(self, new_data):
-		df = ensure_DataFrame(new_data)
+	def append_columns(self, new_data, column_names=None):
+		df = ensure_DataFrame(new_data, columns=column_names)
 		self.update_DataFrame(pd.concat([self.df,df], axis=1))
 
 	def rename_columns(self, column_names):

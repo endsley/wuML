@@ -42,6 +42,8 @@ def ensure_wData(data, column_names=None):
 		return wuml.wData(X_npArray=data.Ӽ)
 
 def ensure_DataFrame(data, columns=None, index=None):
+	columns = ensure_list(columns)
+
 	if type(data).__name__ == 'ndarray': 
 		df = pd.DataFrame(data, columns=columns, index=index)
 	elif type(data).__name__ == 'wData': 
