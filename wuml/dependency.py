@@ -87,6 +87,8 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 
 	return H
 
+def NMI(Y, Ŷ, round_to=3):
+	return np.round(normalized_mutual_info_score(Y, Ŷ), round_to)
 
 def accuracy(Y, Ŷ):
 	if type(Y).__name__ == 'Tensor': 

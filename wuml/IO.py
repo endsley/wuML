@@ -3,11 +3,15 @@
 import os 
 import sys
 
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+
 import types
 import torch
 import pickle
 import numpy as np
 import wuml
+
 import wplotlib
 import pandas as pd
 from pathlib import Path

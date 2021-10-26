@@ -38,7 +38,8 @@ def ensure_wData(data, column_names=None):
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()
 		return wuml.wData(X_npArray=X, column_names=column_names)
-
+	elif type(data).__name__ == 'dimension_reduction': 
+		return wuml.wData(X_npArray=data.Ӽ)
 
 def ensure_DataFrame(data, columns=None, index=None):
 	if type(data).__name__ == 'ndarray': 
@@ -56,9 +57,8 @@ def ensure_DataFrame(data, columns=None, index=None):
 		df = pd.DataFrame(X)
 		df.columns = data.df.columns
 		df.index = data.df.index
-
-	#if columns is not None:
-	#	df.columns = columns
+	elif type(data).__name__ == 'dimension_reduction': 
+		df = pd.DataFrame(data.Ӽ)
 
 	return df
 
@@ -79,6 +79,8 @@ def ensure_numpy(data, rounding=None):
 		X = data.values
 	elif np.isscalar(data):
 		X = np.array([[data]])
+	elif type(data).__name__ == 'dimension_reduction': 
+		X = data.Ӽ
 	else:
 		raise ValueError('Unknown dataType %s'%type(data).__name__)
 
@@ -104,6 +106,11 @@ def ensure_tensor(data, dataType=torch.FloatTensor):
 	elif type(data).__name__ == 'Tensor': 
 		x = Variable(data.type(dataType), requires_grad=False)
 		X = x.to(device, non_blocking=True )
+	elif type(data).__name__ == 'dimension_reduction': 
+		x = torch.from_numpy(data.Ӽ)
+		x = Variable(x.type(dataType), requires_grad=False)
+		X = x.to(device, non_blocking=True )
+
 	else:
 		raise ValueError('Unknown dataType %s'%type(data).__name__)
 
