@@ -59,6 +59,7 @@ class dimension_reduction:
 
 		self.model = model
 		self.method = method
+		self.shape = self.Ӽ.shape
 
 		if show_plot:
 			lp = wplotlib.scatter(figsize=(10,5))		# (width, height)
@@ -85,7 +86,7 @@ def show_multiple_dimension_reduction_results(data, n_components, learning_rate=
 	results = {}
 	lp = wplotlib.scatter(figsize=(7,8))		# (width, height)
 	for i, m in enumerate(methods):
-		results[m] = dimension_reduction(data, n_components=n_components, method=m, 
+		results[m] = dimension_reduction(data, n_components, method=m, 
 											learning_rate=learning_rate, show_plot=False, 
 											n_neighbors=n_neighbors, gamma=gamma)
 		lp.plot_scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i)

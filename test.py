@@ -5,11 +5,11 @@ import numpy as np
 
 
 X = np.vstack((np.random.randn(10,4), np.random.randn(10,4) + 10))
-print(X.shape)
+print('Dimension Before', X.shape)
 
 #	Run a single method
-DR = wuml.dimension_reduction(X, method='PCA', show_plot=True)
-print(DR.shape)
+Xᵈ = wuml.dimension_reduction(X, 2, method='PCA', show_plot=True)
+print('Dimension After', Xᵈ.shape)
 
 
 #	Run a all methods
