@@ -126,7 +126,7 @@ class basicNetwork:
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
-						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True): 
+						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=False): 
 		'''
 			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
@@ -171,7 +171,7 @@ class basicNetwork:
 
 		self.out_structural = None
 		self.info(printOut=network_info_print)
-
+		self.network_info_print = network_info_print
 
 		#	Catch some errors
 		if costFunction == 'CE' and X.label_type == 'continuous':
@@ -255,5 +255,5 @@ class basicNetwork:
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
 	def fit(self, X,Y):
-		self.train(print_status=False)
+		self.train(print_status=self.network_info_print)
 

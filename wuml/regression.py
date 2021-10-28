@@ -26,8 +26,8 @@ class regression:
 	gamma: weight of the Gaussian kernel
 	'''
 
-	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP', kernel=None, 
-				alpha=0.5, gamma=1, l1_ratio=0.5, 
+	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP',  
+				alpha=0.5, gamma=1, l1_ratio=0.5, network_info_print=False,
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
@@ -48,11 +48,11 @@ class regression:
 			self.y_train = y
 
 		if regressor == 'GP':
-			model = GaussianProcessRegressor(kernel=kernel, random_state=0)
+			model = GaussianProcessRegressor(kernel=None, random_state=0)
 		elif regressor == 'linear':
 			model = LinearRegression()
 		elif regressor == 'kernel ridge':
-			model = KernelRidge(alpha=alpha, gamma=gamma)
+			model = KernelRidge(alpha=alpha, gamma=gamma, kernel='rbf')
 		elif regressor == 'AdaBoost':
 			model = AdaBoostRegressor(random_state=0, n_estimators=100)
 		elif regressor == 'Elastic net':
@@ -64,8 +64,7 @@ class regression:
 		elif regressor == 'Predef_NeuralNet':
 			Xt = wuml.ensure_wData(self.X_train)
 			model = wuml.basicNetwork('mse', Xt, Y=S(NP(self.y_train)), networkStructure=networkStructure, 
-										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=False)
-
+										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=network_info_print)
 		model.fit(NP(self.X_train), S(NP(self.y_train)))
 		try: [self.ŷ_train, self.σ] = model.predict(NP(self.X_train), return_std=True)
 		except: 
@@ -81,7 +80,6 @@ class regression:
 		self.split_train_test = split_train_test
 		self.model = model
 		self.regressor = regressor
-		self.kernel = kernel
 
 	def score(self, score_type='r2'):
 
@@ -107,28 +105,29 @@ class regression:
 		self.score(score_type='all scores')
 
 		if self.split_train_test:
-			column_names = ['regressor', 	'Train mse', 'Test mse', 
-											'Train r2 Score', 'Test r2 Score', 
-											'Train avg abs error', 'Test avg abs error', 
-											'Train max error', 'Test max error' ]
-			data = np.array([[	self.regressor, NPR(self.mse_train,4), 
-												NPR(self.mse_test,4), 
-												NPR(self.train_r2_score,4), 
-												NPR(self.test_r2_score,4), 
-												NPR(self.train_avg_abs_Δ,4), 
-												NPR(self.test_avg_abs_Δ,4), 
-												NPR(self.train_max_abs_Δ,4), 
-												NPR(self.test_max_abs_Δ, 4) ]])
+			column_names = ['Train mse', 'Test mse', 
+							'Train r2 Score', 'Test r2 Score', 
+							'Train avg abs error', 'Test avg abs error', 
+							'Train max error', 'Test max error' ]
+
+			data = np.array([[	NPR(self.mse_train,4), 
+								NPR(self.mse_test,4), 
+								NPR(self.train_r2_score,4), 
+								NPR(self.test_r2_score,4), 
+								NPR(self.train_avg_abs_Δ,4), 
+								NPR(self.test_avg_abs_Δ,4), 
+								NPR(self.train_max_abs_Δ,4), 
+								NPR(self.test_max_abs_Δ, 4) ]])
 		else:
-			column_names = ['regressor', 'Train mse', 'Train r2 Score',											
+			column_names = ['Train mse', 'Train r2 Score',											
 											'Train avg abs error', 'Train max error']
 
-			data = np.array([[self.regressor, 	NPR(self.mse_train,4), 
-												NPR(self.train_r2_score,4), 
-												NPR(self.train_avg_abs_Δ,4), 
-												NPR(self.train_max_abs_Δ,4)]])
+			data = np.array([[NPR(self.mse_train,4), 
+							  NPR(self.train_r2_score,4), 
+							  NPR(self.train_avg_abs_Δ,4), 
+							  NPR(self.train_max_abs_Δ,4)]])
 
-		df = pd.DataFrame(data, columns=column_names,index=[''])
+		df = pd.DataFrame(data, columns=column_names,index=[self.regressor])
 		if print_out: print(df)
 		return df
 
@@ -151,18 +150,23 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, alpha=1, gamma=1, l1_ratio=0.2):
+def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, 
+						alpha=1, gamma=1, l1_ratio=0.2, max_epoch=500, learning_rate=0.001,
+						network_info_print=False):
 	'''
 	order_by: 'Train mse', 'Test mse', 'Train r2 Score', 'Test r2 Score', 
 				'Train avg abs error', 'Test avg abs error', 'Train max error', 'Test max error'
 	'''
 	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet']
+	results = {}
 
 	df = pd.DataFrame()
 	for reg in regressors:
-		reg = regression(data, y=y, regressor=reg, alpha=alpha, gamma=gamma, l1_ratio=l1_ratio)
-		df = df.append(reg.result_summary(print_out=False))
+		results[reg] = regression(data, y=y, regressor=reg, alpha=alpha, gamma=gamma, 
+							l1_ratio=l1_ratio, max_epoch=max_epoch, learning_rate=learning_rate,
+							network_info_print=network_info_print)
+		df = df.append(results[reg].result_summary(print_out=False))
 
-	df = df.sort_values(order_by, ascending=ascending)
-	return df
+	results['Train/Test Summary'] = df.sort_values(order_by, ascending=ascending)
+	return results
 
