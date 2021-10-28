@@ -150,6 +150,39 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
+	def show_true_v_predicted(self, sort_by='Error', ascending=False):
+		'''
+			sort_by = 'Value' or 'Error'
+		'''
+		NP = wuml.ensure_numpy
+
+		Y = wuml.ensure_wData(self.y_train)
+		train_E = np.absolute(NP(self.y_train) - NP(self.ŷ_train))
+		Y.append_columns(self.ŷ_train)
+		Y.append_columns(train_E)
+		Y.rename_columns(['Train y','Train ŷ', 'Train Error'])
+		if sort_by == 'Value':
+			Y.sort_by('Train y', ascending=ascending)
+		if sort_by == 'Error':
+			Y.sort_by('Train Error', ascending=ascending)
+
+
+		if self.split_train_test:
+			Yt = wuml.ensure_wData(self.y_test)
+			test_E = np.absolute(NP(self.y_test) - NP(self.ŷ_test))
+
+			Yt.append_columns(self.ŷ_test)
+			Yt.append_columns(test_E)
+			Yt.rename_columns(['Test y', 'Test ŷ', 'Test Error'])
+
+			if sort_by == 'Value':
+				Yt.sort_by('Test y', ascending=ascending)
+			if sort_by == 'Error':
+				Yt.sort_by('Test Error', ascending=ascending)
+
+		Y.append_columns(Yt)
+		return Y
+
 def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, 
 						alpha=1, gamma=1, l1_ratio=0.2, max_epoch=500, learning_rate=0.001,
 						network_info_print=False):

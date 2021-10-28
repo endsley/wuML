@@ -89,7 +89,8 @@ class wData:
 
 		self.df.columns = update_col_names
 
-
+	def sort_by(self, column_name, ascending=True):
+		self.df.sort_values(column_name, ascending=ascending)
 
 	def get_columns(self, columns):
 		columns = ensure_list(columns)
