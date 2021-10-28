@@ -158,7 +158,7 @@ class wData:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 
 	def __getitem__(self, item):
-		if type(item).__name__ == 'str': return self.df[item]
+		if type(item).__name__ == 'str': return ensure_wData(self.df[item].to_frame())
 		else: 
 			return ensure_wData(self.df.iloc[item])
 

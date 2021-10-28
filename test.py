@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 import wuml 
-import numpy as np
 
 
-X = np.vstack((np.random.randn(10,4), np.random.randn(10,4) + 10))
-print('Dimension Before', X.shape)
+data = wuml.wData('examples/data/shap_regress_example_uniform.csv', label_column_name='label', label_type='continuous', first_row_is_label=True)
 
-#	Run a single method
-Xᵈ = wuml.dimension_reduction(X, 2, method='PCA', show_plot=True)
-print('Dimension After', Xᵈ.shape)
+reg = wuml.regression(data, regressor='Elastic net', alpha=0.05, gamma=0.05, l1_ratio=0.05)
+print('Running a single regressor')
+print(reg)
 
+print('\n\nRun all regressors sorted by least test error')
+result = wuml.run_every_regressor(data, alpha=0.1, gamma=0.05, l1_ratio=0.05)
+print(result)
 
-#	Run a all methods
-wuml.show_multiple_dimension_reduction_results(X, 2, learning_rate=14, n_neighbors=10, gamma=0.05)

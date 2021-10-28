@@ -22,9 +22,12 @@ class regression:
 	regressor='GP', 'linear', 'NeuralNet', 'kernel ridge', 'AdaBoost', 'Elastic net', 'RandomForest', 'Predef_NeuralNet'
 				if 'Predef_NeuralNet' is used, you can additionally set arguments : networkStructure, max_epoch, learning_rate
 	split_train_test: automatically splits the data, default is true
+	alpha: weight of the Kernel Ridge regularizer
+	gamma: weight of the Gaussian kernel
 	'''
 
 	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP', kernel=None, 
+				alpha=0.5, gamma=1, l1_ratio=0.5, 
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
@@ -49,11 +52,11 @@ class regression:
 		elif regressor == 'linear':
 			model = LinearRegression()
 		elif regressor == 'kernel ridge':
-			model = KernelRidge(alpha=1.0)
+			model = KernelRidge(alpha=alpha, gamma=gamma)
 		elif regressor == 'AdaBoost':
 			model = AdaBoostRegressor(random_state=0, n_estimators=100)
 		elif regressor == 'Elastic net':
-			model = ElasticNet(random_state=0)
+			model = ElasticNet(random_state=0, alpha=alpha, l1_ratio=l1_ratio)
 		elif regressor == 'NeuralNet':
 			model = MLPRegressor(random_state=1, max_iter=1000)
 		elif regressor == 'RandomForest':
@@ -148,15 +151,16 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse'):
+def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', alpha=1, gamma=1, l1_ratio=0.2):
 	'''
-	order_by: 'Test mse', 'Train mse'
+	order_by: 'Train mse', 'Test mse', 'Train r2 Score', 'Test r2 Score', 
+				'Train avg abs error', 'Test avg abs error', 'Train max error', 'Test max error'
 	'''
 	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet']
 
 	df = pd.DataFrame()
 	for reg in regressors:
-		reg = regression(data, y=y, regressor=reg)
+		reg = regression(data, y=y, regressor=reg, alpha=alpha, gamma=gamma, l1_ratio=l1_ratio)
 		df = df.append(reg.result_summary(print_out=False))
 
 	df = df.sort_values(order_by, ascending=True)
