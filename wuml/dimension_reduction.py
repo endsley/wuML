@@ -14,7 +14,7 @@ from sklearn.decomposition import FactorAnalysis
 
 
 class dimension_reduction:
-	def __init__(self, data, n_components, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
+	def __init__(self, data, n_components=2, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
 		'''
 			n_components: number of dimension to reduce down to
 			method: 'PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis'
@@ -80,13 +80,13 @@ class dimension_reduction:
 		return str(self.Ӽ)
 
 
-def show_multiple_dimension_reduction_results(data, n_components, learning_rate=15, n_neighbors=5, gamma=1):
+def show_multiple_dimension_reduction_results(data, learning_rate=15, n_neighbors=5, gamma=1):
 	methods = ['PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis']
 
 	results = {}
 	lp = wplotlib.scatter(figsize=(7,8))		# (width, height)
 	for i, m in enumerate(methods):
-		results[m] = dimension_reduction(data, n_components, method=m, 
+		results[m] = dimension_reduction(data, n_components=2, method=m, 
 											learning_rate=learning_rate, show_plot=False, 
 											n_neighbors=n_neighbors, gamma=gamma)
 		lp.plot_scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i)
