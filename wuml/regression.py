@@ -10,6 +10,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import max_error
+from wuml.type_check import *
 import numpy as np
 import pandas as pd
 import wuml
@@ -29,7 +30,7 @@ class regression:
 	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP',  
 				alpha=0.5, gamma=1, l1_ratio=0.5, network_info_print=False,
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
-		NP = wuml.ensure_numpy
+		NP = ensure_numpy
 		S = np.squeeze
 
 		X = NP(data)
@@ -62,7 +63,7 @@ class regression:
 		elif regressor == 'RandomForest':
 			model = RandomForestRegressor(max_depth=3, random_state=0)
 		elif regressor == 'Predef_NeuralNet':
-			Xt = wuml.ensure_wData(self.X_train)
+			Xt = ensure_wData(self.X_train)
 			model = wuml.basicNetwork('mse', Xt, Y=S(NP(self.y_train)), networkStructure=networkStructure, 
 										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=network_info_print)
 		model.fit(NP(self.X_train), S(NP(self.y_train)))
@@ -134,14 +135,14 @@ class regression:
 
 
 	def __call__(self, data):
-		X = wuml.ensure_numpy(data)	
+		X = ensure_numpy(data)	
 
 		try:
 			[self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
 		except:
 			self.ŷ = self.model.predict(X)
 
-		return wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
+		return ensure_data_type(self.ŷ, type_name=type(data).__name__)
 
 		#else: raise ValueError('Regressor not recognized, must use regressor="GP"')
 		
@@ -150,25 +151,27 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
-	def show_true_v_predicted(self, sort_by='Error', ascending=False):
+	def show_true_v_predicted(self, view='train', sort_by='Error', ascending=False):
 		'''
 			sort_by = 'Value' or 'Error'
+			view = 'train', 'test'
 		'''
-		NP = wuml.ensure_numpy
+		NP = ensure_numpy
 
-		Y = wuml.ensure_wData(self.y_train)
+		Y = ensure_wData(self.y_train)
 		train_E = np.absolute(NP(self.y_train) - NP(self.ŷ_train))
 		Y.append_columns(self.ŷ_train)
 		Y.append_columns(train_E)
 		Y.rename_columns(['Train y','Train ŷ', 'Train Error'])
 		if sort_by == 'Value':
 			Y.sort_by('Train y', ascending=ascending)
-		if sort_by == 'Error':
-			Y.sort_by('Train Error', ascending=ascending)
+		elif sort_by == 'Error':
+			Y.sort_by(['Train Error'], ascending=ascending)
 
+		if view == 'train': return Y
 
 		if self.split_train_test:
-			Yt = wuml.ensure_wData(self.y_test)
+			Yt = ensure_wData(self.y_test)
 			test_E = np.absolute(NP(self.y_test) - NP(self.ŷ_test))
 
 			Yt.append_columns(self.ŷ_test)
@@ -177,10 +180,11 @@ class regression:
 
 			if sort_by == 'Value':
 				Yt.sort_by('Test y', ascending=ascending)
-			if sort_by == 'Error':
+			elif sort_by == 'Error':
 				Yt.sort_by('Test Error', ascending=ascending)
+		
+			if view == 'test': return Yt
 
-		Y.append_columns(Yt)
 		return Y
 
 def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, 

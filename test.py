@@ -16,7 +16,8 @@ babyAge = data.get_columns(['BabyAssessAge_B1W'])
 regressor = wuml.regression(suckPattern, y=babyAge, regressor='kernel ridge', alpha=0.5, gamma=0.5)
 #regressor = wuml.regression(suckPattern, y=babyAge, regressor='Predef_NeuralNet', network_info_print=True, max_epoch=2000)
 summary = regressor.result_summary()
-regressor.show_true_v_predicted()
+YY = regressor.show_true_v_predicted(view='train')
+YY2 = regressor.show_true_v_predicted(view='test')
 
 #res = wuml.run_every_regressor(suckPattern, y=babyAge, order_by='Test mse', 
 #								alpha=1, gamma=1, l1_ratio=0.2, max_epoch=2000, network_info_print=True)

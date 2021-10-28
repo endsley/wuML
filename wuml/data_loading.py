@@ -90,7 +90,8 @@ class wData:
 		self.df.columns = update_col_names
 
 	def sort_by(self, column_name, ascending=True):
-		self.df.sort_values(column_name, ascending=ascending)
+		self.df = self.df.sort_values(column_name, ascending=ascending)
+		self.update_DataFrame(self.df)
 
 	def get_columns(self, columns):
 		columns = ensure_list(columns)
@@ -103,6 +104,9 @@ class wData:
 		self.X = self.df.values
 		self.shape = self.df.shape
 	
+	def append_rows(self, new_data, column_names=None):
+		df = ensure_DataFrame(new_data, columns=column_names)
+		self.update_DataFrame(pd.concat([self.df,df], axis=0))
 
 	def append_columns(self, new_data, column_names=None):
 		df = ensure_DataFrame(new_data, columns=column_names)
