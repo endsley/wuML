@@ -151,7 +151,7 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', alpha=1, gamma=1, l1_ratio=0.2):
+def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, alpha=1, gamma=1, l1_ratio=0.2):
 	'''
 	order_by: 'Train mse', 'Test mse', 'Train r2 Score', 'Test r2 Score', 
 				'Train avg abs error', 'Test avg abs error', 'Train max error', 'Test max error'
@@ -163,6 +163,6 @@ def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', a
 		reg = regression(data, y=y, regressor=reg, alpha=alpha, gamma=gamma, l1_ratio=l1_ratio)
 		df = df.append(reg.result_summary(print_out=False))
 
-	df = df.sort_values(order_by, ascending=True)
+	df = df.sort_values(order_by, ascending=ascending)
 	return df
 
