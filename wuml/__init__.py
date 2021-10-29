@@ -18,9 +18,10 @@ from .distribution_modeling import *
 from .operations import *
 from .matrix_manipulate import *
 from .explainer import *
-from .error import *
 from .dimension_reduction import *
 from .system import *
 from .regression import *
 from .classification import *
 from .cluster import *
+from .kernels import *
+from .IKDR import *

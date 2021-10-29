@@ -34,13 +34,7 @@ class regression:
 		S = np.squeeze
 
 		X = NP(data)
-		if y is not None:
-			y = S(NP(y))
-		elif y_column_name is not None:
-			y = data[y_column_name].values
-		elif type(data).__name__ == 'wData':
-			y = data.Y
-		else: raise ValueError('Undefined label Y')
+		y = ensure_label(data, y=y, y_column_name=y_column_name)
 
 		if split_train_test:
 			self.X_train, self.X_test, self.y_train, self.y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")

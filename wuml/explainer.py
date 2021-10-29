@@ -22,7 +22,7 @@ class explainer():
 		'''
 
 		if type(data).__name__ != 'wData': 
-			wuml.error_msg_exit('Error: data input into explainer must be wData type with data.X, data.Y defined.')
+			raise ValueError('Error: data input into explainer must be wData type with data.X, data.Y defined.')
 
 		if explainer_algorithm == 'shap':
 			X = wuml.ensure_numpy(data)
