@@ -104,8 +104,12 @@ class wData:
 		self.X = self.df.values
 		self.shape = self.df.shape
 	
-	def append_rows(self, new_data, column_names=None):
-		df = ensure_DataFrame(new_data, columns=column_names)
+	def reset_index(self):
+		self.df.reset_index(drop=True, inplace=True)	
+		self.update_DataFrame(self.df)
+
+	def append_rows(self, new_data):
+		df = ensure_DataFrame(new_data, columns=self.columns)
 		self.update_DataFrame(pd.concat([self.df,df], axis=0))
 
 	def append_columns(self, new_data, column_names=None):
@@ -174,7 +178,10 @@ class wData:
 
 	def __str__(self): 
 		return str(self.df)
- 
+
+	def __repr__(self): 
+		return str(self.df)
+
 
 	def plot_2_columns_as_scatter(self, column1, column2):
 		X = self.df[column1].to_numpy()

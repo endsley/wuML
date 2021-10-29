@@ -27,6 +27,12 @@ def ensure_list(data):
 		return [data]
 	elif type(data).__name__ == 'list': 
 		return data
+	elif type(data).__name__ == 'NoneType': 
+		return data
+	elif type(data).__name__ == 'Index': 
+		return data.tolist()
+	if type(data).__name__ == 'ndarray': 
+		return data.tolist()
 
 def ensure_wData(data, column_names=None):
 	if type(data).__name__ == 'ndarray': 
@@ -52,7 +58,7 @@ def ensure_DataFrame(data, columns=None, index=None):
 		df.index = data.df.index
 	elif type(data).__name__ == 'DataFrame': 
 		df = data
-		#df.columns = data.df.columns
+		if columns is not None: df.columns = columns
 		#df.index = data.df.index
 	elif type(data).__name__ == 'Tensor': 
 		X = data.detach().cpu().numpy()

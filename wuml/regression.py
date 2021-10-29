@@ -151,10 +151,9 @@ class regression:
 		return str(self.result_summary(print_out=False))
 
 
-	def show_true_v_predicted(self, view='train', sort_by='Error', ascending=False):
+	def show_true_v_predicted(self, sort_by='Error', ascending=False):
 		'''
 			sort_by = 'Value' or 'Error'
-			view = 'train', 'test'
 		'''
 		NP = ensure_numpy
 
@@ -168,7 +167,6 @@ class regression:
 		elif sort_by == 'Error':
 			Y.sort_by(['Train Error'], ascending=ascending)
 
-		if view == 'train': return Y
 
 		if self.split_train_test:
 			Yt = ensure_wData(self.y_test)
@@ -182,9 +180,16 @@ class regression:
 				Yt.sort_by('Test y', ascending=ascending)
 			elif sort_by == 'Error':
 				Yt.sort_by('Test Error', ascending=ascending)
-		
-			if view == 'test': return Yt
 
+			padding_len = Y.shape[0] - Yt.shape[0]
+			an_array = np.empty((padding_len, 3))
+			an_array[:] = np.NaN
+			padding = pd.DataFrame(an_array)
+			Yt.append_rows(padding)
+
+			Y.reset_index()
+			Yt.reset_index()
+			Y.append_columns(Yt)
 		return Y
 
 def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, 
