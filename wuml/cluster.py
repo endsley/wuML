@@ -115,19 +115,3 @@ def run_every_clustering_algorithm(data, n_clusters, gamma=1):
 		results[C].plot_scatter_result()
 
 
-#	methods = ['PCA', 'TSNE', 'KPCA']
-#	for i, C in enumerate(c_methods):
-#
-#
-#		for j, m in enumerate(methods):
-#			title = 'Using %s'%(C)
-#			imgText = '%d clusters\n%s'%(n_clusters, m)
-#			ϰ = wuml.dimension_reduction(X, method=m)
-#			if i == 0 and j==0:
-#				plts = wplotlib.plot_clusters(ϰ, results[C].labels, title=title, subplot=431+i+j, figsize=(10,10), imgText=imgText)
-#			else:
-#				plts = wplotlib.plot_clusters(ϰ, results[C].labels, title=title, subplot=431+i+j, imgText=imgText)
-#			print(i, j, 431+i*3+j)
-#
-#	plts.show()
-

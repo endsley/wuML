@@ -8,13 +8,14 @@ from wplotlib import scatter
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 data = wuml.wData(xpath='examples/data/wine.csv', ypath='examples/data/wine_label.csv', label_type='discrete', first_row_is_label=False)
-#ikdr = wuml.IKDR(data, q=3)
-#ikdr.fit(data, data.Y)
-#Ŷ = ikdr.predict(data)
-#import pdb; pdb.set_trace()
+ikdr = wuml.IKDR(data, q=2)
+ikdr.fit(data, data.Y)
+Ŷ = ikdr.predict(data)
+print(ikdr.W)
+import pdb; pdb.set_trace()
 
-results = wuml.run_every_classifier(data, q=12)
-print(results['Train/Test Summary'])
+#results = wuml.run_every_classifier(data, q=12)
+#print(results['Train/Test Summary'])
 
 #ikdr = wuml.classification(data, q=12, classifier='IKDR', split_train_test=True)
 #ikdr.result_summary(print_out=True)
