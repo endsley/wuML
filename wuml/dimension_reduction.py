@@ -12,6 +12,7 @@ from sklearn.manifold import MDS
 from sklearn.manifold import SpectralEmbedding
 from sklearn.decomposition import FactorAnalysis
 
+from wuml.type_check import *
 
 class dimension_reduction:
 	def __init__(self, data, n_components=2, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
@@ -23,7 +24,8 @@ class dimension_reduction:
 			gamma: used for KPCA
 		'''
 
-		X = wuml.ensure_numpy(data)
+		df = ensure_DataFrame(data)
+		X = ensure_numpy(data)
 		if method == 'PCA':
 			model = PCA(n_components=X.shape[1])
 			use_all_dims = model.fit_transform(X)
@@ -32,6 +34,8 @@ class dimension_reduction:
 			self.normalized_eigs = model.explained_variance_ratio_
 			self.eigen_values = model.singular_values_
 			self.cumulative_eigs = np.cumsum(self.eigen_values)/np.sum(self.eigen_values)
+			column_names = ['λ%d'%x for x in range(1, model.components_.shape[1]+1)]
+			self.eig_vectors = ensure_DataFrame(model.components_, columns=column_names, index=df.columns)
 
 		elif method == 'TSNE':
 			model = TSNE(n_components=n_components, learning_rate=learning_rate)
