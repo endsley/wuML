@@ -96,4 +96,4 @@ def show_multiple_dimension_reduction_results(data, learning_rate=15, n_neighbor
 		lp.plot_scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i)
 
 	lp.show()
-
+	return results
