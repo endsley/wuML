@@ -41,6 +41,9 @@ pip install wuml
 [Maximum Likelihood on Exponential Distribution Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/basic_exponential_MLE_modeling.ipynb)
 
 
+### Feature Selection
+[Unsupervised Filtering via HSIC](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/selection_by_hsic.ipynb) 
+
 ### Explaining Models
 [Run Default Shap explainer (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/default_regression_explainer.ipynb) \
 [Run Shap on data between 0 and 1 (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_uniform.ipynb) 
