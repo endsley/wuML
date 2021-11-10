@@ -198,7 +198,7 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 	return X, ignore_column_with_0_σ
 
-def split_training_test(data, label=None, data_name=None, data_path=None, save_as='ndarray', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
+def split_training_test(data, label=None, data_name=None, data_path=None, save_as='none', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
 	X = ensure_numpy(data)
 	Y = None
 

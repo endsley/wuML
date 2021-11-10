@@ -25,3 +25,6 @@ from .classification import *
 from .cluster import *
 from .kernels import *
 from .IKDR import *
+from .flow import flow
+from .generate_data import *
+from .feature_selection import *

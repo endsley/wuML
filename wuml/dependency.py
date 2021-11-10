@@ -81,10 +81,10 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 	if Hᵪᵧ == 0: return 0
 	if not normalize_hsic: return Hᵪᵧ/(n*n)
 
-	Hᵪ = np.linalg.norm(HKᵪ)						# equivalent to 	np.sqrt(np.sum(KᵪH*KᵪH))
-	Hᵧ = np.linalg.norm(HKᵧ) 						# equivalent to 	np.sqrt(np.sum(KᵧH*KᵧH))
-	H = Hᵪᵧ/( Hᵪ * Hᵧ )
+	Hᵪ = np.sqrt(np.sum(HKᵪ.T*HKᵪ))					#note wrong if Hᵪ = np.linalg.norm(HKᵪ)	b/c it is equivalent to np.sqrt(np.sum(KᵪH*KᵪH))
+	Hᵧ = np.sqrt(np.sum(HKᵧ.T*HKᵧ))						
 
+	H = Hᵪᵧ/( Hᵪ * Hᵧ )
 	return H
 
 def NMI(Y, Ŷ, round_to=3):

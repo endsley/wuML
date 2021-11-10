@@ -59,6 +59,8 @@ def ensure_wData(data, column_names=None):
 		return wuml.wData(X_npArray=X, column_names=column_names)
 	elif wtype(data) == 'dimension_reduction': 
 		return wuml.wData(X_npArray=data.Ӽ)
+	elif wtype(data) == 'Series': 
+		return wuml.wData(X_npArray=data.to_numpy(), column_names=column_names)
 
 def ensure_DataFrame(data, columns=None, index=None):
 	columns = ensure_list(columns)

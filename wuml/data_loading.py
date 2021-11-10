@@ -94,6 +94,9 @@ class wData:
 		self.update_DataFrame(self.df)
 
 	def get_columns(self, columns):
+		if type(columns).__name__ == 'int': 
+			return ensure_wData(self.df.iloc[:,columns], column_names=[columns])
+			
 		columns = ensure_list(columns)
 		subColumns = self.df[columns]
 		return ensure_wData(subColumns)
@@ -169,12 +172,7 @@ class wData:
 	def __getitem__(self, item):
 		if type(item).__name__ == 'str': return ensure_wData(self.df[item].to_frame())
 		else: 
-			return ensure_wData(self.df.iloc[item])
-
-			#if return_data_as == 'DataFrame': return self.df.iloc[item]
-			#if return_data_as == 'ndarray': return self.df.values[item]
-			#if return_data_as == 'wData': return ensure_wData(self.df.iloc[item])
-
+			return ensure_wData(self.df.iloc[item], column_names=[item])
 
 	def __str__(self): 
 		return str(self.df)
