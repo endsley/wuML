@@ -42,7 +42,7 @@ pip install wuml
 
 
 ### Feature Selection
-[Unsupervised Filtering via HSIC](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/selection_by_hsic.ipynb) 
+[Unsupervised Filtering via HSIC](https://github.com/endsley/wuML/blob/main/examples/feature_selection/ipynb/selection_by_hsic.ipynb) 
 
 ### Explaining Models
 [Run Default Shap explainer (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/default_regression_explainer.ipynb) \
