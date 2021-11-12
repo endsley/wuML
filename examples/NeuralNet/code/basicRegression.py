@@ -29,20 +29,11 @@ SR = wuml.summarize_regression_result(data.Y, Ŷ)
 print(SR.true_vs_predict(print_result=False))
 
 
-
-
 #	Draw the regression line
 newX = np.expand_dims(np.arange(0,5,0.1),1)
 Ŷline = bNet(newX, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
 
 
 #	plot the results out
-splot = wplotlib.scatter()
-splot.add_plot(data.X, data.Y, marker='o')
-
-lp = wplotlib.lines()	
-lp.add_plot(newX, Ŷline)
-
-splot.show(title='Basic Network Regression', xlabel='x-axis', ylabel='y-axis')
-
-
+splot = wplotlib.scatter(data.X, data.Y, marker='o', show=False)
+lp = wplotlib.lines(newX, Ŷline, title='Basic Network Regression')	

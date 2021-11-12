@@ -8,6 +8,7 @@ import wuml
 data = wuml.wData('../../data/Chem_decimated_imputed.csv', row_id_with_label=0)
 
 
+
 ## You can pick a column from the data using its column name, here it is 'finalga_best'
 wuml.get_feature_histograms(data['finalga_best'], title='Histogram of Data Labels', ylogScale=False)
 wuml.get_feature_histograms(data['finalga_best'], title='Histogram of Data Labels', ylogScale=True)

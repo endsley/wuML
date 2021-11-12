@@ -17,14 +17,9 @@ newX = Pₓ.generate_samples(300)
 cdf_val = Pₓ.integrate(-7, 0)		# you can get the cdf by integration.
 print('Half of the distribution should yield 0.5, and we got %.3f'%cdf_val)
 
+
+#plot out the result
 textstr = 'Blue: True Density\nRed: KDE estimated density\nGreen: Histogram sampled from KDE'
-lp = lines()
-H = histograms()
-lp.add_plot(X,realProb, color='blue', marker=',')
-lp.add_plot(X,estimatedProb, color='red', marker=',')
-lp.add_text(X,estimatedProb, textstr, β=0.8)
-H.histogram(newX, num_bins=10, title='Using KDE to Estimate Distributions', facecolor='green', α=0.5, showImg=False, normalize=True)
-
-H.show()
-
-
+lp = lines(X,realProb, color='blue', marker=',', show=False)
+lines(X,estimatedProb, color='red', marker=',', imgText=textstr, show=False)
+histograms(newX, num_bins=10, title='Using KDE to Estimate Distributions', facecolor='green', α=0.5, normalize=True)

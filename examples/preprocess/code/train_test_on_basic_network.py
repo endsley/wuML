@@ -31,14 +31,9 @@ newX = np.expand_dims(np.arange(0,5,0.1),1)
 
 
 #	plot the results out
-splot = wplotlib.scatter()
-splot.add_plot(data_train.X, data_train.Y, marker='o', color='blue')
-splot.add_plot(data_test.X, data_test.Y, marker='o', color='red')
-
-lp = wplotlib.lines()	
-lp.add_plot(newX, Ŷ_line)
-
-splot.show(title='Train/Test Network Regression', xlabel='x-axis', ylabel='y-axis',
-			imgText='Blue dot:Training Data\nRed dot: Test Data')
-
+# If show is false, the next plot will superimpose on the current one
+wplotlib.scatter(data_train.X, data_train.Y, marker='o', color='blue', show=False)	
+wplotlib.scatter(data_test.X, data_test.Y, marker='o', color='red', show=False)
+wplotlib.lines(newX, Ŷ_line, title='Train/Test Network Regression', xlabel='x-axis', ylabel='y-axis', 
+				imgText='Blue dot:Training Data\nRed dot: Test Data')
 

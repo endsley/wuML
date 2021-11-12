@@ -23,8 +23,7 @@ def get_feature_histograms(X, path=None, title='', ylogScale=False):
 		wuml.ensure_path_exists('./results')
 		wuml.ensure_path_exists(header)
 
-	H = histograms()
-	H.histogram(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None, ylogScale=ylogScale)
+	H = histograms(X, num_bins=10, title=title, fontsize=12, facecolor='blue', α=0.5, path=path, subplot=None, ylogScale=ylogScale)
 
 def identify_missing_data_per_feature(data):
 	df = wuml.ensure_DataFrame(data)
@@ -54,10 +53,12 @@ def missing_data_stats(data, save_plots=False):
 		textstr = ''
 		x = np.arange(1, len(mdp)+1)
 	
-		lp = lines()
-		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
+		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
 					imgText=textstr, outpath= header + 'feature_missing_percentage.png', 
 					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+		#lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
+		#			imgText=textstr, outpath= header + 'feature_missing_percentage.png', 
+		#			xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
 
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()
@@ -75,9 +76,10 @@ def missing_data_stats(data, save_plots=False):
 		textstr = ''
 		x = np.arange(1, len(mdp)+1)
 	
-		lp = lines()
-		lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
+		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
 					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+		#lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
+		#			xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
 	
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()

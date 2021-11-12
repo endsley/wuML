@@ -13,12 +13,9 @@ Q = 2*np.exp(-2*Xp)							# theoretical true distribution
 P = E(Xp)									# estimated distribution via MSE
 
 
-H = wplotlib.histograms()
-l = wplotlib.lines()
-H.histogram(X, num_bins=20, title='Basic Histogram', xlabel='value', ylabel='count', facecolor='blue', α=0.5, path=None, normalize=True, showImg=False )
-l.add_plot(Xp,Q, color='red', marker=',')
-l.add_text(Xp, Q, 'Red: true distribution\nBlue: Estimated distribution', α=0.35, β=0.95)
-l.plot_line(Xp, P, 'Histogram and Modeled Distribution', 'X', 'Probability')
+H = wplotlib.histograms(X, num_bins=20, facecolor='blue', α=0.5, path=None, normalize=True, show=False )
+l = wplotlib.lines(Xp,Q, color='red', marker=',', imgText='Red: true distribution\nBlue: Estimated distribution', xTextShift=0.35, yTextShift=0.95, show=False )
+wplotlib.lines(Xp,P, color='blue', title='Basic Histogram', xlabel='value', ylabel='count')
 
 
 A = E.cdf(1)
