@@ -132,10 +132,9 @@ def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold
 	#x = np.arange(1, len(mdp)+1)
 	colnames = dfo.columns.to_numpy()
 
-	lp = wplotlib.bar(figsize=(10,5))
-	lp.plot_bar(colnames, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=121, ylim=[0,1], 
-					xticker_rotate=90)
+	lp = wplotlib.bar(colnames, mdp, 'Before Missing Percentage', 'Feature ID', 'Percentage Missing', 
+						imgText=dfSize, subplot=121, ylim=[0,1], xticker_rotate=90, figsize=(10,5))
+						
 
 	df = remove_columns_with_too_much_missing_entries(dfo, threshold=column_threshold)
 	df_decimated = remove_rows_with_too_much_missing_entries(df, threshold=row_threshold, newDataFramePath=newDataFramePath)
@@ -144,9 +143,8 @@ def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold
 	mdp = np.array(identify_missing_data_per_feature(df_decimated))
 	#x = np.arange(1, len(mdp)+1)
 	colnames = df.columns.to_numpy()
-	lp.plot_bar(colnames, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
-					imgText=dfSize, subplot=122, ylim=[0,1], 
-					xticker_rotate=90)
+	wplotlib.bar(colnames, mdp, 'After Missing Percentage', 'Feature ID', 'Percentage Missing', 
+					imgText=dfSize, subplot=122, ylim=[0,1], xticker_rotate=90)
 	lp.show()
 
 	return df_decimated
