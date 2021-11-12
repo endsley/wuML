@@ -78,8 +78,6 @@ def missing_data_stats(data, save_plots=False):
 	
 		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
 					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
-		#lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
-		#			xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
 	
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()
@@ -152,8 +150,8 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 	
 			corV = subTopCorr.values[i]
 			textstr = r'Order ID: %d, Correlation : %.3f' % (i+1, corV)
-			lp = scatter(figsize=(10,5))		# (width, height)
-			lp.plot_scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr)
+
+			lp = scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr, figsize=(10,5))		# (width, height)
 
 
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)
@@ -217,8 +215,7 @@ def feature_wise_HSIC(data, n=10, label_name=None, get_top_dependent_pairs=False
 	
 			corV = subTopCorr.values[i]
 			textstr = r'Order ID: %d, Correlation : %.3f' % (i+1, corV)
-			lp = scatter(figsize=(10,5))		# (width, height)
-			lp.plot_scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr)
+			lp = scatter(A, B, α + ' vs ' + β, α, β, imgText=textstr, figsize=(10,5))		# (width, height)
 
 
 	return wuml.ensure_data_type(outDF, type_name=type(data).__name__)

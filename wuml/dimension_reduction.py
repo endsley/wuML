@@ -66,8 +66,7 @@ class dimension_reduction:
 		self.shape = self.Ӽ.shape
 
 		if show_plot:
-			lp = wplotlib.scatter(figsize=(10,5))		# (width, height)
-			lp.plot_scatter(self.Ӽ[:,0], self.Ӽ[:,1], 'Data After ' + method, 'X axis', 'Y axis')
+			lp = wplotlib.scatter(self.Ӽ[:,0], self.Ӽ[:,1], 'Data After ' + method, 'X axis', 'Y axis', figsize=(10,5))		# (width, height)
 
 	def __call__(self, X):
 		methods = ['PCA', 'KPCA', 'isoMap','LLE', 'Factor Analysis']
@@ -88,12 +87,16 @@ def show_multiple_dimension_reduction_results(data, learning_rate=15, n_neighbor
 	methods = ['PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis']
 
 	results = {}
-	lp = wplotlib.scatter(figsize=(7,8))		# (width, height)
+	#lp = wplotlib.scatter(figsize=(7,8))		# (width, height)
 	for i, m in enumerate(methods):
 		results[m] = dimension_reduction(data, n_components=2, method=m, 
 											learning_rate=learning_rate, show_plot=False, 
 											n_neighbors=n_neighbors, gamma=gamma)
-		lp.plot_scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i)
+
+		if i == 0:
+			lp = wplotlib.scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i, show=False, figsize=(7,12))
+		else:
+			wplotlib.scatter(results[m].Ӽ[:,0], results[m].Ӽ[:,1], m, '', '', subplot=421 + i)
 
 	lp.show()
 	return results
