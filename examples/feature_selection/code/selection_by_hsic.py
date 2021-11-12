@@ -14,5 +14,6 @@ x5 = np.random.randn(n,1)
 data = np.hstack((x1,x2,x3,x4,x5))
 data = wuml.ensure_wData(data, column_names=['A','B','C','D','E'])
 
-results = wuml.feature_selection(data)
-print(results)
+FS = wuml.feature_selection(data)
+print(FS.removal_history)
+print(FS.removal_table)
