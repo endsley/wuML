@@ -14,7 +14,8 @@ class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
 					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, sample_id_included=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
-					torchDataType=torch.FloatTensor, batch_size=20, columns_to_ignore=None,
+					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
+					batch_size=20, columns_to_ignore=None,
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False
@@ -60,7 +61,8 @@ class wData:
 		self.X = self.df.values
 		self.batch_size = batch_size
 		self.shape = self.df.shape
-		self.torchDataType = torchDataType				
+		self.xtorchDataType = xtorchDataType				
+		self.ytorchDataType = ytorchDataType				
 		self.torchloader = None
 		self.label_type = label_type
 
@@ -143,7 +145,7 @@ class wData:
 		if data_type == 'wData': return self
 		if data_type == 'Tensor': 
 			x = torch.from_numpy(self.df.values)
-			x = Variable(x.type(self.torchDataType), requires_grad=False)
+			x = Variable(x.type(self.xtorchDataType), requires_grad=False)
 			X = x.to(self.device, non_blocking=True )
 			return X
 		if data_type == 'DataFrame': return self.df
@@ -185,5 +187,8 @@ class wData:
 		X = self.df[column1].to_numpy()
 		Y = self.df[column2].to_numpy()
 		
-		lp = wuml.scatter(figsize=(10,5))		# (width, height)
-		lp.plot_scatter(X, Y, column1 + ' vs ' + column2, column1, column2, ticker_fontsize=8 )
+		#lp = wuml.scatter(figsize=(10,5))		# (width, height)
+		#lp.plot_scatter(X, Y, column1 + ' vs ' + column2, column1, column2, ticker_fontsize=8 )
+
+		lp = wuml.scatter(X, Y, title=str(column1) + ' vs ' + str(column2), 
+				xlabel=str(column1), ylabel=str(column2), ticker_fontsize=8)

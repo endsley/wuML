@@ -23,8 +23,9 @@ class KDE:
 		self.σ = self.grid.best_estimator_.bandwidth
 		self.kde = self.grid.best_estimator_
 
-	def generate_samples(self, num_of_samples):
-		return self.kde.sample(num_of_samples, random_state=0)
+	def generate_samples(self, num_of_samples, return_data_type='wData'):
+		samples = self.kde.sample(num_of_samples, random_state=0)
+		return ensure_data_type(samples, type_name=return_data_type)
 
 	def integrate(self, x0, x1):	# This only works for 1D data
 		[result, error] = wuml.integrate(self, x0, x1)

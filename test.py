@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
 import wuml 
-
-'''
-	This code loads data with missing entries at random as a wData type
-	It will automatically remove the features and samples that are missing too many entries
-	On the decimated data, it will perform imputation
-	It will lastly save and export the results to a csv file
-'''
+from wplotlib import scatter
 
 wuml.set_terminal_print_options(precision=3)
-data = wuml.wData('examples/data/missin_example.csv', row_id_with_label=0)
-print(data)
+data = wuml.make_moons(n_samples=1500)
 
 
-#	column_threshold=0.95, this will keep features that are at least 95% full
-#	Note that an id column is "required" for this process to document which rows are removes
-dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.50, row_threshold=0.70,newDataFramePath='')
-print(dataDecimated)
+Pᵳ = wuml.flow(data, max_epochs=2000, num_flows=10, network_width=1024)
+probᵳ = Pᵳ(data)
+samplesᵳ = Pᵳ.generate_samples(2000)
+samplesᵳ.plot_2_columns_as_scatter(0, 1)
 
-X = wuml.impute(dataDecimated, ignore_first_index_column=True)		# perform mice imputation
 
-print(dataDecimated)
+Pᴋ = wuml.KDE(data)
+probᴋ = Pᴋ(data)
+samplesᴋ = Pᴋ.generate_samples(2000)
+samplesᴋ.plot_2_columns_as_scatter(0, 1)
 
+import pdb; pdb.set_trace()
+S = scatter(data.X[:,0], data.X[:,1], title='Original data', subplot=131, figsize=(10,7))
+scatter(samplesᴋ.X[:,0], samplesᴋ.X[:,1], title='KDE Generated', subplot=132)
+scatter(samplesᵳ.X[:,0], samplesᵳ.X[:,1], title='Flow Generated', subplot=133)
+S.show()
