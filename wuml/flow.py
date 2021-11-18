@@ -75,32 +75,43 @@ class RealNVP(nn.Module):
 
 
 class flow:
-	def __init__(self, data, flow_mothod='realNVP', network_width=512, output_model_name='flow', print_status=True, 
+	def __init__(self, data=None, flow_mothod='realNVP', network_width=512, output_model_name='flow', print_status=True, 
 					lr = 1e-3, max_epochs=1000, max_patience=None, num_flows=8, dequantization=False, 
 					load_model_path=None):
 		'''
 			max_patience: an early stopping is used, if training doesn't improve for longer than 20 epochs, it is stopped
 		'''
-		self.data = data
-		X = ensure_wData(data)
-		[X_train, X_test, y_train, y_test] = wuml.split_training_test(X, test_percentage=0.2, save_as='none')
-		X_train_DL = X_train.get_data_as('DataLoader')
-		X_test_DL = X_test.get_data_as('DataLoader')
-	
-		d = X.shape[1]
+
 		self.netW = M = network_width
 		self.lr = lr
 		self.max_epochs = max_epochs
 		self.max_patience = max_patience
 		self.print_status = print_status
 
+		# get data
+		self.data = data
+		X = ensure_wData(data)
+
+		if data.Y is None: data.Y = data.X
+
+		[X_train, X_test, y_train, y_test] = wuml.split_training_test(X, test_percentage=0.2, save_as='none')
+		X_train_DL = X_train.get_data_as('DataLoader')
+		X_test_DL = X_test.get_data_as('DataLoader')
+		d = X.shape[1]
+
 		# scale (s) network
 		self.S = nets = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
 										nn.Linear(M, M), nn.LeakyReLU(), 
 										nn.Linear(M, d // 2), nn.Tanh())
 		
 		# translation (t) network
 		self.T = nett = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
+										nn.Linear(M, M), nn.LeakyReLU(), 
 										nn.Linear(M, M), nn.LeakyReLU(), 
 										nn.Linear(M, d // 2))
 
@@ -116,7 +127,8 @@ class flow:
 
 		# Init RealNVP
 		if load_model_path is not None:
-			self.model = wuml.pickle_load(load_model_path)
+			self.model = torch.load(load_model_path)
+			#self.model = wuml.pickle_load(load_model_path)
 			self.model.eval()
 		else:
 			self.model = model = RealNVP(nets, nett, num_flows, prior, D=d, dequantization=dequantization)
@@ -128,6 +140,9 @@ class flow:
 			# Training procedure
 			nll_val = self.train(name=output_model_name, max_patience=max_patience, num_epochs=max_epochs, 
 								model=model, optimizer=optimizer, training_loader=X_train_DL, val_loader=X_test_DL)
+
+	def save(self, pth): 
+		torch.save(self.model, pth)
 
 	def train(self, name, max_patience, num_epochs, model, optimizer, training_loader, val_loader):
 		nll_val = []
