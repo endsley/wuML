@@ -16,6 +16,7 @@ import wplotlib
 import pandas as pd
 from pathlib import Path
 from sklearn.metrics import accuracy_score
+from IPython.display import clear_output
 
 def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
@@ -103,6 +104,7 @@ def clear_current_line():
 
 def write_to_current_line(txt):
 	clear_current_line()
+	clear_output(wait = True)
 	sys.stdout.write(txt)
 
 def clear_previous_line():

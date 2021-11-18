@@ -1,30 +1,41 @@
 #!/usr/bin/env python
 
 import wuml 
-from wplotlib import scatter
+import numpy as np
+import scipy.stats
+from wplotlib import histograms
+from wplotlib import lines
+	
+
+data = wuml.wData(X_npArray=np.random.randn(1000))
+Pₓ = wuml.KDE(data)
+
+X = np.arange(-3,3,0.05)
+realProb = scipy.stats.norm(0, 1).pdf(X)
+estimatedProb = Pₓ(X)
+newX = Pₓ.generate_samples(300)
+cdf_val = Pₓ.integrate(-7, 0)		# you can get the cdf by integration.
+Pₓ.save('kde.model')				# save the model for later usage
+print('Half of the distribution should yield 0.5, and we got %.3f'%cdf_val)
+
+
+#plot out the result
+textstr = 'Blue: True Density\nRed: KDE estimated density\nGreen: Histogram sampled from KDE'
+lp = lines(X,realProb, color='blue', marker=',', show=False)
+lines(X,estimatedProb, color='red', marker=',', imgText=textstr, show=False)
+histograms(newX, num_bins=10, title='Using KDE to Estimate Distributions', facecolor='green', α=0.5, normalize=True)
 
 
 
-wuml.set_terminal_print_options(precision=3)
-data = wuml.make_moons(n_samples=1500)
+#	Reload the model later
+Pₓ2 = wuml.KDE(load_model_path='kde.model')
+estimatedProb = Pₓ2(X)
+newX = Pₓ2.generate_samples(300)
+cdf_val = Pₓ2.integrate(-7, 0)		# you can get the cdf by integration.
 
-Pᵳ = wuml.flow(data, load_model_path='flow.model')
-samplesᵳ = Pᵳ.generate_samples(2000)
-probᵳ = Pᵳ(data)
-samplesᵳ.plot_2_columns_as_scatter(0, 1)
+#plot out the result from saved model, should be the same
+textstr = 'Blue: True Density\nRed: KDE estimated density\nGreen: Histogram sampled from KDE'
+lp = lines(X,realProb, color='blue', marker=',', show=False)
+lines(X,estimatedProb, color='red', marker=',', imgText=textstr, show=False)
+histograms(newX, num_bins=10, title='Using KDE to Estimate Distributions', facecolor='green', α=0.5, normalize=True)
 
-Pᵳ = wuml.flow(data, max_epochs=100, num_flows=10, network_width=1024)
-probᵳ = Pᵳ(data)
-samplesᵳ = Pᵳ.generate_samples(2000)
-samplesᵳ.plot_2_columns_as_scatter(0, 1)
-Pᵳ.save('flow.model')
-
-Pᴋ = wuml.KDE(data)
-probᴋ = Pᴋ(data)
-samplesᴋ = Pᴋ.generate_samples(2000)
-samplesᴋ.plot_2_columns_as_scatter(0, 1)
-
-S = scatter(data.X[:,0], data.X[:,1], title='Original data', subplot=131, figsize=(10,7))
-scatter(samplesᴋ.X[:,0], samplesᴋ.X[:,1], title='KDE Generated', subplot=132)
-scatter(samplesᵳ.X[:,0], samplesᵳ.X[:,1], title='Flow Generated', subplot=133)
-S.show()
