@@ -2,7 +2,7 @@
 
 import wuml 
 
-data = wuml.wData(xpath='../data/wine.csv', ypath='examples/data/wine_label.csv', label_type='discrete', first_row_is_label=False)
+data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv', label_type='discrete', first_row_is_label=False)
 
 cf = wuml.classification(data, classifier='NaiveBayes')
 print('Running a single classifier')
