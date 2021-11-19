@@ -4,6 +4,15 @@ from wplotlib import lines		#pip install wplotlib
 from wplotlib import heatMap
 from wplotlib import histograms
 from wplotlib import scatter
+
+import sys
+import os
+
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+
+
+
 import wuml 
 from wuml.data_loading import wData
 
@@ -53,16 +62,13 @@ def missing_data_stats(data, save_plots=False):
 		textstr = ''
 		x = np.arange(1, len(mdp)+1)
 	
-		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
+		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', subplot=121,
 					imgText=textstr, outpath= header + 'feature_missing_percentage.png', 
-					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
-		#lp.plot_line(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', 
-		#			imgText=textstr, outpath= header + 'feature_missing_percentage.png', 
-		#			xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=30)
 
 		X2 = np.isnan(df.values).astype(int)
 		hMap = heatMap()
-		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
+		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', subplot=122,
 								xlabel='Feature ID', ylabel='Sample ID',
 								path= header + 'missing_data_heatMap.png')
 	
@@ -76,18 +82,13 @@ def missing_data_stats(data, save_plots=False):
 		textstr = ''
 		x = np.arange(1, len(mdp)+1)
 	
-		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr,
-					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=90)
+		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr, subplot=121,
+					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=30, figsize=(8,4))
 	
 		X2 = np.isnan(df.values).astype(int)
-		hMap = heatMap()
-		hMap.draw_HeatMap(X2, title='Missing Data Heat Map', 
-								xlabel='Feature ID', ylabel='Sample ID')
-	
-#		buffer = io.StringIO()
-#		df.info(buf=buffer, verbose=True)
-#		s = buffer.getvalue()
-
+		heatMap(X2, title='Missing Data Heat Map', subplot=122, xlabel='Feature ID', xticker_rotate=30,
+					ylabel='Sample ID', xtick_locations=(x-0.5), xtick_labels=df.columns.to_numpy())
+		lp.show()
 
 def get_redundant_pairs(df):
 	'''Get diagonal and lower triangular pairs of correlation matrix'''

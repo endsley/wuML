@@ -28,6 +28,7 @@ class dimension_reduction:
 		X = ensure_numpy(data)
 		if method == 'PCA':
 			model = PCA(n_components=X.shape[1])
+			
 			use_all_dims = model.fit_transform(X)
 			self.Ӽ = use_all_dims[:,0:n_components]
 
