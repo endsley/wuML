@@ -9,8 +9,10 @@ dat = var.rvs(size=2000, random_state=None)
 P1 = wuml.multivariate_gaussian(dat)
 P2 = wuml.flow(dat, max_epochs=200)
 
-p1 = P1(dat)
-p2 = P2(dat)
+p1 = P1(dat, return_data_type='ndarray')
+p2 = P2(dat, return_data_type='ndarray')
 
+print(p1[0:10])
+print(p2[0:10])
 
 

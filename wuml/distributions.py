@@ -28,7 +28,7 @@ class multivariate_gaussian: #Assuming that data is 1 dimension
 		if return_log_likelihood: output = np.log(prob)
 		else: output = prob
 
-		return output
+		return ensure_data_type(output, type_name=return_data_type)
 
 
 class exponential: #Assuming that data is 1 dimension

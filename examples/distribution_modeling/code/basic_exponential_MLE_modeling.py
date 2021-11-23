@@ -6,7 +6,7 @@ import numpy as np
 
 
 X = wuml.gen_exponential(λ=2, size=3000)	# generates 2 exp(-2x)
-E = wuml.model_as_exponential(X)
+E = wuml.exponential(X)
 
 Xp = np.arange(0.05,8,0.05)
 Q = 2*np.exp(-2*Xp)							# theoretical true distribution
