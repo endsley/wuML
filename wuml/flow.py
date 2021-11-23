@@ -90,9 +90,9 @@ class flow:
 
 		# get data
 		self.data = data
-		X = ensure_wData(data)
+		self.X = X = ensure_wData(data)
 
-		if data.Y is None: data.Y = data.X
+		if X.Y is None: X.Y = X.X
 
 		[X_train, X_test, y_train, y_test] = wuml.split_training_test(X, test_percentage=0.2, save_as='none')
 		X_train_DL = X_train.get_data_as('DataLoader')
@@ -149,8 +149,8 @@ class flow:
 		best_nll = 1000.
 		patience = 0
 
-		X_dataType = self.data.xtorchDataType
-		Y_dataType = self.data.ytorchDataType
+		X_dataType = self.X.xtorchDataType
+		Y_dataType = self.X.ytorchDataType
 
 		# Main loop
 		for e in range(num_epochs):
@@ -210,8 +210,8 @@ class flow:
 			# load best performing model
 			model_best = torch.load(name + '.model')
 
-		X_dataType = self.data.xtorchDataType
-		Y_dataType = self.data.ytorchDataType
+		X_dataType = self.X.xtorchDataType
+		Y_dataType = self.X.ytorchDataType
 
 		model_best.eval()
 		loss = 0.
