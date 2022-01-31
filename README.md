@@ -39,7 +39,8 @@ pip install wuml
 ### Distribution Modeling
 [KDE Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/basicKDE_estimate.ipynb) \
 [Maximum Likelihood on Exponential Distribution Example](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/basic_exponential_MLE_modeling.ipynb)\
-[Using Flow-based Deep Generative Model](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/flow_example.ipynb)
+[Using Flow-based Deep Generative Model](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/flow_example.ipynb)\
+[Using Flow to get P(X)](https://github.com/endsley/wuML/blob/main/examples/distribution_modeling/ipynb/flow_prob.ipynb)
 
 
 ### Feature Selection

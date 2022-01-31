@@ -6,7 +6,8 @@ import wuml
 ##	x1 x2 has positive influence
 ##	x3 has no influence
 ##	x4 has negative influence
-#
+#	features : x₁ x₂ x₃ x₄ -> y
+#	Equation : 5x₁ + x₂ + x₁x₂ - 8x₄ - 2x₄x₄ + δ = y
 
 data = wuml.wData(xpath='../../data/shap_regress_example_uniform.csv', batch_size=20, 
 					label_type='continuous', label_column_name='label', 

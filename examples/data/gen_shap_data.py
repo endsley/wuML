@@ -15,6 +15,7 @@ def generate_data_from_same_distribution(n=30, with_regression=True, distributio
 
 	Y = []
 	for m in range(X.shape[0]):
+		# 5x₁ + x₂ + x₁x₂ - 8x₄ - 2x₄x₄ + δ
 		y = 5*X[m,0] + X[m,1] + X[m,0]*X[m,1] - 8*X[m,3] - 2*X[m,3]*X[m,3] + 0.01*np.random.randn()
 		Y.append(y)
 	
