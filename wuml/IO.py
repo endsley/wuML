@@ -95,6 +95,9 @@ def remove_files(folder_path):	# make sure to end the path with /
 			os.remove(folder_path + i)
 
 
+
+
+
 #	Terminal Printing
 
 def clear_current_line():
@@ -202,19 +205,29 @@ class summarize_regression_result:
 					facecolor='blue', α=0.5, path=None)
 		
 	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=False):
-		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
-
+		#A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
+		A = np.array([['y', 'ŷ']])
 		if sort_based_on_label:
-			Yjoing = np.hstack((self.y, self.ŷ))
+			Yjoing = np.hstack((self.y, np.round(self.ŷ,3)))
 			sorted_df = wuml.sort_matrix_rows_by_a_column(Yjoing, 0)
-			B = wuml.pretty_np_array(sorted_df.values)
-		else: B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
-		avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
-		C = avg_Δ + A + B
+			#B = wuml.pretty_np_array(sorted_df.values)
+			B = sorted_df.values
+		else: 
+			B = np.hstack((self.y, self.ŷ))
+
+		return wuml.ensure_wData(np.vstack((A,B)))
+
+
+		#import pdb; pdb.set_trace()
+
+		#avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
+		#C = avg_Δ + A + B
 	
-		if print_result: print(C)
-		if write_path is not None: wuml.write_to(C, write_path)
-		return C
+		#if print_result: print(C)
+		#if write_path is not None: wuml.write_to(C, write_path)
+
+		#return ensure_wData(C, column_names=None)
+		#return C
 	
 
 class summarize_classification_result:
