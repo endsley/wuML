@@ -18,6 +18,19 @@ from pathlib import Path
 from sklearn.metrics import accuracy_score
 from IPython.display import clear_output
 
+def jupyter_print(value):
+	if wuml.isnotebook():
+		if wuml.wtype(data) == 'DataFrame': 
+	    	display(value)
+		elif wuml.wtype(data) == 'wData': 
+	    	display(value.df)
+		else:
+			print(value)
+	else:
+		print(value)
+
+
+
 def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
 	np.set_printoptions(linewidth=400)
