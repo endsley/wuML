@@ -17,6 +17,10 @@ pip install wuml
 [Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/comparing_HSIC_to_correlation.ipynb)
 
 
+### IO
+[jupyter_print](https://github.com/endsley/wuML/blob/main/examples/IO/ipynb/jupyter_print.ipynb)
+
+
 ### Data Preprocessing
 [Obtain sample weight based on label likelihood](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/weight_sample_by_rarity.ipynb) \
 [Show histogram of a feature](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/show_feature_histogram.ipynb) \

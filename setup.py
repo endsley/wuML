@@ -44,6 +44,7 @@ setup(
           'sklearn',
           'shap',
           'numpy',
+		  'ipython',
           'pandas',
           'torch',
       ],

@@ -5,6 +5,8 @@ import sys
 
 if os.path.exists('/home/chieh/code/wPlotLib'):
 	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 
 import types
 import torch
@@ -16,16 +18,33 @@ import wplotlib
 import pandas as pd
 from pathlib import Path
 from sklearn.metrics import accuracy_score
-from IPython.display import clear_output
+from IPython.display import clear_output, HTML, Math
 
-def jupyter_print(value):
+def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False):
+	#font_size is from 1 to 6
+	font_size = int(6 - font_size)
+	if font_size > 6: font_size = 6
+	if font_size < 0: font_size = 1
+
 	if wuml.isnotebook():
-		if wuml.wtype(data) == 'DataFrame': 
-	    	display(value)
-		elif wuml.wtype(data) == 'wData': 
-	    	display(value.df)
+		if wuml.wtype(value) == 'DataFrame': 
+			if display_all_rows: pd.set_option('display.max_rows', None)
+			if display_all_columns: pd.set_option('display.max_columns', None)
+			display(value)
+		elif wuml.wtype(value) == 'wData': 
+			if display_all_rows: pd.set_option('display.max_rows', None)
+			if display_all_columns: pd.set_option('display.max_columns', None)
+			display(value.df)
+		elif wuml.wtype(value) == 'str': 
+			if latex:
+				display(Math(r'%s'%value))
+			else:
+				str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
+				display(HTML(data=str2html))
 		else:
 			print(value)
+
+		pd.set_option('display.max_rows', 10)
 	else:
 		print(value)
 
