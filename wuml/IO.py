@@ -29,12 +29,20 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	if wuml.isnotebook():
 		if wuml.wtype(value) == 'DataFrame': 
 			if display_all_rows: pd.set_option('display.max_rows', None)
-			if display_all_columns: pd.set_option('display.max_columns', None)
+			if display_all_columns: pd.set_option('display.max_columns', None) 
 			display(value)
 		elif wuml.wtype(value) == 'wData': 
 			if display_all_rows: pd.set_option('display.max_rows', None)
 			if display_all_columns: pd.set_option('display.max_columns', None)
 			display(value.df)
+		elif wuml.wtype(value) == 'Index': 
+			value = str(value.tolist())
+			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
+			display(HTML(data=str2html))
+		elif wuml.wtype(value) == 'tuple': 
+			value = str(value)
+			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
+			display(HTML(data=str2html))
 		elif wuml.wtype(value) == 'str': 
 			if latex:
 				display(Math(r'%s'%value))

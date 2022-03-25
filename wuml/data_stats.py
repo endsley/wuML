@@ -82,13 +82,24 @@ def missing_data_stats(data, save_plots=False):
 		textstr = ''
 		x = np.arange(1, len(mdp)+1)
 	
-		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr, subplot=121,
-					xtick_locations=x, xtick_labels=df.columns.to_numpy(), xticker_rotate=30, figsize=(8,4))
-	
+		xtick_locations=x
+		column_names = df.columns.to_numpy()
+		if len(column_names) > 10: 
+			column_names = None
+			xtick_locations = None
+
+		lp = lines(x, mdp, 'Missing Percentage', 'Feature ID', 'Percentage Missing', imgText=textstr, subplot=211,
+					xtick_locations=xtick_locations, xtick_labels=column_names, xticker_rotate=30, figsize=(8,12))	
+
+		#	Show heatmap
 		X2 = np.isnan(df.values).astype(int)
-		heatMap(X2, title='Missing Data Heat Map', subplot=122, xlabel='Feature ID', xticker_rotate=30,
-					ylabel='Sample ID', xtick_locations=(x-0.5), xtick_labels=df.columns.to_numpy())
+		xtick_locations = (x-0.5)
+		if column_names is None: xtick_locations = None
+		heatMap(X2, title='Missing Data Heat Map', subplot=212, xlabel='Feature ID', xticker_rotate=40, 
+					ylabel='Sample ID', xtick_locations=xtick_locations, xtick_labels=column_names)
 		lp.show()
+
+		return mdp
 
 def get_redundant_pairs(df):
 	'''Get diagonal and lower triangular pairs of correlation matrix'''

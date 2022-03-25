@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 
 class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
-					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, sample_id_included=False, 
+					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, first_column_as_sample_index=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
 					batch_size=20, columns_to_ignore=None,
@@ -24,18 +24,36 @@ class wData:
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
+			first_column_as_sample_index: if the first column is used as sample ID
 		'''
 		self.label_column_name = label_column_name
-	
+
 		if dataFrame is not None:
 			self.df = dataFrame
+
+			if first_row_is_label: 
+				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
+	
+			if first_column_as_sample_index: 
+				self.df = self.df.set_index(list(self.df)[0])
+
 		elif X_npArray is not None:
 			self.df = pd.DataFrame(X_npArray, columns=column_names)
-		else:
 			if first_row_is_label: 
-				self.df = pd.read_csv (xpath, header=0, index_col=False)
+				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
+	
+			if first_column_as_sample_index: 
+				self.df = self.df.set_index(list(self.df)[0])
+
+		else:
+			self.df = pd.read_csv (xpath, header=None)
+			if first_column_as_sample_index: first_column_as_sample_index = 0
+			if first_row_is_label: 
+				self.df = pd.read_csv (xpath, header=0, index_col=first_column_as_sample_index)
 			else:
-				self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=False)
+				self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=first_column_as_sample_index)
+
+
 
 		if replace_this_entry_with_nan is not None:
 			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
@@ -172,8 +190,15 @@ class wData:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 
 	def __getitem__(self, item):
-		if type(item).__name__ == 'str': return ensure_wData(self.df[item].to_frame())
-		else: 
+		#	If item is string, it will return the row corresponding to the string
+		#	If item is int, it will return the row
+		if type(item).__name__ == 'str': 
+			return ensure_wData(self.df.loc[item].to_frame().transpose())
+
+		try: 
+			print('here')
+			return ensure_wData(self.df.loc[item].to_frame().transpose())
+		except:
 			return ensure_wData(self.df.iloc[item], column_names=[item])
 
 	def __str__(self): 
