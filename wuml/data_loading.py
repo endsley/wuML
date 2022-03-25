@@ -175,6 +175,9 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
 			return self.torchloader
 
+	def retrieve_scalar_value(self):
+		return self.df.to_numpy()[0,0]
+
 	def to_csv(self, path, add_row_indices=False, include_column_names=True, float_format='%.4f'):
 		LCn = self.label_column_name
 
@@ -196,16 +199,30 @@ class wData:
 			return ensure_wData(self.df.loc[item].to_frame().transpose())
 
 		try: 
-			print('here')
-			return ensure_wData(self.df.loc[item].to_frame().transpose())
+			return ensure_wData(self.df.iloc[item].to_frame().transpose())
 		except:
-			return ensure_wData(self.df.iloc[item], column_names=[item])
+			return ensure_wData(self.df.loc[item].to_frame().transpose())
 
 	def __str__(self): 
 		return str(self.df)
 
 	def __repr__(self): 
 		return str(self.df)
+
+	def __iter__(self): 
+		self.itr_count = 0
+		return self
+
+	def __next__(self):
+		''''Returns the next value from team object's lists '''
+		try:
+			nextItm = ensure_wData(self.df.iloc[self.itr_count].to_frame().transpose())
+			#nextItm = self[self.itr_count]
+			self.itr_count += 1
+			return nextItm
+		except:
+			self.itr_count = 0
+			raise StopIteration
 
 
 	def plot_2_columns_as_scatter(self, column1, column2):

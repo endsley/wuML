@@ -140,6 +140,11 @@ def remove_files(folder_path):	# make sure to end the path with /
 
 #	Terminal Printing
 
+def print_status(percent):
+	clear_current_line()
+	write_to_current_line('Completion Status: %.3f'%percent)
+	sys.stdout.flush()
+
 def clear_current_line():
 	sys.stdout.write("\r")
 	sys.stdout.write("\033[K")
