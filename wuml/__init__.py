@@ -29,3 +29,4 @@ from .generate_data import *
 from .feature_selection import *
 from .distributions import *
 from .dates_and_time import *
+from .kernelShap import *

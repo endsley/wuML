@@ -1,6 +1,7 @@
 
 
-import shap		#pip install shap
+#import kernelShap		#pip install shap
+import shap				#pip install shap
 import xgboost
 import sys
 import wuml

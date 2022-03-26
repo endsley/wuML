@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+import os
+import sys
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 import wuml
 
 
