@@ -113,6 +113,9 @@ class wData:
 		self.df = self.df.sort_values(column_name, ascending=ascending)
 		self.update_DataFrame(self.df)
 
+	def get_column_names_as_a_list(self):
+		return ensure_wData(self.df.columns)
+
 	def get_columns(self, columns):
 		if type(columns).__name__ == 'int': 
 			return ensure_wData(self.df.iloc[:,columns], column_names=[columns])

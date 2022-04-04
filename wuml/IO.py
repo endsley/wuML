@@ -44,6 +44,8 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 			display(HTML(data=str2html))
 		elif wuml.wtype(value) == 'str': 
+			value = value.replace('\r','<br>')
+			value = value.replace('\n','<br>')
 			if latex:
 				display(Math(r'%s'%value))
 			else:
@@ -189,11 +191,16 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 	if col_1.shape[0] == 1: col_1 = col_1.T
 	if col_2.shape[0] == 1: col_2 = col_2.T
 
-	output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
-	if labels is not None:
-		output = wuml.pretty_np_array(labels) + output
+	if wuml.isnotebook():
+		output = wuml.ensure_wData(np.hstack((col_1, col_2)), column_names=labels)
+		jupyter_print(output, display_all_rows=True)
+	else:
+		output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
+		if labels is not None:
+			output = wuml.pretty_np_array(labels) + output
+		print(output)
 
-	return output
+		return output
 
 def output_regression_result(y, ŷ, write_path=None):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))

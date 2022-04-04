@@ -50,6 +50,9 @@ def ensure_list(data):
 def ensure_wData(data, column_names=None):
 	if wtype(data) == 'ndarray': 
 		return wuml.wData(X_npArray=data, column_names=column_names)
+	elif wtype(data) == 'Index': 
+		ArrayType = np.array(data.tolist())
+		return wuml.wData(X_npArray=ArrayType, column_names=column_names)
 	elif wtype(data) == 'wData': 
 		return data
 	elif wtype(data) == 'DataFrame': 
