@@ -6,11 +6,15 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.linear_model import ElasticNet
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import max_error
 from wuml.type_check import *
+import matplotlib.pyplot as plt
+import wplotlib
 import numpy as np
 import pandas as pd
 import wuml
@@ -20,7 +24,7 @@ class regression:
 	Automatically run regression on data
 
 	data: can be any data type
-	regressor='GP', 'linear', 'NeuralNet', 'kernel ridge', 'AdaBoost', 'Elastic net', 'RandomForest', 'Predef_NeuralNet'
+	regressor='GP', 'linear', 'NeuralNet', 'kernel ridge', 'AdaBoost', 'Elastic net', 'RandomForest', 'Predef_NeuralNet', 'Lasso', 'Ridge',
 				if 'Predef_NeuralNet' is used, you can additionally set arguments : networkStructure, max_epoch, learning_rate
 	split_train_test: automatically splits the data, default is true
 	alpha: weight of the Kernel Ridge regularizer
@@ -42,10 +46,15 @@ class regression:
 			self.X_train = X
 			self.y_train = y
 
+
 		if regressor == 'GP':
 			model = GaussianProcessRegressor(kernel=None, random_state=0)
 		elif regressor == 'linear':
 			model = LinearRegression()
+		elif regressor == 'Ridge':
+			model = Ridge(alpha=alpha)
+		elif regressor == 'Lasso':
+			model = Lasso(alpha=alpha)
 		elif regressor == 'kernel ridge':
 			model = KernelRidge(alpha=alpha, gamma=gamma, kernel='rbf')
 		elif regressor == 'AdaBoost':
@@ -75,6 +84,34 @@ class regression:
 		self.split_train_test = split_train_test
 		self.model = model
 		self.regressor = regressor
+
+	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9):
+		regressor = self.regressor
+
+		Cnames = wuml.ensure_list(Column_names)
+		if regressor == 'linear' or regressor == 'Elastic net' or regressor == 'Lasso' or regressor == 'Ridge':
+			coefs = pd.DataFrame( self.model.coef_, columns=['Coefficients'], index=Cnames)
+				
+			#coefs.plot(kind='barh', figsize=(9, 7))
+			coefs.plot(kind='barh')
+			plt.title(title, fontsize=title_fontsize)
+			plt.axvline(x=0, color='.5')
+			plt.subplots_adjust(left=.3)
+			plt.tight_layout()
+			plt.ylabel('Features', fontsize=axis_fontsize)
+			plt.xlabel('Features Influence on Results', fontsize=axis_fontsize)
+			plt.show()
+
+		elif regressor == 'RandomForest':
+			coefs = self.model.feature_importances_.tolist()
+			B = wplotlib.bar(Cnames, coefs, title, 'Feature name', 'Importance via Impurity')
+
+		
+			#import pdb; pdb.set_trace()
+			#X = ['Nuclear', 'Hydro', 'Gas', 'Oil', 'Coal', 'Biofuel']
+			#Y = [5, 6, 15, 22, 24, 8]
+			#B = wplotlib.bar(Cnames, coefs, 'Energy Percentage', 'Energy Type', 'Amount')
+	
 
 	def score(self, score_type='r2'):
 
@@ -193,7 +230,7 @@ def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', a
 	order_by: 'Train mse', 'Test mse', 'Train r2 Score', 'Test r2 Score', 
 				'Train avg abs error', 'Test avg abs error', 'Train max error', 'Test max error'
 	'''
-	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet']
+	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet', 'Lasso', 'Ridge']
 	results = {}
 
 	df = pd.DataFrame()

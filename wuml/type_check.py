@@ -44,8 +44,17 @@ def ensure_list(data):
 		return data
 	elif wtype(data) == 'Index': 
 		return data.tolist()
-	if wtype(data) == 'ndarray': 
+	elif wtype(data) == 'ndarray': 
 		return data.tolist()
+	elif wtype(data) == 'wData': 
+		npD = data.df.to_numpy()
+		npD = np.squeeze(npD)
+		return npD.tolist()
+	elif type_name=='DataFrame':
+		npD = data.to_numpy()
+		npD = np.squeeze(npD)
+		return npD.tolist()
+
 
 def ensure_wData(data, column_names=None):
 	if wtype(data) == 'ndarray': 
