@@ -98,6 +98,9 @@ class wData:
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 
+	def replace_label(self, newY):
+		self.Y = ensure_numpy(newY)
+
 	def strip_white_space_from_column_names(self):
 		# make sure to strip white space from column names
 		update_col_names = []

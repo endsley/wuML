@@ -45,6 +45,7 @@ setup(
           'shap',
           'numpy==1.21.4', 
 		  'ipython',
+		  'imbalanced-learn',
           'pandas',
 		  'xgboost',
           'torch',

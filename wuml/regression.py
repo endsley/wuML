@@ -1,4 +1,9 @@
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
@@ -85,7 +90,8 @@ class regression:
 		self.model = model
 		self.regressor = regressor
 
-	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9):
+	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
+								yticker_rotate=0, ytick_locations=None, ytick_labels=None):
 		regressor = self.regressor
 
 		Cnames = wuml.ensure_list(Column_names)
@@ -100,11 +106,13 @@ class regression:
 			plt.tight_layout()
 			plt.ylabel('Features', fontsize=axis_fontsize)
 			plt.xlabel('Features Influence on Results', fontsize=axis_fontsize)
+			plt.yticks(fontsize=ticker_fontsize, rotation=yticker_rotate, ticks=ytick_locations, labels=ytick_labels )
+
 			plt.show()
 
 		elif regressor == 'RandomForest':
 			coefs = self.model.feature_importances_.tolist()
-			B = wplotlib.bar(Cnames, coefs, title, 'Feature name', 'Importance via Impurity')
+			B = wplotlib.bar(Cnames, coefs, title, 'Feature name', 'Importance via Impurity', xticker_rotate=xticker_rotate, ticker_fontsize=ticker_fontsize)
 
 		
 			#import pdb; pdb.set_trace()
