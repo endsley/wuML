@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+
+import os
+import sys
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 import wuml
 
 from sklearn.gaussian_process import GaussianProcessClassifier
@@ -13,6 +18,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.inspection import permutation_importance
 
 
 
@@ -41,10 +47,10 @@ class classification:
 		else: raise ValueError('Undefined label Y')
 
 		if split_train_test:
-			X_train, X_test, y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+			self.X_train, X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
 		else:
-			X_train = X
-			y_train = y
+			self.X_train = X
+			self.y_train = y
 
 		if classifier == 'GP':
 			kernel = 1.0 * RBF(1.0) 
@@ -67,9 +73,9 @@ class classification:
 			model = wuml.IKDR(data, q=q, y=y)
 		else: raise ValueError('Unrecognized Classifier')
 
-		model.fit(NP(X_train), S(NP(y_train)))
-		self.ŷ_train = model.predict(NP(X_train))
-		self.Train_acc = wuml.accuracy(S(NP(y_train)), self.ŷ_train)
+		model.fit(NP(self.X_train), S(NP(self.y_train)))
+		self.ŷ_train = model.predict(NP(self.X_train))
+		self.Train_acc = wuml.accuracy(S(NP(self.y_train)), self.ŷ_train)
 
 		if split_train_test:
 			self.ŷ_test = model.predict(NP(X_test))
@@ -81,6 +87,31 @@ class classification:
 		self.kernel = kernel
 
 		#self.results = self.result_summary(print_out=False)
+
+	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
+								yticker_rotate=0, ytick_locations=None, ytick_labels=None):
+
+		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
+		Cnames = wuml.ensure_list(Column_names)
+
+		importance_GP = permutation_importance(self.model, self.X_train, self.y_train, scoring='accuracy')
+		importance = importance_GP.importances_mean
+
+		if self.classifier in all_classifiers:
+
+			coefs = pd.DataFrame( importance, columns=['Coefficients'], index=Cnames)
+				
+			#coefs.plot(kind='barh', figsize=(9, 7))
+			coefs.plot(kind='barh')
+			plt.title(title, fontsize=title_fontsize)
+			plt.axvline(x=0, color='.5')
+			plt.subplots_adjust(left=.3)
+			plt.tight_layout()
+			plt.ylabel('Features', fontsize=axis_fontsize)
+			plt.xlabel('Features Influence on Results', fontsize=axis_fontsize)
+			plt.yticks(fontsize=ticker_fontsize, rotation=yticker_rotate, ticks=ytick_locations, labels=ytick_labels )
+
+			plt.show()
 
 	def result_summary(self, print_out=True):
 		NPR = np.round
