@@ -18,6 +18,7 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import max_error
 from wuml.type_check import *
+from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt
 import wplotlib
 import numpy as np
@@ -90,11 +91,34 @@ class regression:
 		self.model = model
 		self.regressor = regressor
 
-	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
-								yticker_rotate=0, ytick_locations=None, ytick_labels=None):
-		regressor = self.regressor
 
+	def output_sorted_feature_importance_table(self, Column_names): 	# feature importance computed via permutation_importance
+		NP = wuml.ensure_numpy
+
+		all_regressors =['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet', 'Lasso', 'Ridge']
+		if self.regressor in all_regressors:
+			Cnames = wuml.ensure_list(Column_names)
+
+			importance_GP = permutation_importance(self.model, NP(self.X_train), self.y_train, scoring='neg_mean_squared_error')
+			importance = importance_GP.importances_mean
+			coefs = pd.DataFrame( importance, columns=['Coefficients'], index=Cnames)
+			sorted_coefs = coefs.sort_values(by='Coefficients', ascending=False)
+			wuml.jupyter_print(sorted_coefs)
+
+
+	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
+								yticker_rotate=0, ytick_locations=None, ytick_labels=None, method='weights'):
+
+		# method: 
+		#	weights : for linear models only, if doesn't support weights, automatically use permutation
+		#	permutation : for all models
+		#	both : if possible plot both models side by side
+
+		NP = ensure_numpy
+		regressor = self.regressor
 		Cnames = wuml.ensure_list(Column_names)
+		if method == 'weights': regressor = 'default'
+
 		if regressor == 'linear' or regressor == 'Elastic net' or regressor == 'Lasso' or regressor == 'Ridge':
 			coefs = pd.DataFrame( self.model.coef_, columns=['Coefficients'], index=Cnames)
 				
@@ -114,12 +138,12 @@ class regression:
 			coefs = self.model.feature_importances_.tolist()
 			B = wplotlib.bar(Cnames, coefs, title, 'Feature name', 'Importance via Impurity', xticker_rotate=xticker_rotate, ticker_fontsize=ticker_fontsize)
 
-		
-			#import pdb; pdb.set_trace()
-			#X = ['Nuclear', 'Hydro', 'Gas', 'Oil', 'Coal', 'Biofuel']
-			#Y = [5, 6, 15, 22, 24, 8]
-			#B = wplotlib.bar(Cnames, coefs, 'Energy Percentage', 'Energy Type', 'Amount')
-	
+		else:
+			importance_GP = permutation_importance(self.model, NP(self.X_train), self.y_train, scoring='neg_mean_squared_error')
+			importance = importance_GP.importances_mean
+			#coefs = pd.DataFrame( importance, columns=['Coefficients'], index=Cnames)
+			B = wplotlib.bar(Cnames, importance, title, 'Feature name', 'Via Permutation Importance', xticker_rotate=xticker_rotate, ticker_fontsize=ticker_fontsize)
+
 
 	def score(self, score_type='r2'):
 

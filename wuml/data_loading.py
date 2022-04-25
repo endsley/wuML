@@ -59,8 +59,6 @@ class wData:
 			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
 
 		self.strip_white_space_from_column_names()
-
-		self.columns = self.df.columns
 		self.Y = None
 		if Y_npArray is not None:
 			self.Y = Y_npArray
@@ -75,6 +73,7 @@ class wData:
 			self.delete_column(label_column_name)
 
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
+		self.columns = self.df.columns
 
 		self.X = self.df.values
 		self.batch_size = batch_size

@@ -90,11 +90,12 @@ class classification:
 		#self.results = self.result_summary(print_out=False)
 
 	def output_sorted_feature_importance_table(self, Column_names): 	# feature importance computed via permutation_importance
+		NP = wuml.ensure_numpy
 
 		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
 		Cnames = wuml.ensure_list(Column_names)
 
-		importance_GP = permutation_importance(self.model, self.X_train, self.y_train, scoring='accuracy')
+		importance_GP = permutation_importance(self.model, NP(self.X_train), self.y_train, scoring='accuracy')
 		importance = importance_GP.importances_mean
 
 		if self.classifier in all_classifiers:
@@ -102,15 +103,16 @@ class classification:
 			coefs = pd.DataFrame( importance, columns=['Coefficients'], index=Cnames)
 			sorted_coefs = coefs.sort_values(by='Coefficients', ascending=False)
 			wuml.jupyter_print(sorted_coefs)
-			return sorted_coefs
+			#return sorted_coefs
 
 	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
 								yticker_rotate=0, ytick_locations=None, ytick_labels=None): # feature importance computed via permutation_importance
 
+		NP = wuml.ensure_numpy
 		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
 		Cnames = wuml.ensure_list(Column_names)
 
-		importance_GP = permutation_importance(self.model, self.X_train.X, self.y_train, scoring='accuracy')
+		importance_GP = permutation_importance(self.model, NP(self.X_train), self.y_train, scoring='accuracy')
 		importance = importance_GP.importances_mean
 
 		if self.classifier in all_classifiers:
