@@ -42,7 +42,9 @@ def ensure_list(data):
 		return data
 	elif wtype(data) == 'NoneType': 
 		return data
-	elif wtype(data) == 'Index': 
+	elif wtype(data) == 'Int64Index': 
+		return data.values.tolist()
+	elif wtype(data) == 'Index': 	
 		return data.tolist()
 	elif wtype(data) == 'ndarray': 
 		return data.tolist()
