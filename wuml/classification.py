@@ -89,7 +89,7 @@ class classification:
 
 		#self.results = self.result_summary(print_out=False)
 
-	def output_sorted_feature_importance_table(self, Column_names): 	# feature importance computed via permutation_importance
+	def output_sorted_feature_importance_table(self, Column_names, show_top_few=5): 	# feature importance computed via permutation_importance
 		NP = wuml.ensure_numpy
 
 		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
@@ -102,8 +102,8 @@ class classification:
 
 			coefs = pd.DataFrame( importance, columns=['Coefficients'], index=Cnames)
 			sorted_coefs = coefs.sort_values(by='Coefficients', ascending=False)
-			wuml.jupyter_print(sorted_coefs)
-			#return sorted_coefs
+			first_few = sorted_coefs.head(show_top_few)
+			wuml.jupyter_print(first_few)
 
 	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
 								yticker_rotate=0, ytick_locations=None, ytick_labels=None): # feature importance computed via permutation_importance

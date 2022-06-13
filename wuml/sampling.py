@@ -33,3 +33,10 @@ def gen_exponential(λ=1, size=1):
 def gen_categorical(category_range, n, probabilities):
 	return np.random.choice(category_range, n, p=probabilities)
 	
+
+def sampling_rows_from_matrix(sample_size, matrix):
+	number_of_rows = matrix.shape[0]
+	random_indices = np.random.choice(number_of_rows, size=sample_size, replace=False)
+	random_rows = matrix[random_indices, :]
+	return random_rows
+
