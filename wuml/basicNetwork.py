@@ -11,33 +11,53 @@ from inspect import signature
 import torch.nn.functional as F
 import torch.nn as nn
 import collections
+from wuml import wtype
 
 class flexable_Model(torch.nn.Module):
+	#	Note that currently batch normalization is automatically included, so eval must be called before running test data
 	def __init__(self, dataDim, networkStructure):
 		super(flexable_Model, self).__init__()
 
 		self.networkStructure = networkStructure
 		inDim = dataDim
 		for l, Layer_info in enumerate(networkStructure):
-			layer_width, activation_function = Layer_info
-			φ = activation_function
-			outDim = layer_width
+			if wtype(Layer_info) == 'tuple':	# it is a regular layer
+				layer_width, activation_function = Layer_info
+				φ = activation_function
+				outDim = layer_width
+	
+				lr = 'self.l' + str(l) + ' = torch.nn.Linear(' + str(inDim) + ', ' + str(outDim) + ' , bias=True)'
+				#print(lr)
+				exec(lr)
+				exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
 
-			lr = 'self.l' + str(l) + ' = torch.nn.Linear(' + str(inDim) + ', ' + str(outDim) + ' , bias=True)'
-			exec(lr)
-			exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
+			### new batch normalization code
+			elif wtype(Layer_info) == 'str':	# it is a batch norm layer
+				cmd = ('self.l' + str(l) + '_BN = nn.BatchNorm1d(num_features=' + str(inDim) + ')')
+				#print(cmd)
+				exec(cmd)
+
 			inDim = outDim
+
 
 	def forward(self, x):
 		self.y0 = x
-		for m, layer in enumerate(self.children(),0):
-			var = 'self.y' + str(m+1)
 
-			if layer.activation == 'none':
-				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(self.y' + str(m) + ')'
-			else:
-				cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
-			exec(cmd)
+		for m, layer in enumerate(self.children(),0):
+			var = 'self.y' + str(m+1)	
+			if type(layer).__name__ == 'Linear':
+				if layer.activation == 'none':
+					cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(self.y' + str(m) + ')'
+				else:
+					cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
+				#print(cmd)
+				exec(cmd)
+
+			#batch Normalization code
+			elif type(layer).__name__ == 'BatchNorm1d':
+				cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '_BN(self.yout)'
+				#print(cmd)
+				exec(cmd)
 
 		if torch.isnan(self.yout).any():
 			print('\n nan was detected inside a network forward\n')
@@ -126,7 +146,7 @@ class basicNetwork:
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
-						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=False): 
+						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True): 
 		'''
 			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
@@ -172,6 +192,7 @@ class basicNetwork:
 		self.out_structural = None
 		self.info(printOut=network_info_print)
 		self.network_info_print = network_info_print
+
 
 		#	Catch some errors
 		if costFunction == 'CE' and X.label_type == 'continuous':
