@@ -22,20 +22,27 @@ class flexable_Model(torch.nn.Module):
 		inDim = dataDim
 		for l, Layer_info in enumerate(networkStructure):
 			if wtype(Layer_info) == 'tuple':	# it is a regular layer
-				layer_width, activation_function = Layer_info
-				φ = activation_function
-				outDim = layer_width
-	
-				lr = 'self.l' + str(l) + ' = torch.nn.Linear(' + str(inDim) + ', ' + str(outDim) + ' , bias=True)'
-				#print(lr)
-				exec(lr)
-				exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
+				### new batch normalization code
+				if wtype(Layer_info[0]) == 'str':
+					bn , train_gamma_beta_parameters = Layer_info
+					cmd = ('self.l' + str(l) + '_BN = nn.BatchNorm1d(num_features=' + str(inDim) + ', affine=' + str(train_gamma_beta_parameters) + ')')
+					#print(cmd)
+					exec(cmd)
+				else:
+					layer_width, activation_function = Layer_info
+					φ = activation_function
+					outDim = layer_width
+		
+					lr = 'self.l' + str(l) + ' = torch.nn.Linear(' + str(inDim) + ', ' + str(outDim) + ' , bias=True)'
+					#print(lr)
+					exec(lr)
+					exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
 
-			### new batch normalization code
-			elif wtype(Layer_info) == 'str':	# it is a batch norm layer
-				cmd = ('self.l' + str(l) + '_BN = nn.BatchNorm1d(num_features=' + str(inDim) + ')')
-				#print(cmd)
-				exec(cmd)
+			#### new batch normalization code
+			#elif wtype(Layer_info) == 'str':	# it is a batch norm layer
+			#	cmd = ('self.l' + str(l) + '_BN = nn.BatchNorm1d(num_features=' + str(inDim) + ', affine=' + + ')')
+			#	#print(cmd)
+			#	exec(cmd)
 
 			inDim = outDim
 
