@@ -37,6 +37,6 @@ bNet.train(print_status=True)
 Ŷ = bNet(data, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
 
 Network_out_v_Label = np.hstack((Ŷ, data.Y))
-jupyter_print(Network_out_v_Label)
+wuml.jupyter_print(Network_out_v_Label)
 
 
