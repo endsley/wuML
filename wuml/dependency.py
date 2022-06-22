@@ -14,11 +14,113 @@ import pandas as pd
 import numpy as np
 #import ppscore as pps
 import wuml
+from wuml import wtype
+from torch import nn
+import torch
+
+
 
 # compute normalized HSIC between X,Y
 # if sigma_type = mpd, it uses median of pairwise distance
 # if sigma_type = opt, it uses optimal
 def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+
+	#X = X.detach().cpu().numpy()
+	#Y = Y.detach().cpu().numpy()
+
+	if wtype(X) == 'Tensor':
+		return HSIC_Tensor(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic)
+	else:
+		return HSIC_numpy(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic)
+
+
+
+
+
+# compute normalized HSIC between X,Y
+# if sigma_type = mpd, it uses median of pairwise distance
+# if sigma_type = opt, it uses optimal
+def HSIC_Tensor(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+
+	def get_γ(X,Y, sigma_type):
+		if X_kernel == 'linear' and Y_kernel == 'linear': return [0,0]
+
+		pdist = nn.PairwiseDistance(p=2)
+
+		self.x_pd = torch.cdist(X, X)
+		self.y_pd = torch.cdist(Y, Y)
+
+		σᵪ = torch.median(self.x_pd)
+		σᵧ = torch.median(self.y_pd)
+			
+		if σᵪ == 0: σᵪ = 0.1
+		if σᵧ == 0: σᵧ = 0.1
+
+		γᵪ = 1.0/(2*σᵪ*σᵪ)
+		γᵧ = 1.0/(2*σᵧ*σᵧ)
+
+		return [γᵪ, γᵧ]
+
+	def double_center(Ψ):
+		HΨ = Ψ - np.mean(Ψ, axis=0)								# equivalent to Γ = Ⲏ.dot(Kᵧ).dot(Ⲏ)
+		HΨH = (HΨ.T - np.mean(HΨ.T, axis=0)).T
+		return HΨH
+
+	def get_Kᵪ(X, Y, X_kernel, γ):
+		if X_kernel == 'linear': 
+			#Kᵪ = X.dot(X.T)
+			Kᵪ = torch.mm(X, X.t())
+		elif X_kernel == 'Gaussian':
+			Mx = self.x_pd
+			Kᵪ = torch.exp(-γ*(Mx*Mx))
+			#Kᵪ = sklearn.metrics.pairwise.rbf_kernel(X, gamma=γ)
+
+		return Kᵪ
+
+	def get_Kᵧ(X, Y, X_kernel, γ):
+		if Y_kernel == 'linear': 
+			#Yₒ = OneHotEncoder(categories='auto', sparse=False).fit_transform(Y)
+			#Kᵧ = Yₒ.dot(Yₒ.T)
+			Kᵧ = torch.mm(Y, Y.t())
+		elif X_kernel == 'Gaussian':
+			My = self.y_pd
+			Kᵧ = torch.exp(-γ*(My*My))
+
+			#[γᵪ, γᵧ] = get_γ(X, Y, sigma_type)
+			#Kᵧ = sklearn.metrics.pairwise.rbf_kernel(Y, gamma=γ)
+
+		return Kᵧ
+
+	n = X.shape[0]
+	if Y.dim() == 1: Y = torch.unsqueeze(Y, dim=0).t()
+	if X.dim() == 1: X = torch.unsqueeze(X, dim=0).t()
+	Y = Y.float()
+
+	[γᵪ, γᵧ] = get_γ(X, Y, sigma_type)
+
+	Kᵪ = get_Kᵪ(X, Y, X_kernel, γᵪ)
+	Kᵧ = get_Kᵧ(X, Y, X_kernel, γᵧ)
+
+	HKᵪ = Kᵪ - torch.mean(Kᵪ, dim=0)					# equivalent to		HKᵪ = H.dot(Kᵪ)
+	HKᵧ = Kᵧ - torch.mean(Kᵧ, dim=0)                  # equivalent to		HKᵧ = H.dot(Kᵧ)
+
+	Hᵪᵧ= torch.sum(HKᵪ.t()*HKᵧ)			# same as HKᵪH = double_center(Kᵪ)
+
+	if Hᵪᵧ == 0: return 0
+	if not normalize_hsic: return Hᵪᵧ/(n*n)
+
+	Hᵪ = torch.sqrt(torch.sum(HKᵪ.t()*HKᵪ))			# same as HKᵪH = double_center(Kᵪ)
+	Hᵧ = torch.sqrt(torch.sum(HKᵧ.t()*HKᵧ))			# same as HKᵪH = double_center(Kᵪ)
+
+	H = Hᵪᵧ/( Hᵪ * Hᵧ )
+	return H
+
+
+
+# compute normalized HSIC between X,Y
+# if sigma_type = mpd, it uses median of pairwise distance
+# if sigma_type = opt, it uses optimal
+def HSIC_numpy(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
 	X = wuml.ensure_numpy(X)
 	Y = wuml.ensure_numpy(Y)
 
@@ -57,8 +159,9 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 
 	def get_Kᵧ(X, Y, X_kernel, γ):
 		if Y_kernel == 'linear': 
-			Yₒ = OneHotEncoder(categories='auto', sparse=False).fit_transform(Y)
-			Kᵧ = Yₒ.dot(Yₒ.T)
+			#Yₒ = OneHotEncoder(categories='auto', sparse=False).fit_transform(Y)
+			#Kᵧ = Yₒ.dot(Yₒ.T)
+			Kᵧ = Y.dot(Y.T)
 		elif X_kernel == 'Gaussian':
 			[γᵪ, γᵧ] = get_γ(X, Y, sigma_type)
 			Kᵧ = sklearn.metrics.pairwise.rbf_kernel(Y, gamma=γ)
@@ -76,7 +179,9 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 
 	HKᵪ = Kᵪ - np.mean(Kᵪ, axis=0)					# equivalent to		HKᵪ = H.dot(Kᵪ)
 	HKᵧ = Kᵧ - np.mean(Kᵧ, axis=0)                  # equivalent to		HKᵧ = H.dot(Kᵧ)
+
 	Hᵪᵧ= np.sum(HKᵪ.T*HKᵧ)							# same as HKᵪH = double_center(Kᵪ)
+	#Hᵪᵧ= HKᵪ.T*HKᵧ							
                                                     #		  Hᵪᵧ = np.sum(HKᵪH*Kᵧ)
 	if Hᵪᵧ == 0: return 0
 	if not normalize_hsic: return Hᵪᵧ/(n*n)

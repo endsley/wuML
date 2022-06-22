@@ -14,8 +14,9 @@ class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
 					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, first_column_as_sample_index=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
+					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
-					batch_size=20, columns_to_ignore=None,
+					batch_size=20, randomly_shuffle_batch=True, columns_to_ignore=None,
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False
@@ -27,6 +28,7 @@ class wData:
 			first_column_as_sample_index: if the first column is used as sample ID
 		'''
 		self.label_column_name = label_column_name
+		self.randomly_shuffle_batch = randomly_shuffle_batch
 
 		if dataFrame is not None:
 			self.df = dataFrame
@@ -65,11 +67,19 @@ class wData:
 		elif ypath is not None: 
 			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
-			if label_type == 'discrete': self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+			if label_type == 'discrete': 
+				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+				if encode_discrete_label_to_one_hot:
+					self.Y = wuml.one_hot_encoding(self.Y)
+
 		elif label_column_name is not None:
 			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
 			self.Y = self.df[label_column_name].values
-			if label_type == 'discrete': self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+			if label_type == 'discrete': 
+				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+				if encode_discrete_label_to_one_hot:
+					self.Y = wuml.one_hot_encoding(self.Y)
+
 			self.delete_column(label_column_name)
 
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
@@ -177,7 +187,7 @@ class wData:
 			return self.df.values
 		if data_type == 'DataLoader':		# and self.torchloader is None 
 			self.DM = wuml.DManager(self.df.values, self.Y)
-			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=True, pin_memory=True, num_workers=1)
+			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 
 	def retrieve_scalar_value(self):
