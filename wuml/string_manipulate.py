@@ -10,7 +10,7 @@ import torch
 #str.rjust(s, width[, fillchar])
 #str.center(s, width[, fillchar])
 
-def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False):
+def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space=''):
 	m = str(m)
 
 	if type(m) == type(torch.tensor([])):
@@ -20,7 +20,7 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 		if len(m.shape) == 1:
 			m = np.atleast_2d(m).T
 
-	out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + '\n'
+	out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
 	out_str = str(out_str).replace('.]',']')
 
 	if type(title).__name__ == 'str':
