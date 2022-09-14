@@ -10,9 +10,12 @@ from sklearn.preprocessing import LabelEncoder
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 
+
 class wData:
-	def __init__(self, xpath=None, ypath=None, column_names=None, label_column_name=None, dataFrame=None, 
-					X_npArray=None, Y_npArray=None, first_row_is_label=False, row_id_with_label=None, first_column_as_sample_index=False, 
+	def __init__(self, xpath=None, ypath=None, column_names=None, 
+					label_column_name=None, label_column_id=None,
+					dataFrame=None, X_npArray=None, Y_npArray=None, first_row_is_label=False, 
+					row_id_with_feature_names=None, first_column_as_sample_index=False, 
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
@@ -20,7 +23,7 @@ class wData:
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False
-			row_id_with_label: None, if the label is not the first row 0, set with this
+			row_id_with_feature_names: None, if the label is not the first row 0, set with this
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
@@ -28,6 +31,8 @@ class wData:
 			first_column_as_sample_index: if the first column is used as sample ID
 		'''
 		self.label_column_name = label_column_name
+		self.label_column_id = label_column_id
+
 		self.randomly_shuffle_batch = randomly_shuffle_batch
 
 		if dataFrame is not None:
@@ -53,7 +58,7 @@ class wData:
 			if first_row_is_label: 
 				self.df = pd.read_csv (xpath, header=0, index_col=first_column_as_sample_index)
 			else:
-				self.df = pd.read_csv (xpath, header=row_id_with_label, index_col=first_column_as_sample_index)
+				self.df = pd.read_csv (xpath, header=row_id_with_feature_names, index_col=first_column_as_sample_index)
 
 
 
@@ -81,6 +86,18 @@ class wData:
 					self.Y = wuml.one_hot_encoding(self.Y)
 
 			self.delete_column(label_column_name)
+		elif label_column_id is not None:
+			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+			self.Y = self.df[label_column_id].values
+			if label_type == 'discrete': 
+				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+				if encode_discrete_label_to_one_hot:
+					self.Y = wuml.one_hot_encoding(self.Y)
+
+			self.delete_column(label_column_id)
+
+
+
 
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
 		self.columns = self.df.columns
@@ -168,6 +185,10 @@ class wData:
 					del self.df[name]
 
 		elif type(column_name) == type(''):
+			if column_name in self.df.columns:
+				del self.df[column_name]
+
+		elif type(column_name) == type(0):
 			if column_name in self.df.columns:
 				del self.df[column_name]
 

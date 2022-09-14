@@ -73,6 +73,22 @@ def set_terminal_print_options(precision=3):
 	pd.set_option("display.max_rows", 500)
 	pd.set_option("precision", precision)
 
+def csv_load(xpath, ypath=None, shuffle_samples=False):
+	X = genfromtxt(	xpath, delimiter=',')
+	Y = None
+	if ypath is not None: 
+		Y = genfromtxt(ypath, delimiter=',')
+
+	if shuffle_samples:
+		if Y is None:
+			X = shuffle(X, random_state=0)
+		else:
+			X, Y = shuffle(X, Y, random_state=0)
+
+	if Y is None: return X
+	else: return [X,Y]
+
+
 def csv_out(X, path, add_row_indices=False, include_column_names=False, float_format='%.4f'):
 	X = wuml.ensure_wData(X)
 	X.to_csv(path, add_row_indices=add_row_indices, include_column_names=include_column_names, float_format=float_format)

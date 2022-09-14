@@ -10,6 +10,7 @@ import torch
 #str.rjust(s, width[, fillchar])
 #str.center(s, width[, fillchar])
 
+
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space=''):
 	m = str(m)
 
