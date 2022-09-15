@@ -61,6 +61,10 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	if auto_print: print(outS)
 	else: return outS
 
+def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):
+	eK = pretty_np_array(M1, front_tab='', title=title1, auto_print=False)
+	eQ = pretty_np_array(M2, front_tab='', title=title2, auto_print=False)
+	block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
 
 def block_string_concatenate(strList, spacing='\t'):
 	all_concat = ''

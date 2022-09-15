@@ -80,3 +80,6 @@ pip install wuml
 [EigenDecomposition](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) \
 [Integrate a univariate function](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/integrate_function.ipynb) 
 
+
+### Feature Map Approximation
+[RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) \
