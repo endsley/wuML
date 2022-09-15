@@ -82,4 +82,4 @@ pip install wuml
 
 
 ### Feature Map Approximation
-[RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/operations/ipynb/eigDecomp.ipynb) \
+[RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/random_features/random_features.ipynb) 
