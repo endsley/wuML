@@ -211,6 +211,14 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 
+	def get_all_samples_from_a_class(self, class_name_or_id):
+		class_samples = np.empty((0,self.X.shape[1]))
+		for i, j in enumerate(self.Y):
+			if j == class_name_or_id:
+				class_samples = np.vstack((class_samples, self.X[i]))
+
+		return class_samples
+
 	def retrieve_scalar_value(self):
 		return self.df.to_numpy()[0,0]
 

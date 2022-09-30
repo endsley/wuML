@@ -11,6 +11,13 @@ def double_center(Ψ):
 	HΨH = (HΨ.T - np.mean(HΨ.T, axis=0)).T
 	return HΨH
 
+def ensure_vector_is_a_column_format(data):
+	X = ensure_numpy(data)
+	X = np.atleast_2d(X)
+	if X.shape[0] < X.shape[1]:
+		return X.T
+	return X
+
 def get_np_column(data, column_id):
 	X = ensure_numpy(data)
 	return np.atleast_2d(X[:,column_id]).T

@@ -169,6 +169,7 @@ class classification:
 
 def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None):
 	'''
+	data is type wData
 	order_by: 'Test', 'Train'
 	q: for ikdr
 	'''
