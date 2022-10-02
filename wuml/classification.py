@@ -38,6 +38,8 @@ class classification:
 		NP = wuml.ensure_numpy
 		S = np.squeeze
 
+		self.X_train = None
+		self.data = data
 		X = NP(data)
 		if y is not None:
 			y = S(NP(y))
@@ -89,6 +91,18 @@ class classification:
 
 		#self.results = self.result_summary(print_out=False)
 
+	def project_data_onto_linear_weights(self, X=None):
+		# if X is none, it will use the original data
+		if wuml.wtype(self.model) != 'LinearDiscriminantAnalysis':
+			print('Warning: the function project_data_onto_linear_weights only works for LDA')
+			return X
+
+		if X is None:
+			nX = wuml.ensure_numpy(self.data)
+			pX = nX.dot(self.model.coef_.T)
+
+		return pX
+			
 	def output_sorted_feature_importance_table(self, Column_names, show_top_few=5): 	# feature importance computed via permutation_importance
 		NP = wuml.ensure_numpy
 
