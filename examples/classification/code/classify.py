@@ -18,7 +18,9 @@ cf.output_sorted_feature_importance_table(data.columns)
 
 
 wuml.jupyter_print('\n\nRun all classifiers sorted by Accuracy')
-models = wuml.run_every_classifier(data, y=data.Y, order_by='Test')
+#default regressor=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']
+models = wuml.run_every_classifier(data, y=data.Y, order_by='Test',
+		regressors=['GP', 'SVM', 'KNN', 'NeuralNet', 'LDA', 'IKDR','LogisticRegression'])
 wuml.jupyter_print(models['Train/Test Summary'])
 
 

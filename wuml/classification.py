@@ -19,6 +19,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.inspection import permutation_importance
+from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
 
@@ -28,7 +29,7 @@ class classification:
 	Automatically run classification on data
 
 	data: can be any data type
-	classifier='GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR'
+	classifier='GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR', 'LogisticRegression'
 	split_train_test: automatically splits the data, default is true
 	q: for IKDR, dimension to reduce to
 	'''
@@ -88,6 +89,8 @@ class classification:
 			model = GaussianNB()
 		elif classifier == 'GradientBoosting':
 			model = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
+		elif classifier == 'LogisticRegression':
+			model = LogisticRegression(random_state=0)
 		elif classifier == 'IKDR':
 			model = wuml.IKDR(data, q=q, y=y)
 		else: raise ValueError('Unrecognized Classifier')
@@ -169,7 +172,7 @@ class classification:
 			data = np.array([[self.classifier, self.Train_acc , self.Test_acc]])
 		else:
 			column_names = ['classifier', 'Train']
-			data = np.array([[self.classifier, NPR(self.Train_acc, 4)]])
+			data = np.array([[self.classifier, self.Train_acc]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
 		if print_out: print(df)
@@ -197,13 +200,14 @@ class classification:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None):
+def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None,
+						regressors=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']	):
 	'''
 	data is type wData
 	order_by: 'Test', 'Train'
 	q: for ikdr
 	'''
-	regressors=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
+	
 	results = {}
 	
 	if q is None: q = int(data.shape[1]/2)
