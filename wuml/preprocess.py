@@ -238,33 +238,49 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 
 	return [X_train, X_test, y_train, y_test]
 
-def gen_10_fold_data(data_name, data_path='./data/'):
+def gen_10_fold_data(data=None, data_name=None, data_path='./data/'):
+	#	if data is provided, data must be wData type
 
-	xpath = data_path + data_name
-
-	X = np.loadtxt(xpath + '.csv', delimiter=',', dtype=np.float64)			
-	Y = np.loadtxt(xpath + '_label.csv', delimiter=',', dtype=np.int32)			
-
-	fold_path = xpath + '/'
-	if os.path.exists(fold_path): 
-		pass
+	#	Load the data 
+	if data is None and data_name is not None:
+		xpath = data_path + data_name
+		X = np.loadtxt(xpath + '.csv', delimiter=',', dtype=np.float64)			
+		Y = np.loadtxt(xpath + '_label.csv', delimiter=',', dtype=np.int32)			
 	else:
-		os.mkdir(fold_path)
+		if wuml.wtype(data) != 'wData': raise ValueError('Unknown dataType %s'%wtype(data))
+
+		X = data.X
+		Y = data.Y
+
+	#	if data_name is not None then we need to save it to file
+	if data_name is not None:
+		xpath = data_path + data_name
+		fold_path = xpath + '/'
+		if os.path.exists(fold_path): 
+			pass
+		else:
+			os.mkdir(fold_path)
 
 	kf = KFold(n_splits=10, shuffle=True)
 	kf.get_n_splits(X)
 	loopObj = enumerate(kf.split(X))
+	all_data_list = [] 
 
 	for count, data in loopObj:
 		[train_index, test_index] = data
 
 		X_train, X_test = X[train_index], X[test_index]
 		Y_train, Y_test = Y[train_index], Y[test_index]
-		
-		np.savetxt( fold_path + data_name + '_' + str(count+1) + '.csv', X_train, delimiter=',', fmt='%.6f') 
-		np.savetxt( fold_path + data_name + '_' + str(count+1) + '_label.csv', Y_train, delimiter=',', fmt='%d') 
-		np.savetxt( fold_path + data_name + '_' + str(count+1) + '_test.csv', X_test, delimiter=',', fmt='%.6f') 
-		np.savetxt( fold_path + data_name + '_' + str(count+1) + '_label_test.csv', Y_test, delimiter=',', fmt='%d') 
+
+		all_data_list.append([X_train, Y_train, X_test, Y_test])
+
+		if data_name is not None:
+			np.savetxt( fold_path + data_name + '_' + str(count+1) + '.csv', X_train, delimiter=',', fmt='%.6f') 
+			np.savetxt( fold_path + data_name + '_' + str(count+1) + '_label.csv', Y_train, delimiter=',', fmt='%d') 
+			np.savetxt( fold_path + data_name + '_' + str(count+1) + '_test.csv', X_test, delimiter=',', fmt='%.6f') 
+			np.savetxt( fold_path + data_name + '_' + str(count+1) + '_label_test.csv', Y_test, delimiter=',', fmt='%d') 
+
+	return all_data_list
 
 def rearrange_sample_to_same_class(X,Y):
 	l = np.unique(Y)

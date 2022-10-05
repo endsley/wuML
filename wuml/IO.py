@@ -26,6 +26,9 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	if font_size > 6: font_size = 6
 	if font_size < 0: font_size = 1
 
+	if wuml.wtype(value) == 'result_table': 
+		value = value.df
+
 	if wuml.isnotebook():
 		if wuml.wtype(value) == 'DataFrame': 
 			if display_all_rows: pd.set_option('display.max_rows', None)
@@ -342,4 +345,31 @@ class summarize_classification_result:
 		if write_path is not None: wuml.write_to(C, write_path)
 		return C
 	
+
+class result_table:
+	def __init__(self, column_names, data=None):
+		self.column_names = column_names
+		if data is None:
+			self.df = pd.DataFrame(columns=column_names)
+		else:
+			self.df = pd.DataFrame(data, columns=column_names)
+
+
+	def add_row(self, row_data):
+		zP = zip(self.column_names, row_data)
+		D = {}
+		for i,j in zP:
+			D[i] = j
+
+		self.df = self.df.append(D, ignore_index = True)
+
+	def __str__(self): 
+		return str(self.df)
+
+
+	def get_column(self, column):
+		if type(column).__name__ == 'int': 
+			return wuml.ensure_wData(self.df.iloc[:,column])
+		
+		return wuml.ensure_wData(self.df[column])
 

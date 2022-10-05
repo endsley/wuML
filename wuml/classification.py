@@ -33,9 +33,10 @@ class classification:
 	q: for IKDR, dimension to reduce to
 	'''
 
-	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=False, 
+	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=False, 	
 				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
-				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2):
+				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2,
+				accuracy_rounding=3):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
 
@@ -51,11 +52,15 @@ class classification:
 		else: raise ValueError('Undefined label Y')
 
 		if test_data is not None:
-			self.X_train = data.X
+			if wuml.wtype(data) == 'wData': self.X_train = data.X
+			elif wuml.wtype(data) == 'ndarray': self.X_train = data
+
 			if y is None: self.y_train = data.Y
 			else: self.y_train = y
 
-			X_test = test_data.X
+			if wuml.wtype(test_data) == 'wData': X_test = test_data.X
+			elif wuml.wtype(test_data) == 'ndarray': X_test = test_data
+			
 			if testY is None: y_test = test_data.Y
 			else:y_test = testY
 			split_train_test = True
@@ -87,13 +92,15 @@ class classification:
 			model = wuml.IKDR(data, q=q, y=y)
 		else: raise ValueError('Unrecognized Classifier')
 
+		NPR = np.round
+
 		model.fit(NP(self.X_train), S(NP(self.y_train)))
 		self.ŷ_train = model.predict(NP(self.X_train))
-		self.Train_acc = wuml.accuracy(S(NP(self.y_train)), self.ŷ_train)
+		self.Train_acc = NPR(wuml.accuracy(S(NP(self.y_train)), self.ŷ_train), accuracy_rounding)
 
 		if split_train_test:
 			self.ŷ_test = model.predict(NP(X_test))
-			self.Test_acc = wuml.accuracy(S(NP(y_test)), self.ŷ_test)
+			self.Test_acc = NPR(wuml.accuracy(S(NP(y_test)), self.ŷ_test), accuracy_rounding)
 
 		self.split_train_test = split_train_test
 		self.model = model
@@ -157,11 +164,9 @@ class classification:
 			plt.show()
 
 	def result_summary(self, print_out=True):
-		NPR = np.round
-
 		if self.split_train_test:
 			column_names = ['classifier', 'Train', 'Test']
-			data = np.array([[self.classifier, NPR(self.Train_acc, 4) , NPR(self.Test_acc, 4)]])
+			data = np.array([[self.classifier, self.Train_acc , self.Test_acc]])
 		else:
 			column_names = ['classifier', 'Train']
 			data = np.array([[self.classifier, NPR(self.Train_acc, 4)]])
