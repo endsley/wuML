@@ -33,7 +33,8 @@ class classification:
 	q: for IKDR, dimension to reduce to
 	'''
 
-	def __init__(self, data, y=None, y_column_name=None, split_train_test=False, classifier='GP', kernel=None, 
+	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=False, 
+				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
@@ -49,17 +50,27 @@ class classification:
 			y = data.Y
 		else: raise ValueError('Undefined label Y')
 
-		if split_train_test:
-			self.X_train, X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+		if test_data is not None:
+			self.X_train = data.X
+			if y is None: self.y_train = data.Y
+			else: self.y_train = y
+
+			X_test = test_data.X
+			if testY is None: y_test = test_data.Y
+			else:y_test = testY
+			split_train_test = True
 		else:
-			self.X_train = NP(X)
-			self.y_train = NP(y)
+			if split_train_test:
+				self.X_train, X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+			else:
+				self.X_train = NP(X)
+				self.y_train = NP(y)
 
 		if classifier == 'GP':
-			kernel = 1.0 * RBF(1.0) 
+			if kernel == 'rbf': kernel = 1.0 * RBF(1.0) 
 			model = GaussianProcessClassifier(kernel=kernel, random_state=0)
 		elif classifier == 'SVM':
-			model = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+			model = make_pipeline(StandardScaler(), SVC(gamma='auto', kernel=kernel))
 		elif classifier == 'RandomForest':
 			model = RandomForestClassifier(max_depth=3, random_state=0)
 		elif classifier == 'KNN':

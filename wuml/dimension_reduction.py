@@ -8,6 +8,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.manifold import Isomap
 from sklearn.manifold import LocallyLinearEmbedding
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.manifold import MDS
 from sklearn.manifold import SpectralEmbedding
 from sklearn.decomposition import FactorAnalysis
@@ -18,7 +19,7 @@ class dimension_reduction:
 	def __init__(self, data, n_components=2, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
 		'''
 			n_components: number of dimension to reduce down to
-			method: 'PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis'
+			method: 'PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis', 'LDA'
 			learning_rate: used for TSNE, if too large, everything become equidistance, defulat=30
 			n_neighbors: used for isoMap
 			gamma: used for KPCA
@@ -37,7 +38,13 @@ class dimension_reduction:
 			self.cumulative_eigs = np.cumsum(self.eigen_values)/np.sum(self.eigen_values)
 			column_names = ['λ%d'%x for x in range(1, model.components_.shape[1]+1)]
 			self.eig_vectors = ensure_DataFrame(model.components_, columns=column_names, index=df.columns)
+		elif method == 'LDA':
+			NP = wuml.ensure_numpy
 
+			model = LinearDiscriminantAnalysis()
+			model.fit(NP(data.X), NP(data.Y))
+			nX = wuml.ensure_numpy(data)
+			self.Ӽ = nX.dot(model.coef_.T)
 		elif method == 'TSNE':
 			model = TSNE(n_components=n_components, learning_rate=learning_rate)
 			self.Ӽ = model.fit_transform(X)
