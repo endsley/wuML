@@ -20,7 +20,8 @@ pip install wuml
 
 
 ### IO
-[jupyter_print](https://github.com/endsley/wuML/blob/main/examples/IO/ipynb/jupyter_print.ipynb)
+[jupyter_print](https://github.com/endsley/wuML/blob/main/examples/IO/ipynb/jupyter_print.ipynb)\
+[Easy Create/Print Table](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/ten_fold_cross_validation.ipynb) 
 
 
 ### Data Preprocessing
