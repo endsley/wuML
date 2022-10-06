@@ -180,6 +180,7 @@ def write_to_current_line(txt):
 	clear_current_line()
 	clear_output(wait = True)
 	sys.stdout.write(txt)
+	sys.stdout.flush()
 
 def clear_previous_line():
 	clear_current_line()

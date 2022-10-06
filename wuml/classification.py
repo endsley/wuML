@@ -220,7 +220,7 @@ class classification:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None,
+def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None, kernel='rbf',
 						regressors=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']	):
 	'''
 	data is type wData
@@ -233,11 +233,42 @@ def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=No
 	if q is None: q = int(data.shape[1]/2)
 	df = pd.DataFrame()
 	for reg in regressors:
-		results[reg] = classification(data, y=y, classifier=reg, split_train_test=True, q=q)
+		wuml.write_to_current_line('Running %s'%reg)
+		results[reg] = classification(data, y=y, classifier=reg, split_train_test=True, q=q, kernel='rbf')
 		df = df.append(results[reg].result_summary(print_out=False))
 
 	if order_by == 'Test': results['Train/Test Summary'] = df.sort_values(['Test','Train'], ascending=False)
 	else: results['Train/Test Summary'] = df.sort_values(['Train','Test'], ascending=False)
 
 	return results
+
+
+#	Generate 10 classifiers and use bagging concensus to reach a label
+class ten_folder_classifier:
+	def __init__(self, data, y=None, y_column_name=None, q=2, kernel='linear', classifier='SVM'):
+
+		tenFoldData = wuml.gen_10_fold_data(data=data)
+		self.tb = tb = wuml.result_table(column_names=['Fold', 'Train Acc', 'Test Acc'])
+	
+		self.classifier_list = []
+		for i, fold in enumerate(tenFoldData):
+			wuml.write_to_current_line('Running fold :%d'%(i+1))
+			[X_train, Y_train, X_test, Y_test] = fold
+			cf = wuml.classification(X_train, y=Y_train, test_data=X_test, testY=Y_test, classifier=classifier, kernel=kernel, q=q)
+			self.classifier_list.append(cf)
+			tb.add_row([i+1, cf.Train_acc , cf.Test_acc])
+	
+		TrainAcc = np.mean(tb.get_column('Train Acc').X)
+		TestAcc = np.mean(tb.get_column('Test Acc').X)
+		tb.add_row(['Avg Acc', TrainAcc , TestAcc])
+
+	def show_results(self):
+		wuml.jupyter_print(self.tb)
+
+	def __call__(self, data):
+		for model in self.classifier_list:
+			label = model(data)
+
+	def save_classifier_to_pickle_file(self, path):
+		wuml.pickle_dump(self, path)
 
