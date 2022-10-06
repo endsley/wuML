@@ -71,7 +71,8 @@ pip install wuml
 ### Regression / Classification
 [Run Several Basic Regressors](https://github.com/endsley/wuML/blob/main/examples/regression/ipynb/run_regression.ipynb) \
 [Interpret feature importance for linear Regressors](https://github.com/endsley/wuML/blob/main/examples/regression/ipynb/interpret_result.ipynb) \
-[Run Several Basic Classifiers](https://github.com/endsley/wuML/blob/main/examples/classification/ipynb/classify.ipynb) 
+[Run Several Basic Classifiers](https://github.com/endsley/wuML/blob/main/examples/classification/ipynb/classify.ipynb) \
+[Use bagging with 10 fold Classifiers](https://github.com/endsley/wuML/blob/main/examples/classification/ipynb/tenfold_bagging_classifier.ipynb) 
 
 ### Dimension Reduction
 [Run Several Dimension Reduction Examples](https://github.com/endsley/wuML/blob/main/examples/dimension_reduction/ipynb/DR_examples.ipynb) 

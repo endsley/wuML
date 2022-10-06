@@ -21,7 +21,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
-
+from scipy import stats
 
 
 class classification:
@@ -274,7 +274,8 @@ class ten_folder_classifier:
 				label = model(data)
 				all_labels.append_columns(model(data))
 
-			import pdb; pdb.set_trace()
+		m = stats.mode(all_labels.X, axis=1)
+		return m[0]
 
 	def save_classifier_to_pickle_file(self, path):
 		wuml.pickle_dump(self, path)

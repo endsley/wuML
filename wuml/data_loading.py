@@ -172,7 +172,7 @@ class wData:
 
 	def append_columns(self, new_data, column_names=None):
 		df = ensure_DataFrame(new_data, columns=column_names)
-		self.update_DataFrame(d.concat([self.df,df], axis=1))
+		self.update_DataFrame(pd.concat([self.df,df], axis=1))
 
 	def rename_columns(self, column_names):
 		if type(column_names).__name__ == 'str':
