@@ -10,17 +10,15 @@ import wuml
 
 data = wuml.make_classification_data( n_samples=200, n_features=5, n_informative=3)
 
-#cf = wuml.classification(data, classifier='GP')
-cf = wuml.classification(data, classifier='IKDR', q=3)
-print(cf.model.W)
-import pdb; pdb.set_trace()
-
 wuml.jupyter_print('Running a single classifier')
+cf = wuml.classification(data, classifier='IKDR', q=3)
 wuml.jupyter_print(cf.result_summary(print_out=False))
+wuml.jupyter_print('\nThe linear weights that designates feature importance')
+wuml.jupyter_print(cf.model.get_feature_importance())
 
-wuml.jupyter_print('\n\nSorted Feature Importance')
+wuml.jupyter_print('\nSorted Feature Importance')
 cf.output_sorted_feature_importance_table(data.columns)
-
+wuml.jupyter_print('\nNotice how the feature importances from IKDR is similar to using permutation_importance from sklearn')
 
 wuml.jupyter_print('\n\nRun all classifiers sorted by Accuracy')
 #default regressor=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']

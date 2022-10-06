@@ -83,6 +83,9 @@ class IKDR:
 
 		return Φ
 
+	def get_feature_importance(self):
+		return self.W[:,0]
+
 	def add_rank_constraint(self, Φ):		# from the log det rank constraint
 		if self.ζ == 0: return Φ
 		W, X, ζ = self.W, self.X, self.ζ
