@@ -266,8 +266,15 @@ class ten_folder_classifier:
 		wuml.jupyter_print(self.tb)
 
 	def __call__(self, data):
+		all_labels = None
 		for model in self.classifier_list:
-			label = model(data)
+			if all_labels is None:
+				all_labels = model(data)
+			else:
+				label = model(data)
+				all_labels.append_columns(model(data))
+
+			import pdb; pdb.set_trace()
 
 	def save_classifier_to_pickle_file(self, path):
 		wuml.pickle_dump(self, path)
