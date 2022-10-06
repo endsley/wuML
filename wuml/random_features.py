@@ -30,6 +30,14 @@
 #	of the data after padding. Therefore, to make the width even longer, we must generate multiple size d matrices and 
 #	concatenate them together. 
 
+import os 
+import sys
+
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 import numpy as np
 import sklearn.metrics
 import torch
@@ -41,6 +49,7 @@ from scipy.linalg import hadamard
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 import wuml
+from wuml import jupyter_print
 
 class random_feature:
 	# sample_num, the larger the better approximation
@@ -151,8 +160,8 @@ if __name__ == "__main__":
 	Kᵣ = rff.get_kernel(X)			# kernel matrix from orthogonal
 #
 #
-	print_two_matrices_side_by_side(K, Kₒ, title1='Real', title2='Approx by SORF', auto_print=True)
-	print_two_matrices_side_by_side(K, Kᵣ, title1='Real', title2='Approx by RFF', auto_print=True)
+	wuml.print_two_matrices_side_by_side(K, Kₒ, title1='Real', title2='Approx by SORF', auto_print=True)
+	wuml.print_two_matrices_side_by_side(K, Kᵣ, title1='Real', title2='Approx by RFF', auto_print=True)
 #
 	jupyter_print('Notice that RFFperforms better on lower dimension datasets')
 	ε = mean_absolute_error(K, Kₒ)
@@ -167,7 +176,7 @@ if __name__ == "__main__":
 #
 #
 	#	SORF starts working better when the dimension gets larger, here we use 16 dimension
-	X = csv_load('../dataset/letters.csv', shuffle_samples=True)
+	X = wuml.csv_load('../dataset/letters.csv', shuffle_samples=True)
 	X = X[0:600,:]
 #
 	σ = np.median(sklearn.metrics.pairwise.pairwise_distances(X))

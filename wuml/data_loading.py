@@ -69,6 +69,9 @@ class wData:
 		self.Y = None
 		if Y_npArray is not None:
 			self.Y = Y_npArray
+			if encode_discrete_label_to_one_hot:
+				self.Y = wuml.one_hot_encoding(self.Y)
+
 		elif ypath is not None: 
 			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
 			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			

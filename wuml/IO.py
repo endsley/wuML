@@ -77,10 +77,10 @@ def set_terminal_print_options(precision=3):
 	pd.set_option("precision", precision)
 
 def csv_load(xpath, ypath=None, shuffle_samples=False):
-	X = genfromtxt(	xpath, delimiter=',')
+	X = np.genfromtxt(	xpath, delimiter=',')
 	Y = None
 	if ypath is not None: 
-		Y = genfromtxt(ypath, delimiter=',')
+		Y = np.genfromtxt(ypath, delimiter=',')
 
 	if shuffle_samples:
 		if Y is None:
@@ -167,8 +167,13 @@ def print_status(percent):
 	sys.stdout.flush()
 
 def clear_current_line():
-	sys.stdout.write("\r")
-	sys.stdout.write("\033[K")
+	#print(..., end="")
+	#sys.stdout.write('\033[2K\033[1G')
+	sys.stdout.write("\r")		#jump to the beginning of line
+	sys.stdout.write("\033[K")	#erase to the end of line
+	#sys.stdout.write("\033[F")		move cursor to beginning of previous line
+	#“\033[A” – move cursor up one line.
+	
 	sys.stdout.flush()
 
 def write_to_current_line(txt):

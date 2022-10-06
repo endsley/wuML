@@ -17,14 +17,14 @@ def make_moons(n_samples=100, shuffle=True, noise=0.05, random_state=None):
 
 def make_classification_data( n_samples=100, n_features=20, n_informative=2, n_redundant=0, n_repeated=0, 
 								n_classes=2, n_clusters_per_class=2, weights=None, flip_y=0.01, class_sep=1.0, 
-								hypercube=True, shift=0.0, scale=1.0, shuffle=True, random_state=None):
+								hypercube=True, shift=0.0, scale=1.0, shuffle=True, random_state=None, encode_discrete_label_to_one_hot=False):
 
 	X, y = make_classification(n_samples=n_samples, n_features=n_features, n_informative=n_informative, n_redundant=n_redundant, n_repeated=n_repeated, 
 								n_classes=n_classes, n_clusters_per_class=n_clusters_per_class, weights=weights, flip_y=flip_y, class_sep=class_sep, 
 								hypercube=hypercube, shift=shift, scale=scale, shuffle=shuffle, random_state=random_state)
 
 
-	data = wuml.wData(X_npArray = X, Y_npArray=y, label_type='discrete')
+	data = wuml.wData(X_npArray = X, Y_npArray=y, label_type='discrete', encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
 	return data
 
 

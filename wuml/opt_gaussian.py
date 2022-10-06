@@ -22,7 +22,7 @@ np.set_printoptions(suppress=True)
 
 
 class opt_gaussian():
-	def __init__(self, X, Y, Y_kernel):	#	X=data, Y=label, σ_type='ℍ', or 'maxKseparation'
+	def __init__(self, X, Y, Y_kernel='linear'):	#	X=data, Y=label, σ_type='ℍ', or 'maxKseparation'
 		ń = X.shape[0]
 		ð = X.shape[1]
 		self.Y_kernel = Y_kernel

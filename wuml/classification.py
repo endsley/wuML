@@ -34,10 +34,10 @@ class classification:
 	q: for IKDR, dimension to reduce to
 	'''
 
-	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=False, 	
+	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=True, 	
 				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2,
-				accuracy_rounding=3):
+				accuracy_rounding=3, regularization_weight=1):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
 
@@ -76,13 +76,13 @@ class classification:
 			if kernel == 'rbf': kernel = 1.0 * RBF(1.0) 
 			model = GaussianProcessClassifier(kernel=kernel, random_state=0)
 		elif classifier == 'SVM':
-			model = make_pipeline(StandardScaler(), SVC(gamma='auto', kernel=kernel))
+			model = make_pipeline(StandardScaler(), SVC(gamma='auto', kernel=kernel, C=regularization_weight))
 		elif classifier == 'RandomForest':
 			model = RandomForestClassifier(max_depth=3, random_state=0)
 		elif classifier == 'KNN':
 			model = KNeighborsClassifier(n_neighbors=4)
 		elif classifier == 'NeuralNet':
-			model = MLPClassifier(random_state=1, max_iter=400)
+			model = MLPClassifier(random_state=1, max_iter=max_epoch)
 		elif classifier == 'LDA':
 			model = LinearDiscriminantAnalysis()
 		elif classifier == 'NaiveBayes':
@@ -109,7 +109,7 @@ class classification:
 		self.model = model
 		self.classifier = classifier
 		self.kernel = kernel
-
+		
 		#self.results = self.result_summary(print_out=False)
 
 	def project_data_onto_linear_weights(self, X=None):
