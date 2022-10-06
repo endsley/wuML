@@ -36,6 +36,7 @@ class classification:
 
 	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=True, 	
 				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
+				reduce_dimension_first_method=None, # 'LDA'
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2,
 				accuracy_rounding=3, regularization_weight=1):
 		NP = wuml.ensure_numpy
@@ -59,18 +60,33 @@ class classification:
 			if y is None: self.y_train = data.Y
 			else: self.y_train = y
 
-			if wuml.wtype(test_data) == 'wData': X_test = test_data.X
-			elif wuml.wtype(test_data) == 'ndarray': X_test = test_data
+			if wuml.wtype(test_data) == 'wData': self.X_test = test_data.X
+			elif wuml.wtype(test_data) == 'ndarray': self.X_test = test_data
 			
 			if testY is None: y_test = test_data.Y
 			else:y_test = testY
 			split_train_test = True
 		else:
 			if split_train_test:
-				self.X_train, X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+				self.X_train, self.X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
 			else:
 				self.X_train = NP(X)
 				self.y_train = NP(y)
+
+		#Check for dimension reduction, example LDA+SVM
+		cfname = classifier.split('+')
+		self.original_classifier_name = classifier
+		if len(cfname) == 2:
+			reduce_dimension_first_method = cfname[0]
+			classifier = cfname[1]
+
+		# Reduce the dimension of data first if LDA is required
+		if reduce_dimension_first_method == 'LDA':
+			self.dim_reduct = LinearDiscriminantAnalysis()
+			self.dim_reduct.fit(NP(self.X_train), S(NP(self.y_train)))
+			self.X_train = NP(self.X_train).dot(self.dim_reduct.coef_.T)
+			if split_train_test: self.X_test = NP(self.X_test).dot(self.dim_reduct.coef_.T)
+
 
 		if classifier == 'GP':
 			if kernel == 'rbf': kernel = 1.0 * RBF(1.0) 
@@ -92,7 +108,7 @@ class classification:
 		elif classifier == 'LogisticRegression':
 			model = LogisticRegression(random_state=0)
 		elif classifier == 'IKDR':
-			model = wuml.IKDR(data, q=q, y=y)
+			model = wuml.IKDR(self.X_train, q=q, y=self.y_train)
 		else: raise ValueError('Unrecognized Classifier')
 
 		NPR = np.round
@@ -102,14 +118,15 @@ class classification:
 		self.Train_acc = NPR(wuml.accuracy(S(NP(self.y_train)), self.ŷ_train), accuracy_rounding)
 
 		if split_train_test:
-			self.ŷ_test = model.predict(NP(X_test))
+			self.ŷ_test = model.predict(NP(self.X_test))
 			self.Test_acc = NPR(wuml.accuracy(S(NP(y_test)), self.ŷ_test), accuracy_rounding)
 
+		#import pdb; pdb.set_trace()
 		self.split_train_test = split_train_test
 		self.model = model
 		self.classifier = classifier
 		self.kernel = kernel
-		
+		self.reduce_dimension_first_method = reduce_dimension_first_method
 		#self.results = self.result_summary(print_out=False)
 
 	def project_data_onto_linear_weights(self, X=None):
@@ -169,10 +186,10 @@ class classification:
 	def result_summary(self, print_out=True):
 		if self.split_train_test:
 			column_names = ['classifier', 'Train', 'Test']
-			data = np.array([[self.classifier, self.Train_acc , self.Test_acc]])
+			data = np.array([[self.original_classifier_name, self.Train_acc , self.Test_acc]])
 		else:
 			column_names = ['classifier', 'Train']
-			data = np.array([[self.classifier, self.Train_acc]])
+			data = np.array([[self.original_classifier_name, self.Train_acc]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
 		if print_out: print(df)
@@ -180,11 +197,14 @@ class classification:
 		return df
 
 
+	def save_classifier_to_pickle_file(self, path):
+		wuml.pickle_dump(self, path)
 
 	def __call__(self, data):
 
 		X = wuml.ensure_numpy(data)	
-		#[self.ŷ, self.σ] = model.predict(X, return_std=True)
+		if self.reduce_dimension_first_method == 'LDA':
+			X = X.dot(self.dim_reduct.coef_.T)
 
 		try: [self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
 		except: self.ŷ = self.model.predict(X)

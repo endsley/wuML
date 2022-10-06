@@ -20,7 +20,7 @@ class IKDR:
 
 		self.X = X = ensure_numpy(data)
 		self.Y = Y = ensure_label(data, y=y, y_column_name=y_column_name)
-
+	
 		# optimize for σ is default
 		if True:
 			optimizer = opt_gaussian(X,Y)
