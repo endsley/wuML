@@ -13,7 +13,17 @@ from wuml import jupyter_print
 #	['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']
 #	['LDA+GP', 'LDA+SVM', 'LDA+RandomForest', 'LDA+KNN', 'LDA+NeuralNet', 'LDA', 'LDA+NaiveBayes', 'LDA+IKDR','LDA+LogisticRegression']
 
-data = wuml.make_classification_data( n_samples=300, n_features=6, n_informative=3, n_classes=3)
+#data = wuml.make_classification_data( n_samples=300, n_features=6, n_informative=3, n_classes=3)
+#cf = wuml.classification(data, classifier='LogisticRegression')
+#jupyter_print(cf.result_summary(print_out=False))
+#
+#print(cf.model.coef_)
+#
+#import pdb; pdb.set_trace()
+
+
+
+
 
 #jupyter_print('Running a single classifier')
 #cf = wuml.classification(data, classifier='IKDR', q=3)

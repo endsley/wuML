@@ -265,17 +265,30 @@ class ten_folder_classifier:
 	def show_results(self):
 		wuml.jupyter_print(self.tb)
 
+	def predict(self, data):
+		return self.__call__(data)
+
 	def __call__(self, data):
 		all_labels = None
 		for model in self.classifier_list:
 			if all_labels is None:
-				all_labels = model(data)
+				all_labels = wuml.ensure_wData(model(data))
 			else:
-				label = model(data)
+				label = wuml.ensure_wData(model(data))
 				all_labels.append_columns(model(data))
 
 		m = stats.mode(all_labels.X, axis=1)
 		return m[0]
+
+	def fit(self, data, y=None):
+		tenFoldData = wuml.gen_10_fold_data(data=data)
+	
+		self.classifier_list = []
+		for i, fold in enumerate(tenFoldData):
+			wuml.write_to_current_line('Running fold :%d'%(i+1))
+			[X_train, Y_train, X_test, Y_test] = fold
+			cf = wuml.classification(X_train, y=Y_train, test_data=X_test, testY=Y_test, classifier=classifier, kernel=kernel, q=q)
+			self.classifier_list.append(cf)
 
 	def save_classifier_to_pickle_file(self, path):
 		wuml.pickle_dump(self, path)
