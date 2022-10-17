@@ -3,6 +3,9 @@ from scipy.stats import multivariate_normal
 import numpy as np
 import wuml
 
+#	Each class acts as a distribution where you can get the p(x) given x as well as sampling from them. 
+
+
 class multivariate_gaussian: #Assuming that data is 1 dimension
 	def __init__(self, dat=None, mean=None, cov=None):
 		self.X = X = wuml.ensure_numpy(dat)	
