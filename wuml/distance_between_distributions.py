@@ -27,20 +27,31 @@ def wasserstein_distance(X, Y, M=None, XY_as_histogram=True):
 
 	if XY_as_histogram:
 		if len(X.shape) == 1:
-			Nx = len(X)
-			Ny = len(Y)
-			
-			# normalize the distribution to 1
-			#import pdb; pdb.set_trace()
-
+			Nx = X.shape[0]
 			if M is None:
 				D = np.arange(Nx, dtype=np.float64)
 				D = D.reshape((Nx, 1))
 				M = ot.dist(D, D, 'euclidean')
 
+			# normalize the distribution to 1
+			#import pdb; pdb.set_trace()
 			return ot.emd2(X, Y, M) # exact linear program
+		elif len(X.shape) == 2:
+			n = X.shape[0]
+			wasDis_matrix = np.zeros((n,n))
+			for i in range(n):
+				for j in range(n):
+					Nx = X[i].shape[0]
+					if M is None:
+						D = np.arange(Nx, dtype=np.float64)
+						D = D.reshape((Nx, 1))
+						M = ot.dist(D, D, 'euclidean')
+
+					wasDis_matrix[i,j] = ot.emd2(X[i], Y[j], M)
+					#print(X[i], Y[i])
+			return wasDis_matrix
 		else:
-			raise ValueError('XY_as_histogram as False is not yet supported')
+			raise ValueError('Wasserstein Distance does not handle 3 dimensional data.')
 	else:
 		raise ValueError('XY_as_histogram as False is not yet supported')
 
