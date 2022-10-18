@@ -415,3 +415,25 @@ def use_cdf_to_map_data_between_0_and_1(data, output_type_name='wData'):
 		except: pass
 
 	return output
+
+# X has to be in wData type
+def get_N_samples_from_each_class(data, N, output_as='wData'):
+	type_check_with_error(data, 'wData', function_name=get_N_samples_from_each_class.__name__)
+	X = data.X
+	Y = data.Y
+
+	newX = np.empty((0, X.shape[1]))
+	newY = np.empty(0)
+	unique_classes = np.unique(Y)
+	for i in unique_classes:
+		Xsub = data.get_all_samples_from_a_class(i)
+		Xsub = wuml.randomly_shuffle_rows_of_matrix(Xsub)
+		Xsub = Xsub[0:N,:]
+		newX = np.vstack((newX, Xsub))
+
+		newY = np.hstack((newY, np.full((N), i)))
+
+	if output_as == 'wData': return wData(X_npArray=newX, Y_npArray=newY, label_type='discrete')
+	elif output_as == 'ndarray': return [newX, newY]
+	else:
+		raise ValueError('Error: The function get_N_samples_from_each_class does not output data type %s.'%output_as)

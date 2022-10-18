@@ -57,3 +57,8 @@ def compute_Degree_matrix(M, output_type=None):
 
 	return ensure_data_type(D, type_name=output_type)
 
+
+def randomly_shuffle_rows_of_matrix(X):
+	X = wuml.ensure_numpy(X)
+	np.random.shuffle(X)
+	return X

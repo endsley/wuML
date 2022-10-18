@@ -20,7 +20,7 @@ import ot
 #	if they are vectors, we assume they are counts of the histogram, returning a scalar value for the distance
 #	if they are matrices, we assume each row is a histogram and output a distance matrix
 #	if M is none, we assume the increments of distance is 1 between tickers
-def wasserstein_distance(X, Y, M=None, XY_as_histogram=True):
+def wasserstein_distance(X, Y, M=None, XY_as_histogram=True, verbose=False):
 
 	X = np.squeeze(wuml.ensure_numpy(X))
 	Y = np.squeeze(wuml.ensure_numpy(Y))
@@ -47,8 +47,15 @@ def wasserstein_distance(X, Y, M=None, XY_as_histogram=True):
 						D = D.reshape((Nx, 1))
 						M = ot.dist(D, D, 'euclidean')
 
-					wasDis_matrix[i,j] = ot.emd2(X[i], Y[j], M)
-					#print(X[i], Y[i])
+					if X[i].flags['C_CONTIGUOUS'] == False: Xc = X[i].copy(order = 'C')
+					else: Xc = X[i]
+					if Y[i].flags['C_CONTIGUOUS'] == False: Yc = Y[i].copy(order = 'C')
+					else: Yc = Y[i]
+
+					wasDis_matrix[i,j] = ot.emd2(Xc, Yc, M)
+
+					wuml.write_to_current_line('Completion %.3f'%((i*n+j)/(n*n)))
+
 			return wasDis_matrix
 		else:
 			raise ValueError('Wasserstein Distance does not handle 3 dimensional data.')

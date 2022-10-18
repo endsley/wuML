@@ -19,6 +19,7 @@ import pandas as pd
 from pathlib import Path
 from sklearn.metrics import accuracy_score
 from IPython.display import clear_output, HTML, Math
+from wuml.type_check import *
 
 def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False):
 	#font_size is from 1 to 6
@@ -26,27 +27,27 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	if font_size > 6: font_size = 6
 	if font_size < 0: font_size = 1
 
-	if wuml.wtype(value) == 'result_table': 
+	if wtype(value) == 'result_table': 
 		value = value.df
 
 	if wuml.isnotebook():
-		if wuml.wtype(value) == 'DataFrame': 
+		if wtype(value) == 'DataFrame': 
 			if display_all_rows: pd.set_option('display.max_rows', None)
 			if display_all_columns: pd.set_option('display.max_columns', None) 
 			display(value)
-		elif wuml.wtype(value) == 'wData': 
+		elif wtype(value) == 'wData': 
 			if display_all_rows: pd.set_option('display.max_rows', None)
 			if display_all_columns: pd.set_option('display.max_columns', None)
 			display(value.df)
-		elif wuml.wtype(value) == 'Index': 
+		elif wtype(value) == 'Index': 
 			value = str(value.tolist())
 			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 			display(HTML(data=str2html))
-		elif wuml.wtype(value) == 'tuple': 
+		elif wtype(value) == 'tuple': 
 			value = str(value)
 			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 			display(HTML(data=str2html))
-		elif wuml.wtype(value) == 'str': 
+		elif wtype(value) == 'str': 
 			value = value.replace('\r','<br>')
 			value = value.replace('\n','<br>')
 			if latex:
@@ -138,6 +139,22 @@ def path_list_exists(path_list):
 			return False
 
 	return True
+
+# path_prefix can be a string or a list of string
+# if list, then it will check the existence given the prefix
+def append_prefix_to_path(path_prefix, fname):
+	if wtype(path_prefix) == 'str':
+		ypth = path_prefix + fname
+	elif wtype(path_prefix) == 'list':
+		for pre in path_prefix:
+			ypth = pre + fname
+			if wuml.path_exists(ypth):
+				break
+	else:
+		raise ValueError('path_prefix must be a string or a list of strings')
+
+	return ypth
+
 
 def create_file(path):
 	fin = open(path,'w')

@@ -35,8 +35,8 @@ pip install wuml
 [Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
 [Load data + center/scaled or between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/load_data_with_preprocess.ipynb) 
 \
-[With 10 Fold Cross Validation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/ten_fold_cross_validation.ipynb) 
-
+[With 10 Fold Cross Validation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/ten_fold_cross_validation.ipynb) \
+[Get data subset with N samples from each Class](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/get_N_samples_from_each_class.ipynb) 
 
 ### Build Neural Networks via Pytorch
 [Simple Regression with/without Batch Normalization](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \

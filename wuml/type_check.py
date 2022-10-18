@@ -9,6 +9,11 @@ from torch.autograd import Variable
 def wtype(data):
 	return type(data).__name__
 
+
+def type_check_with_error(data, desired_type, function_name=''):
+	if wtype(data) != desired_type:
+		raise ValueError('For function %s, you must input type as %s'%(function_name, desired_type))
+
 def ensure_label(data, y=None, y_column_name=None):
 	NP = ensure_numpy
 	S = np.squeeze

@@ -1,4 +1,12 @@
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
+
 from sklearn import preprocessing
 from wuml.type_check import *
 import sys
@@ -12,7 +20,7 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class wData:
-	def __init__(self, xpath=None, ypath=None, column_names=None, 
+	def __init__(self, xpath=None, ypath=None, column_names=None, path_prefix='',
 					label_column_name=None, label_column_id=None,
 					dataFrame=None, X_npArray=None, Y_npArray=None, first_row_is_label=False, 
 					row_id_with_feature_names=None, first_column_as_sample_index=False, 
@@ -29,6 +37,8 @@ class wData:
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 			first_column_as_sample_index: if the first column is used as sample ID
+
+			path_prefix: string or list, if list, automatically goes through potential folders where the data might be
 		'''
 		self.label_column_name = label_column_name
 		self.label_column_id = label_column_id
@@ -53,12 +63,13 @@ class wData:
 				self.df = self.df.set_index(list(self.df)[0])
 
 		else:
-			self.df = pd.read_csv (xpath, header=None)
+			pth = wuml.append_prefix_to_path(path_prefix, xpath)
+			self.df = pd.read_csv (pth, header=None)
 			if first_column_as_sample_index: first_column_as_sample_index = 0
 			if first_row_is_label: 
-				self.df = pd.read_csv (xpath, header=0, index_col=first_column_as_sample_index)
+				self.df = pd.read_csv (pth, header=0, index_col=first_column_as_sample_index)
 			else:
-				self.df = pd.read_csv (xpath, header=row_id_with_feature_names, index_col=first_column_as_sample_index)
+				self.df = pd.read_csv (pth, header=row_id_with_feature_names, index_col=first_column_as_sample_index)
 
 
 
@@ -73,8 +84,10 @@ class wData:
 				self.Y = wuml.one_hot_encoding(self.Y)
 
 		elif ypath is not None: 
+			ypth = wuml.append_prefix_to_path(path_prefix, ypath)
+
 			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-			self.Y = np.loadtxt(ypath, delimiter=',', dtype=np.float32)			
+			self.Y = np.loadtxt(ypth, delimiter=',', dtype=np.float32)			
 			if label_type == 'discrete': 
 				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
 				if encode_discrete_label_to_one_hot:
