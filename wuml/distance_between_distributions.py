@@ -10,7 +10,6 @@ if os.path.exists('/home/chieh/code/wuML'):
 import wuml
 import wplotlib
 from wuml import jupyter_print
-from ot.datasets import make_1D_gauss as gauss
 import numpy as np
 import ot
 
