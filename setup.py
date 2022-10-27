@@ -48,7 +48,7 @@ setup(
 		  'imbalanced-learn',
           'pandas',
 		  'xgboost',
-		  'POT==0.4.0',
+		  'POT',
           'torch',
       ],
   classifiers=[
