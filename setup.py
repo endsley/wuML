@@ -39,7 +39,7 @@ setup(
   keywords = ['ML', 'data analysis'],   # Keywords that define your package best
   include_package_data=False,
   install_requires=[            # I get to this in a second
-          'matplotlib',
+          'matplotlib==3.6.1',
           'wplotlib',
           'sklearn',
           'shap',
@@ -48,6 +48,7 @@ setup(
 		  'imbalanced-learn',
           'pandas',
 		  'xgboost',
+		  'POT==0.4.0',
           'torch',
       ],
   classifiers=[

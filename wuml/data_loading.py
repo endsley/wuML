@@ -27,7 +27,7 @@ class wData:
 					label_type=None, #it should be either 'continuous' or 'discrete'
 					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
-					batch_size=20, randomly_shuffle_batch=True, columns_to_ignore=None,
+					batch_size=32, randomly_shuffle_batch=True, columns_to_ignore=None,
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False

@@ -437,3 +437,21 @@ def get_N_samples_from_each_class(data, N, output_as='wData'):
 	elif output_as == 'ndarray': return [newX, newY]
 	else:
 		raise ValueError('Error: The function get_N_samples_from_each_class does not output data type %s.'%output_as)
+
+#	Make sure that the vector sums up to 1
+#	If there's a negative value within the vector, we increase the whole vector by the most negative value
+def map_vector_to_distribution_data(x, method='raise by negative constant'):
+	x = ensure_numpy(x)
+	mx = np.min(x)
+
+	if mx < 0:
+		if method == 'raise by negative constant':
+			x = x - mx + 0.00001*np.random.rand()
+		elif method == 'set negative to 0':
+			x[x<0] = 0
+		elif method == 'set negative to small noise':
+			x[x<0] = 0.00001*np.random.rand()
+			
+	return np.squeeze(x/np.sum(x))
+
+

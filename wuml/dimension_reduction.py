@@ -16,7 +16,7 @@ from sklearn.decomposition import FactorAnalysis
 from wuml.type_check import *
 
 class dimension_reduction:
-	def __init__(self, data, n_components=2, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
+	def __init__(self, data, n_components=None, method='PCA', learning_rate=30, show_plot=False, kernel='rbf', n_neighbors=5, gamma=1 ):
 		'''
 			n_components: number of dimension to reduce down to
 			method: 'PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis', 'LDA'
@@ -28,6 +28,7 @@ class dimension_reduction:
 		df = ensure_DataFrame(data)
 		X = ensure_numpy(data)
 		if method == 'PCA':
+			if n_components is None: n_components = 2
 			model = PCA(n_components=X.shape[1])
 			
 			use_all_dims = model.fit_transform(X)
@@ -44,26 +45,35 @@ class dimension_reduction:
 			model = LinearDiscriminantAnalysis()
 			model.fit(NP(data.X), NP(data.Y))
 			nX = wuml.ensure_numpy(data)
+
+			if n_components is not None: model.coef_ = model.coef_[0:n_components,:]
 			self.Ӽ = nX.dot(model.coef_.T)
 		elif method == 'TSNE':
+			if n_components is None: n_components = 2
 			model = TSNE(n_components=n_components, learning_rate=learning_rate)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'KPCA':
+			if n_components is None: n_components = 2
 			model = KernelPCA(n_components=n_components, kernel=kernel, gamma=gamma)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'isoMap':
+			if n_components is None: n_components = 2
 			model = Isomap(n_components=n_components, n_neighbors=n_neighbors)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'LLE':
+			if n_components is None: n_components = 2
 			model = LocallyLinearEmbedding(n_components=n_components)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'MDS':
+			if n_components is None: n_components = 2
 			model = MDS(n_components=n_components)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'Spectral Embedding':
+			if n_components is None: n_components = 2
 			model = SpectralEmbedding(n_components=n_components)
 			self.Ӽ = model.fit_transform(X)
 		elif method == 'Factor Analysis':
+			if n_components is None: n_components = 2
 			model = FactorAnalysis(n_components=n_components, random_state=0)
 			self.Ӽ = model.fit_transform(X)
 		else:
@@ -80,6 +90,9 @@ class dimension_reduction:
 		methods = ['PCA', 'KPCA', 'isoMap','LLE', 'Factor Analysis']
 		if self.method in methods:
 			return self.model.transform(X)
+		elif self.method == 'LDA':
+			nX = wuml.ensure_numpy(X)
+			return nX.dot(self.model.coef_.T)
 		else:
 			raise ValueError('This function does not have a transform function yet.')
 		

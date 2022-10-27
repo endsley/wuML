@@ -73,7 +73,7 @@ class flexable_Model(torch.nn.Module):
 		return self.yout
 
 
-def run_SGD(loss_function, model_parameters, trainLoader, device, 
+def run_SGD(loss_function, model_parameters, trainLoader, device, early_exit_loss_threshold=0.000000001,
 				X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor,
 				model=None, lr=0.001, print_status=True, max_epoch=1000,
 				on_new_epoch_call_back=None):
@@ -134,6 +134,8 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 
 		loss_avg = np.array(loss_list).mean()
 		scheduler.step(loss_avg)
+
+		if loss_avg < early_exit_loss_threshold: break;
 		if print_status:
 			txt = '\tepoch: %d, Avg Loss: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, scheduler._last_lr[0])
 			write_to_current_line(txt)
@@ -150,7 +152,7 @@ def run_SGD(loss_function, model_parameters, trainLoader, device,
 
 class basicNetwork:
 	def __init__(self, costFunction, X, 
-						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], 
+						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], early_exit_loss_threshold=0.000000001, 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
 						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True): 
@@ -162,7 +164,7 @@ class basicNetwork:
 		'''
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
-
+		self.early_exit_loss_threshold = early_exit_loss_threshold
 		if simplify_network_for_storage is None:
 			#	X should be in wuml format
 			self.trainLoader = X.get_data_as('DataLoader')
@@ -279,7 +281,7 @@ class basicNetwork:
 		[Xtype, Ytype] = [self.X_dataType, self.Y_dataType]
 
 		run_SGD(ℓ, param, TL, Dev, model=self.model, lr=self.lr, print_status=print_status,
-				max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype, 
+				max_epoch=mE, X_dataType=Xtype, Y_dataType=Ytype, early_exit_loss_threshold=self.early_exit_loss_threshold,
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
 	def fit(self, X,Y):
