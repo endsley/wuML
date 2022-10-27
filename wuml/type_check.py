@@ -106,11 +106,14 @@ def ensure_DataFrame(data, columns=None, index=None):
 
 
 def ensure_numpy(data, rounding=None):
+	import pdb; pdb.set_trace()
 	if wtype(data) == 'ndarray': 
 		if len(data.shape) == 1:
 			X = np.atleast_2d(data).T
 		else:
 			X = data
+	elif wtype(data) == 'list': 
+		return np.array(data)
 	elif wtype(data) == 'wData': 
 		X = data.df.values
 	elif wtype(data) == 'DataFrame': 
