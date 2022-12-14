@@ -169,6 +169,16 @@ class wData:
 		subColumns = self.df[columns]
 		return ensure_wData(subColumns)
 
+	def update_data(self, data, columns=None):
+		if wtype(data) == 'DataFrame':
+			self.update_DataFrame(data)
+		elif wtype(data) == 'ndarray':
+			new_df = pd.DataFrame(data, columns=columns)
+			self.update_DataFrame(new_df)
+		else:
+			raise ValueError('data_loading.update_data function does not recognizes input data type = %s', wtype(data))
+
+
 	def update_DataFrame(self, df):
 		self.df = df
 		self.columns = self.df.columns

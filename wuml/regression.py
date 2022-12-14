@@ -107,6 +107,13 @@ class regression:
 			first_few = sorted_coefs.head(show_top_few)
 			wuml.jupyter_print(first_few)
 
+	def get_coefs(self):
+		regressor = self.regressor
+		if regressor == 'linear':
+			return [self.model.coef_, self.model.intercept_]
+		elif regressor == 'Elastic net' or regressor == 'Lasso' or regressor == 'Ridge':
+			return self.model.coef_
+
 
 	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
 								yticker_rotate=0, ytick_locations=None, ytick_labels=None, method='weights'):

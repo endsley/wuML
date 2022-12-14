@@ -455,3 +455,18 @@ def map_vector_to_distribution_data(x, method='raise by negative constant'):
 	return np.squeeze(x/np.sum(x))
 
 
+
+def normalize(data, norm='l2', ensure_positive_values_method=None):
+	wuml.type_check_with_error(data, 'wData', function_name='process.normalize')
+
+	X = data.X
+	if ensure_positive_values_method == 'raise by most negative':
+		xm = np.reshape(np.min(X, axis=1), (X.shape[0],1 ))
+		xm2 = np.matlib.repmat(xm, 1, X.shape[1])
+		X = X - xm2
+
+
+	Xn = preprocessing.normalize(X, norm=norm)
+
+	new_df = pd.DataFrame(Xn, columns=data.df.columns)
+	data.update_DataFrame(new_df)
