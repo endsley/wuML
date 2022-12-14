@@ -456,7 +456,7 @@ def map_vector_to_distribution_data(x, method='raise by negative constant'):
 
 
 
-def normalize(data, norm='l2', ensure_positive_values_method=None):
+def normalize(data, norm='l2', ensure_positive_values_method=None, return_new_copy=False):
 	wuml.type_check_with_error(data, 'wData', function_name='process.normalize')
 
 	X = data.X
@@ -467,6 +467,9 @@ def normalize(data, norm='l2', ensure_positive_values_method=None):
 
 
 	Xn = preprocessing.normalize(X, norm=norm)
-
 	new_df = pd.DataFrame(Xn, columns=data.df.columns)
-	data.update_DataFrame(new_df)
+
+	if return_new_copy:
+		return wuml.wData(dataFrame=new_df)
+	else:
+		data.update_DataFrame(new_df)

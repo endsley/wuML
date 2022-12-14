@@ -62,3 +62,5 @@ def randomly_shuffle_rows_of_matrix(X):
 	X = wuml.ensure_numpy(X)
 	np.random.shuffle(X)
 	return X
+
+

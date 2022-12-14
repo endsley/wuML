@@ -8,9 +8,9 @@ if os.path.exists('/home/chieh/code/wuML'):
 
 
 from sklearn import preprocessing
-from wuml.type_check import *
-import sys
 import wuml
+
+from wuml.type_check import *
 import pandas as pd
 import torch
 import numpy as np
