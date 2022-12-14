@@ -13,6 +13,9 @@ pip install wuml
 [Feature wise Correlation Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_correlation.ipynb) \
 [Feature wise HSIC Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_HSIC.ipynb) 
 
+### Measures
+[Norm](https://github.com/endsley/wuML/blob/main/examples/measure/ipynb/various_norms.ipynb) 
+
 ### Dependency Measures
 [Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/comparing_HSIC_to_correlation.ipynb) \
 [Approximate HSIC with fewer samples](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/approximate_HSIC.ipynb)
@@ -30,7 +33,8 @@ pip install wuml
 [Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.ipynb) \
 [Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb)\
 \
-[Map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/map_data_to_between_0_and_1.ipynb) 
+[Map data into between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/map_data_to_between_0_and_1.ipynb) \
+[Normalize each row to l1=1 or l2=1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/normalize_data_via_l1_l2.ipynb) 
 \
 [Load data + Decimate rows and column with too much missing + auto-imputation](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/deal_with_missing_data.ipynb) \
 [Load data + center/scaled or between 0 and 1](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/load_data_with_preprocess.ipynb) 
