@@ -149,6 +149,9 @@ def decimate_data_with_missing_entries(data, column_threshold=0.6, row_threshold
 
 	return df_decimated
 
+def center_data(X):
+	return X - X.mean(axis=0)
+
 
 def center_and_scale(wuData, return_type=None):
 	X = ensure_numpy(wuData)

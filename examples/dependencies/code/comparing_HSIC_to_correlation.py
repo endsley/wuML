@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 import wuml 
 import numpy as np
 import scipy.stats
@@ -27,7 +34,7 @@ YP_data_nmi = np.squeeze(enc.fit_transform(np.atleast_2d(plinear_data[:,1]).T))
 
 plinear_pc = np.round(pearsonr(plinear_data[:,0], plinear_data[:,1])[0], 2)
 plinear_nmi = np.round(normalized_mutual_info_score(XP_data_nmi, YP_data_nmi),2)
-plinear_hsic = np.round(wuml.HSIC(plinear_data[:,0], plinear_data[:,1], sigma_type='opt'),2)	
+plinear_hsic = np.round(wuml.HSIC(plinear_data[:,0], plinear_data[:,1], sigma_type='mpd'),2)	
 plinear_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
 print('Linear Relationship:')
@@ -61,7 +68,7 @@ print('\tHSIC : ', linear_hsic)
 #	Sine Data
 dat_x = 9.3*np.random.rand(n,1)
 dat_y = np.sin(dat_x)
-sine_data = np.hstack((dat_x,dat_y)) + 0.06*np.random.randn(n,2)
+sine_data = np.hstack((dat_x,dat_y)) + 0.10*np.random.randn(n,2)
 df = pd.DataFrame(data=sine_data, columns=["x", "y"])
 sine_pc = np.round(pearsonr(sine_data[:,0], sine_data[:,1])[0],2)
 
@@ -84,7 +91,7 @@ print('\tHSIC : ', sine_hsic)
 #	Parabola Data
 dat_x = 4*np.random.rand(n,1) - 2
 dat_y = 0.05*dat_x*dat_x
-para_data = np.hstack((dat_x,dat_y)) + 0.01*np.random.randn(n,2)
+para_data = np.hstack((dat_x,dat_y)) #+ 0.01*np.random.randn(n,2)
 df = pd.DataFrame(data=para_data, columns=["x", "y"])
 
 enc = KBinsDiscretizer(n_bins=10, encode='ordinal')
@@ -129,23 +136,28 @@ plt.figure(figsize=(13,3))
 
 plt.subplot(151)
 plt.plot(plinear_data[:,0], plinear_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic) + '\npps : ' + str(plinear_pps) + ' , nmi : ' + str(plinear_nmi))
+plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic)  + '\nnmi : ' + str(plinear_nmi))
+#plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic) + '\npps : ' + str(plinear_pps) + ' , nmi : ' + str(plinear_nmi))
 
 plt.subplot(152)
 plt.plot(linear_data[:,0], linear_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + '\npps : ' + str(linear_pps) + ' , nmi : ' + str(linear_nmi))
+plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + ' \nnmi : ' + str(linear_nmi))
+#plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + '\npps : ' + str(linear_pps) + ' , nmi : ' + str(linear_nmi))
 
 plt.subplot(153)
 plt.plot(sine_data[:,0], sine_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\npps : ' + str(sine_pps) + ' , nmi : ' + str(sine_nmi))
+plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\nnmi : ' + str(sine_nmi))
+#plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\npps : ' + str(sine_pps) + ' , nmi : ' + str(sine_nmi))
 
 plt.subplot(154)
 plt.plot(para_data[:,0], para_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\npps : ' + str(para_pps) + ' , nmi : ' + str(para_nmi))
+plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\nnmi : ' + str(para_nmi))
+#plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\npps : ' + str(para_pps) + ' , nmi : ' + str(para_nmi))
 
 plt.subplot(155)
 plt.plot(unif_data[:,0], unif_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\npps : ' + str(unif_pps) + ' , nmi : ' + str(unif_nmi))
+plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\nnmi : ' + str(unif_nmi))
+#plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\npps : ' + str(unif_pps) + ' , nmi : ' + str(unif_nmi))
 
 plt.tight_layout()
 plt.show()

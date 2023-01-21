@@ -23,15 +23,15 @@ import torch
 # compute normalized HSIC between X,Y
 # if sigma_type = mpd, it uses median of pairwise distance
 # if sigma_type = opt, it uses optimal
-def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True, gamma_x=None, gamma_y=None):	
 
 	#X = X.detach().cpu().numpy()
 	#Y = Y.detach().cpu().numpy()
 
 	if wtype(X) == 'Tensor':
-		return HSIC_Tensor(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic)
+		return HSIC_Tensor(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic, gamma_x=gamma_x, gamma_y=gamma_y)
 	else:
-		return HSIC_numpy(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic)
+		return HSIC_numpy(X,Y, X_kernel=X_kernel, Y_kernel=Y_kernel, sigma_type=sigma_type, normalize_hsic=normalize_hsic, gamma_x=gamma_x, gamma_y=gamma_y)
 
 
 
@@ -40,7 +40,7 @@ def HSIC(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normal
 # compute normalized HSIC between X,Y
 # if sigma_type = mpd, it uses median of pairwise distance
 # if sigma_type = opt, it uses optimal
-def HSIC_Tensor(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+def HSIC_Tensor(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True, gamma_x=None, gamma_y=None):	
 
 	def get_γ(X,Y, sigma_type):
 		if X_kernel == 'linear' and Y_kernel == 'linear': return [0,0]
@@ -120,11 +120,14 @@ def HSIC_Tensor(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt',
 # compute normalized HSIC between X,Y
 # if sigma_type = mpd, it uses median of pairwise distance
 # if sigma_type = opt, it uses optimal
-def HSIC_numpy(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True):	
+def HSIC_numpy(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', normalize_hsic=True, gamma_x=None, gamma_y=None):	
 	X = wuml.ensure_numpy(X)
 	Y = wuml.ensure_numpy(Y)
 
 	def get_γ(X,Y, sigma_type):
+		if X_kernel == 'linear' and Y_kernel == 'linear': 
+			return [0,0]
+
 		if sigma_type == 'mpd': 
 			σᵪ = np.median(sklearn.metrics.pairwise_distances(X))		
 			σᵧ = np.median(sklearn.metrics.pairwise_distances(Y))
@@ -141,6 +144,9 @@ def HSIC_numpy(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', 
 
 		γᵪ = 1.0/(2*σᵪ*σᵪ)
 		γᵧ = 1.0/(2*σᵧ*σᵧ)
+
+		if gamma_x is not None: γᵪ = gamma_x
+		if gamma_y is not None: γᵧ = gamma_y
 
 		return [γᵪ, γᵧ]
 
@@ -184,11 +190,12 @@ def HSIC_numpy(X,Y, X_kernel='Gaussian', Y_kernel='Gaussian', sigma_type='opt', 
 	#Hᵪᵧ= HKᵪ.T*HKᵧ							
                                                     #		  Hᵪᵧ = np.sum(HKᵪH*Kᵧ)
 	if Hᵪᵧ == 0: return 0
-	if not normalize_hsic: return Hᵪᵧ/(n*n)
+	if not normalize_hsic: return Hᵪᵧ/((n-1)*(n-1))
 
 	Hᵪ = np.sqrt(np.sum(HKᵪ.T*HKᵪ))					#note wrong if Hᵪ = np.linalg.norm(HKᵪ)	b/c it is equivalent to np.sqrt(np.sum(KᵪH*KᵪH))
 	Hᵧ = np.sqrt(np.sum(HKᵧ.T*HKᵧ))						
 
+	#import pdb; pdb.set_trace()
 	H = Hᵪᵧ/( Hᵪ * Hᵧ )
 	return H
 

@@ -5,6 +5,38 @@ from wuml.type_check import *
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
+#	X must be symmetrical
+# columns of the output V are the eigenvector such that : Q = V Λ Vᵀ
+def eigh(Q, q='all', eig_order='largest_first'):
+	if np.allclose(Q, Q.T) == False:
+		raise ErrorType('The input for eigh function must be symmetric matrix.')
+
+	σ, U = np.linalg.eigh(Q)
+	if q == 'all': q = Q.shape[0]
+
+	if eig_order == 'smallest_first':
+		V = U[:, 0:q]
+		λ = σ[0:q]
+	else: 
+		reversedU = U[:, ::-1]
+		V = reversedU[:, 0:q]
+		λ = np.flip(σ)[0:q]
+
+	Λ = np.diag(λ)	
+
+	###	debug code
+	#print('Original Matrix')
+	#print(Q,'\n')
+	#print('Constructed Matrix')
+	#print(V.dot(Λ).dot(V.T), '\n')
+	#print('QV')
+	#print(Q.dot(V), '\n')
+	#print('VΛ')
+	#print(V.dot(Λ), '\n')
+	#import pdb; pdb.set_trace()
+	return [V, λ, Λ] # columns of V are the eigenvector such that : Q = V Λ Vᵀ
+
+
 def double_center(Ψ):
 	Ψ = ensure_numpy(Ψ)
 	HΨ = Ψ - np.mean(Ψ, axis=0)								# equivalent to Γ = Ⲏ.dot(Kᵧ).dot(Ⲏ)

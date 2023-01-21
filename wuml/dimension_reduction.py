@@ -38,7 +38,7 @@ class dimension_reduction:
 			self.eigen_values = model.singular_values_
 			self.cumulative_eigs = np.cumsum(self.eigen_values)/np.sum(self.eigen_values)
 			column_names = ['λ%d'%x for x in range(1, model.components_.shape[1]+1)]
-			self.eig_vectors = ensure_DataFrame(model.components_, columns=column_names, index=df.columns)
+			self.eig_vectors = ensure_DataFrame(model.components_.T, columns=column_names, index=df.columns)
 		elif method == 'LDA':
 			NP = wuml.ensure_numpy
 

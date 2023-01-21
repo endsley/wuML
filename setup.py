@@ -43,6 +43,7 @@ setup(
           'wplotlib',
           'sklearn',
           'shap',
+		  'ppscore',
           'numpy==1.21.4', 
 		  'ipython',
 		  'imbalanced-learn',
