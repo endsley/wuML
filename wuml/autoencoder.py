@@ -19,14 +19,31 @@ class autoencoder():
 		bottleneck_size = int(bottleneck_size)
 	
 		if EncoderStructure is None or DecoderStructure is None:
-			[self.encoder_structure, self.decoder_structure] = self.define_default_encoder_decoder(X, bottleneck_size, default_depth, default_activation_function)
+			[self.encoder_structure, self.decoder_structure] = self.get_default_encoder_decoder(X, bottleneck_size, default_depth, default_activation_function)
 		else:
 			self.encoder_structure = EncoderStructure
 			self.decoder_structure = DecoderStructure
 
 
+			self.encoder = flexable_Model(X.shape[1], self.encoder_structure)
+			self.decoder = flexable_Model(bottleneck_size, self.decoder_structure)
 
-	def define_default_encoder_decoder(self, X, bottleneck_size, default_depth, default_activation_function):
+
+			self.trainLoader = X.get_data_as('DataLoader')
+
+			self.lr = learning_rate
+			self.max_epoch = max_epoch
+			self.X_dataType = X_dataType
+			self.Y_dataType = Y_dataType
+			self.costFunction = costFunction
+			self.NetStructure = networkStructure
+			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
+			self.model = flexable_Model(X.shape[1], networkStructure)
+			self.network_output_in_CPU_during_usage = False
+
+
+
+	def get_default_encoder_decoder(self, X, bottleneck_size, default_depth, default_activation_function):
 		# the default encoder and decoder depth are 3 layers
 		d = X.X.shape[1]
 
