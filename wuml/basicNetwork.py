@@ -32,11 +32,16 @@ class flexable_Model(torch.nn.Module):
 					layer_width, activation_function = Layer_info
 					φ = activation_function
 					outDim = layer_width
-		
 					lr = 'self.l' + str(l) + ' = torch.nn.Linear(' + str(inDim) + ', ' + str(outDim) + ' , bias=True)'
+
 					#print(lr)
+					#import pdb; pdb.set_trace()
 					exec(lr)
 					exec('self.l' + str(l) + '.activation = "' + φ + '"')		#softmax, relu, tanh, sigmoid, none
+
+
+
+	#self.l0 = torch.nn.Linear(10, 8 , bias=True)	
 
 			#### new batch normalization code
 			#elif wtype(Layer_info) == 'str':	# it is a batch norm layer
@@ -57,8 +62,10 @@ class flexable_Model(torch.nn.Module):
 					cmd = 'self.yout = ' + var + ' = self.l' + str(m) + '(self.y' + str(m) + ')'
 				else:
 					cmd = 'self.yout = ' + var + ' = F.' + layer.activation + '(self.l' + str(m) + '(self.y' + str(m) + '))'
-				#print(cmd)
 				exec(cmd)
+
+				#print(cmd)
+				#import pdb; pdb.set_trace()
 
 			#batch Normalization code
 			elif type(layer).__name__ == 'BatchNorm1d':
@@ -77,6 +84,7 @@ def run_SGD(loss_function, model_parameters, trainLoader, device, early_exit_los
 				X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor,
 				model=None, lr=0.001, print_status=True, max_epoch=1000,
 				on_new_epoch_call_back=None):
+
 
 	optimizer = torch.optim.Adam(model_parameters, lr=lr)	
 	scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
