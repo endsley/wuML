@@ -20,6 +20,7 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 
 def costFunction(x, y, ŷ, ind):
 	lossFun = nn.CrossEntropyLoss() 
+	import pdb; pdb.set_trace()
 	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3	
 	return loss
 
@@ -27,7 +28,7 @@ def costFunction(x, y, ŷ, ind):
 #It is important for pytorch that with classification, you need to define Y_dataType=torch.int64
 #You can define a costFunction, but for classification it can be directly set to 'CE'
 #bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-bNet = wuml.basicNetwork('CE', data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
+bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
 						Y_dataType=torch.LongTensor, max_epoch=100, learning_rate=0.001)
 bNet.train(print_status=False)
 

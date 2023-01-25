@@ -4,7 +4,7 @@ import torch
 import numpy as np
 
 #	x -> encoder -> x̂
-#	x̂ -> encoder_linear_output -> ẙ	
+#	x̂ -> midcoder -> ẙ	
 #	x̂ -> decoder -> ŷ	
 #	possible autoencoder objective λ could be 0
 #	loss = (x - ŷ)ᒾ + λ * objective(ẙ, y)
@@ -24,7 +24,6 @@ class autoencoder():
 		'''
 		self.X = X
 		bottleneck_size = int(bottleneck_size)
-		self.encoder_output_weight_structure = encoder_output_weight_structure
 
 		if EncoderStructure is None or DecoderStructure is None:
 			[self.encoder_structure, self.decoder_structure] = self.get_default_encoder_decoder(X, bottleneck_size, default_depth, default_activation_function)
@@ -35,8 +34,10 @@ class autoencoder():
 
 		self.encoder = flexable_Model(X.shape[1], self.encoder_structure)
 		self.decoder = flexable_Model(bottleneck_size, self.decoder_structure)
-		if encoder_output_weight_structure is not None:
-			self.encoder_linear_output = flexable_Model(bottleneck_size, encoder_output_weight_structure)
+		if encoder_output_weight_structure is None:
+			self.midcoder = None
+		else:
+			self.midcoder = flexable_Model(bottleneck_size, encoder_output_weight_structure)
 
 		self.trainLoader = X.get_data_as('DataLoader')
 
@@ -55,8 +56,8 @@ class autoencoder():
 			self.device = 'cuda'
 			self.encoder.to(self.device)		# store the network weights in gpu or cpu device
 			self.decoder.to(self.device)		# store the network weights in gpu or cpu device
-			if encoder_output_weight_structure is not None:
-				self.encoder_linear_output.to(self.device)
+			if self.midcoder is not None:
+				self.midcoder.to(self.device)
 
 		else: self.device = 'cpu'
 
@@ -76,9 +77,9 @@ class autoencoder():
 			try: info_str += ('\t\t%s , %s\n'%(i,i.activation))
 			except: info_str += ('\t\t%s \n'%(i))
 
-		if self.encoder_output_weight_structure is not None:
+		if self.midcoder is not None:
 			info_str += '\tEncoder Extra Output weight Structure\n'
-			for i in self.encoder_linear_output.children():
+			for i in self.midcoder.children():
 				try: info_str += ('\t\t%s , %s\n'%(i,i.activation))
 				except: info_str += ('\t\t%s \n'%(i))
 
@@ -135,69 +136,6 @@ class autoencoder():
 
 
 
-	def run_autoencoder_SGD(self, loss_function, enc_param, dec_param, trainLoader, device, early_exit_loss_threshold=0.000000001,
-					X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, 
-					encoder=None, decoder=None, lr=0.001, print_status=True, max_epoch=1000,
-					on_new_epoch_call_back=None):
-	
-	
-		enc_optimizer = torch.optim.Adam(enc_param, lr=lr)	
-		dec_optimizer = torch.optim.Adam(dec_param, lr=lr)	
-
-		enc_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( enc_optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
-		dec_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( dec_optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
-	
-		for epoch in range(max_epoch):
-	
-			loss_list = []	
-			for (i, data) in enumerate(trainLoader):
-				[x, y, ind] = data
-	
-				x = Variable(x.type(X_dataType), requires_grad=False)
-				y = Variable(y.type(Y_dataType), requires_grad=False)
-				x= x.to(device, non_blocking=True )
-				y= y.to(device, non_blocking=True )
-				enc_optimizer.zero_grad()
-	
-				x̂ = encoder(x)
-				ŷ = decoder(x̂)
-
-				if self.encoder_output_weight_structure is not None:
-					ẙ = self.encoder_linear_output(x̂)
-					ẙ = torch.squeeze(ẙ)
-				else: ẙ = 0
-
-				ŷ = torch.squeeze(ŷ)
-				y = torch.squeeze(y)
-
-				loss = loss_function(x, x̂, ẙ, y, ŷ, ind)
-				if torch.isnan(loss): import pdb; pdb.set_trace()
-	
-				loss.backward()
-				enc_optimizer.step()
-				dec_optimizer.step()
-	
-				loss_list.append(loss.item())
-	
-			loss_avg = np.array(loss_list).mean()
-			enc_scheduler.step(loss_avg)
-			dec_scheduler.step(loss_avg)	
-
-			
-			if loss_avg < early_exit_loss_threshold: break;
-			if print_status:
-				txt = '\tepoch: %d, Avg Loss per dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg/(self.X.batch_size*self.X.shape[1]), enc_scheduler._last_lr[0])
-				write_to_current_line(txt)
-	
-			if on_new_epoch_call_back is not None:
-				on_new_epoch_call_back(loss_avg, (epoch+1), enc_scheduler._last_lr[0])
-	
-			#if model is not None:
-			#	if "on_new_epoch" in dir(model):
-			#		early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
-			#		if early_exit: break
-
-
 	def reduce_dimension(self, data, output_type='Tensor', outPath=None):
 		x = wuml.ensure_tensor(data, dataType=torch.FloatTensor)
 		x̂ = self.encoder(x)
@@ -245,5 +183,79 @@ class autoencoder():
 
 		return ŷ
 
+
+
+	def run_autoencoder_SGD(self, loss_function, enc_param, dec_param, trainLoader, device, early_exit_loss_threshold=0.000000001,
+					X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, 
+					encoder=None, decoder=None, lr=0.001, print_status=True, max_epoch=1000,
+					on_new_epoch_call_back=None):
+	
+	
+		enc_optimizer = torch.optim.Adam(enc_param, lr=lr)	
+		dec_optimizer = torch.optim.Adam(dec_param, lr=lr)	
+
+		enc_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( enc_optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+		dec_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( dec_optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+	
+		#	if mid coder is used: midcoder takes output of bottleneck for separate process
+		if self.midcoder is None:
+			midcoder_param = None
+			mid_optimizer = None
+			mid_scheduler = None
+		else:
+			midcoder_param = self.midcoder.parameters()
+			mid_optimizer = torch.optim.Adam(midcoder_param, lr=lr)	
+			mid_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( dec_optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+
+		for epoch in range(max_epoch):
+	
+			loss_list = []	
+			for (i, data) in enumerate(trainLoader):
+				[x, y, ind] = data
+	
+				x = Variable(x.type(X_dataType), requires_grad=False)
+				y = Variable(y.type(Y_dataType), requires_grad=False)
+				x= x.to(device, non_blocking=True )
+				y= y.to(device, non_blocking=True )
+				enc_optimizer.zero_grad()
+	
+				x̂ = encoder(x)
+				ŷ = decoder(x̂)
+
+				if self.midcoder is not None:
+					ẙ = self.midcoder(x̂)
+					ẙ = torch.squeeze(ẙ)
+				else: ẙ = 0
+
+				ŷ = torch.squeeze(ŷ)
+				y = torch.squeeze(y)
+
+				loss = loss_function(x, x̂, ẙ, y, ŷ, ind)
+				if torch.isnan(loss): import pdb; pdb.set_trace()
+	
+				loss.backward()
+				enc_optimizer.step()
+				dec_optimizer.step()
+				if mid_optimizer is not None: mid_optimizer.step()
+
+				loss_list.append(loss.item())
+	
+			loss_avg = np.array(loss_list).mean()
+			enc_scheduler.step(loss_avg)
+			dec_scheduler.step(loss_avg)	
+			if mid_scheduler is not None: mid_scheduler.step(loss_avg)
+			
+			if loss_avg < early_exit_loss_threshold: break;
+			if print_status:
+				txt = '\tepoch: %d, Avg Loss per dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg/(self.X.batch_size*self.X.shape[1]), enc_scheduler._last_lr[0])
+				write_to_current_line(txt)
+	
+			if on_new_epoch_call_back is not None:
+				on_new_epoch_call_back(loss_avg, (epoch+1), enc_scheduler._last_lr[0])
+	
+			#if model is not None:
+			#	if "on_new_epoch" in dir(model):
+			#		early_exit = model.on_new_epoch(loss_avg, (epoch+1), scheduler._last_lr[0])
+			#		if early_exit: break
 
 
