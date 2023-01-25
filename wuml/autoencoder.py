@@ -1,5 +1,6 @@
 
 from wuml.basicNetwork import *
+from wuml.type_check import *
 import torch
 import numpy as np
 
@@ -15,7 +16,7 @@ class autoencoder():
 						default_depth=4, default_activation_function='relu',
 						early_exit_loss_threshold=0.0000001, 
 						on_new_epoch_call_back = None, max_epoch=1000, 	
-						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, network_usage_output_type='Tensor',
+						X_dataType=None, Y_dataType=None, network_usage_output_type='Tensor',
 						learning_rate=0.001):
 		'''
 			X : This should be wData type
@@ -44,9 +45,16 @@ class autoencoder():
 		self.network_usage_output_type = network_usage_output_type
 		self.lr = learning_rate
 		self.max_epoch = max_epoch
-		self.X_dataType = X_dataType
-		self.Y_dataType = Y_dataType
 		self.early_exit_loss_threshold = early_exit_loss_threshold
+
+		# use the default wData type unless strictly set to something else
+		# if label is discrete, Y should default set to torch.LongTensor for integer values
+		if X_dataType is not None: self.X_dataType = X_dataType
+		else: self.X_dataType = X.xtorchDataType
+		if Y_dataType is not None: self.Y_dataType = Y_dataType
+		else: self.Y_dataType = X.ytorchDataType
+
+
 		if costFunction is None: costFunction = torch.nn.MSELoss()
 		else: self.costFunction = costFunction
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
@@ -134,24 +142,33 @@ class autoencoder():
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
 
+	def objective_network(self, data, output_type='wData'):
+		x = ensure_tensor(data, dataType=torch.FloatTensor)
+		x̂ = self.encoder(x)
+		ẙ = self.midcoder(x̂)
+
+		ẙ = ensure_data_type(ẙ, type_name=output_type)
+		if wtype(ẙ) == 'wData': ẙ.Y = data.Y
+		return ẙ
 
 
-	def reduce_dimension(self, data, output_type='Tensor', outPath=None):
-		x = wuml.ensure_tensor(data, dataType=torch.FloatTensor)
+	def reduce_dimension(self, data, output_type='wData', outPath=None):
+		x = ensure_tensor(data, dataType=torch.FloatTensor)
 		x̂ = self.encoder(x)
 
-		if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
-			x̂ = x̂.detach().cpu().numpy()
-		elif output_type == 'wData':
-			x̂ = wuml.ensure_wData(x̂)
-		elif self.network_output_in_CPU_during_usage:
-			x̂ = x̂.detach().cpu()
+		x̂ = ensure_data_type(x̂, type_name=output_type)
+		#if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
+		#	x̂ = x̂.detach().cpu().numpy()
+		#elif output_type == 'wData':
+		#	x̂ = ensure_wData(x̂)
+		#elif self.network_output_in_CPU_during_usage:
+		#	x̂ = x̂.detach().cpu()
 
 		if outPath is not None:
-			wD = wuml.ensure_wData(x̂)
+			wD = ensure_wData(x̂)
 			wD.to_csv(outPath)
 
-		x̂.Y = data.Y
+		if wtype(x̂) == 'wData': x̂.Y = data.Y
 		return x̂
 
 	def __call__(self, data, output_type='Tensor', out_structural=None):
@@ -159,20 +176,7 @@ class autoencoder():
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
 
-		x = wuml.ensure_tensor(data, dataType=torch.FloatTensor)
-
-		#if type(data).__name__ == 'ndarray': 
-		#	x = torch.from_numpy(data)
-		#	x = Variable(x.type(self.X_dataType), requires_grad=False)
-		#	x= x.to(self.device, non_blocking=True )
-		#elif type(data).__name__ == 'Tensor': 
-		#	x = Variable(x.type(self.X_dataType), requires_grad=False)
-		#	x= x.to(self.device, non_blocking=True )
-		#elif type(data).__name__ == 'wData': 
-		#	x = data.get_data_as('Tensor')
-		#else:
-		#	raise
-
+		x = ensure_tensor(data, dataType=torch.FloatTensor)
 		x̂ = self.encoder(x)
 		ŷ = self.decoder(x̂)
 
@@ -210,6 +214,8 @@ class autoencoder():
 		for epoch in range(max_epoch):
 	
 			loss_list = []	
+			recons_loss_list = []	
+			objective_loss_list = []	
 			for (i, data) in enumerate(trainLoader):
 				[x, y, ind] = data
 	
@@ -230,7 +236,13 @@ class autoencoder():
 				ŷ = torch.squeeze(ŷ)
 				y = torch.squeeze(y)
 
-				loss = loss_function(x, x̂, ẙ, y, ŷ, ind)
+				all_losses = loss_function(x, x̂, ẙ, y, ŷ, ind)
+				if wtype(all_losses) == 'list': 
+					[loss, Reconst_loss, obj_loss] = all_losses
+					recons_loss_list.append(Reconst_loss.item())
+					objective_loss_list.append(obj_loss.item())
+				else: loss = all_losses
+
 				if torch.isnan(loss): import pdb; pdb.set_trace()
 	
 				loss.backward()
@@ -247,8 +259,17 @@ class autoencoder():
 			
 			if loss_avg < early_exit_loss_threshold: break;
 			if print_status:
-				txt = '\tepoch: %d, Avg Loss per dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg/(self.X.batch_size*self.X.shape[1]), enc_scheduler._last_lr[0])
-				write_to_current_line(txt)
+				#num_elements = (self.X.batch_size*self.X.shape[1])
+				if wtype(all_losses) == 'list':
+					l1 = loss_avg
+					l2 = np.array(recons_loss_list).mean()
+					l3 = np.array(objective_loss_list).mean()
+
+					txt = '\tepoch: %d, Total Loss/dimension: %.4f, Reconstruct loss: %.4f, Objective loss: %.4f, Learning Rate: %.8f'%((epoch+1), l1, l2, l3, enc_scheduler._last_lr[0])
+					write_to_current_line(txt)
+				else:
+					txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
+					write_to_current_line(txt)
 	
 			if on_new_epoch_call_back is not None:
 				on_new_epoch_call_back(loss_avg, (epoch+1), enc_scheduler._last_lr[0])

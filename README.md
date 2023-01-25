@@ -47,7 +47,8 @@ pip install wuml
 [Weighted Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/weighted_regression.ipynb) \
 [Using HSIC as an objective with batch samples](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/HSIC_as_objective.ipynb) \ 
 \
-[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) 
+[Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) \
+[Basic Autoencoder](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/autoencoder.ipynb) 
 
 ### Distance Between Distributions
 [Wasserstein Distance Example](https://github.com/endsley/wuML/blob/main/examples/distance_between_distributions/ipynb/wasserstein_example.ipynb) \

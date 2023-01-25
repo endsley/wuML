@@ -113,19 +113,21 @@ class wData:
 			self.delete_column(label_column_id)
 
 
-
-
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
 		self.columns = self.df.columns
 
 		self.X = self.df.values
-		self.batch_size = batch_size
-		self.shape = self.df.shape
-		self.xtorchDataType = xtorchDataType				
-		self.ytorchDataType = ytorchDataType				
-		self.torchloader = None
 		self.label_type = label_type
+		self.shape = self.df.shape
+		self.batch_size = batch_size
+		self.torchloader = None
 
+		self.Data_preprocess(preprocess_data)
+		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
+
+
+	def Data_preprocess(self, preprocess_data):
+		#	Various ways to preprocess the data
 		if preprocess_data == 'center and scale':
 			self.X = preprocessing.scale(self.X)
 			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
@@ -136,9 +138,18 @@ class wData:
 			self.X = wuml.wuml.map_data_between_0_and_1(self.X, output_type_name='ndarray', map_type='cdf')
 			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
 
+	def initialize_pytorch_settings(self, xtorchDataType, ytorchDataType):
+		#	Property set the data type in Pytorch
+		self.xtorchDataType = xtorchDataType				
+		if self.label_type == 'discrete': 
+			self.ytorchDataType = torch.LongTensor
+		else:
+			self.ytorchDataType = ytorchDataType				
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
+
+
 
 	def replace_label(self, newY):
 		self.Y = ensure_numpy(newY)

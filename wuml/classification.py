@@ -192,7 +192,7 @@ class classification:
 			data = np.array([[self.original_classifier_name, self.Train_acc]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
-		if print_out: print(df)
+		if print_out: print('\n', df)
 		self.results = df
 		return df
 
