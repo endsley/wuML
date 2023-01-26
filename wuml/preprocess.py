@@ -24,6 +24,25 @@ np.set_printoptions(threshold=sys.maxsize)
 
 #import pdb; pdb.set_trace()
 
+
+#	data here should be wData
+def remove_rows_with_missing_labels(data):
+	df = data.df.copy()
+	label_column = ensure_DataFrame(data.Y, columns='label')
+	newDF = pd.concat([df,label_column], axis=1)
+
+	newDF = newDF.dropna(subset=['label'])	# remove the row with missing label
+	newLabel = (newDF['label']).values
+
+	del newDF['label']
+	data.Y = newLabel
+	data.df = newDF
+	data.X = newDF.values
+	data.shape = newDF.shape
+
+	return data
+
+
 def remove_rows_with_too_much_missing_entries(data, threshold=0.6, newDataFramePath=''):
 	'''
 		If a row is kept if it has more than "threshold" percentage of normal data
