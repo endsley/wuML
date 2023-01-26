@@ -14,8 +14,9 @@ import torch
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space=''):
 	m = str(m)
 
-	if type(m) == type(torch.tensor([])):
-		m = m.cpu().detach().numpy()
+	wuml.ensure_numpy(m)
+	#if type(m) == type(torch.tensor([])):
+	#	m = m.cpu().detach().numpy()
 
 	if verticalize:
 		if len(m.shape) == 1:

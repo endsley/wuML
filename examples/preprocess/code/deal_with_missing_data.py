@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 import wuml 
 
 '''
@@ -10,9 +17,9 @@ import wuml
 '''
 
 wuml.set_terminal_print_options(precision=3)
-data = wuml.wData('../../data/missin_example.csv', row_id_with_label=0)
+data = wuml.wData('../../data/missin_example.csv', first_row_is_label=True)
 print(data)
-
+import pdb; pdb.set_trace()
 
 #	column_threshold=0.95, this will keep features that are at least 95% full
 #	Note that an id column is "required" for this process to document which rows are removes

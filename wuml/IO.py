@@ -75,7 +75,7 @@ def set_terminal_print_options(precision=3):
 	torch.set_printoptions(linewidth=400)
 
 	pd.set_option("display.max_rows", 500)
-	pd.set_option("precision", precision)
+	pd.set_option("display.precision", precision)
 
 def csv_load(xpath, ypath=None, shuffle_samples=False):
 	X = np.genfromtxt(	xpath, delimiter=',')

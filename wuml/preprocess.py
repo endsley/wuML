@@ -13,7 +13,7 @@ import os
 
 from wuml.IO import *
 from wuml.data_stats import *
-from wuml.data_loading import *
+from wuml.wData import *
 from wuml.type_check import *
 
 np.set_printoptions(precision=4)

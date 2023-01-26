@@ -75,6 +75,7 @@ class regression:
 			Xt = ensure_wData(self.X_train)
 			model = wuml.basicNetwork('mse', Xt, Y=S(NP(self.y_train)), networkStructure=networkStructure, 
 										max_epoch=max_epoch, learning_rate=learning_rate, network_info_print=network_info_print)
+		
 		model.fit(NP(self.X_train), S(NP(self.y_train)))
 		try: [self.ŷ_train, self.σ] = model.predict(NP(self.X_train), return_std=True)
 		except: 

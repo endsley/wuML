@@ -125,6 +125,18 @@ class wData:
 		self.Data_preprocess(preprocess_data)
 		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
 
+		# raise a warning if there are missing entries within the data
+		mL = np.sum(np.isnan(self.X))
+		if mL > 0: print('\nWarning: %d entries are missing.'%(mL))
+
+		missingLabels = wuml.identify_missing_labels(self.Y)
+		if missingLabels is not None: 
+			if missingLabels > 0: 
+				mL = np.sum(np.isnan(self.Y))
+				print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
+				removeSample = input("It is very important that you notice this. Press enter to continue.....")
+			
+
 
 	def Data_preprocess(self, preprocess_data):
 		#	Various ways to preprocess the data
@@ -212,6 +224,7 @@ class wData:
 		if type(column_names).__name__ == 'str':
 			column_names = [column_names]
 
+		column_names = np.squeeze(ensure_numpy(column_names)).tolist()
 		self.df.columns = column_names
 		self.columns = column_names
 
