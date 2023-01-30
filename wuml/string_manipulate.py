@@ -12,11 +12,8 @@ import torch
 
 
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space=''):
+	m = wuml.ensure_numpy(m)
 	m = str(m)
-
-	wuml.ensure_numpy(m)
-	#if type(m) == type(torch.tensor([])):
-	#	m = m.cpu().detach().numpy()
 
 	if verticalize:
 		if len(m.shape) == 1:
@@ -31,7 +28,7 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 		t1 = str.center(title, L1_max_width)
 		out_str = t1 + '\n' + out_str
 
-	if auto_print: print(out_str)
+	if auto_print: wuml.jupyter_print(out_str)
 	else: return out_str
 
 def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_print=False):
@@ -59,7 +56,7 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	for l1, l2 in zip(L1,L2):
 		outS += ('%-' + str(max_width) + 's' + spacing + l2 + '\n') % l1
 
-	if auto_print: print(outS)
+	if auto_print: wuml.jupyter_print(outS)
 	else: return outS
 
 def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):

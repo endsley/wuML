@@ -238,7 +238,9 @@ class autoencoder():
 
 				all_losses = loss_function(x, x̂, ẙ, y, ŷ, ind)
 				if wtype(all_losses) == 'list': 
-					[loss, Reconst_loss, obj_loss] = all_losses
+					if len(all_losses) == 3:
+						[loss, Reconst_loss, obj_loss] = all_losses
+
 					recons_loss_list.append(Reconst_loss.item())
 					objective_loss_list.append(obj_loss.item())
 				else: loss = all_losses

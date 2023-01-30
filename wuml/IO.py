@@ -56,10 +56,12 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 				str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 				display(HTML(data=str2html))
 		else:
+			if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 			print(value)
 
 		pd.set_option('display.max_rows', 10)
 	else:
+		if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 		print(value)
 
 
@@ -244,7 +246,7 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 
 		return output
 
-def output_regression_result(y, ŷ, write_path=None):
+def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=False, print_out=True):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 	ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
 
@@ -255,19 +257,25 @@ def output_regression_result(y, ŷ, write_path=None):
 	Δy = np.absolute(ŷ - y)
 	avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
 
-	H = wplotlib.histograms()
-	H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
+	H = wplotlib.histograms(Δy, num_bins=15, title='Histogram of Errors', 
 				xlabel='Error Amount', ylabel='Error count',
 				facecolor='blue', α=0.5, path=None)
 
+	df = pd.DataFrame(np.hstack((y, ŷ, Δy)), columns=['y', 'ŷ', 'Δy'])
 
-	A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
-	B = wuml.pretty_np_array(np.hstack((y, ŷ)))
-	C = avg_Δ + A + B
+	if sort_by == 'error':
+		df = df.sort_values('Δy', ascending=ascending)
+	elif sort_by == 'label':
+		df = df.sort_values('y', ascending=ascending)
+	elif sort_by == 'output':
+		df = df.sort_values('ŷ', ascending=ascending)
 
+	if print_out:
+		jupyter_print(avg_Δ)
+		jupyter_print(df, display_all_rows=True, display_all_columns=True)
+	
 	if write_path is not None: wuml.write_to(C, write_path)
-
-	return C
+	return df
 
 
 class summarize_regression_result:
