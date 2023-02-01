@@ -98,5 +98,5 @@ pip install wuml
 [RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/random_features/random_features.ipynb) 
 
 ### Rebalance Skew classification data
-[Rebalance skewed data with oversampling and smote](https://github.com/endsley/wuML/blob/main/examples/rebalance_data/ipyn/rebalance_data.ipynb) 
+[Rebalance skewed data with oversampling and smote](https://github.com/endsley/wuML/blob/main/examples/rebalance_data/ipynb/rebalance_data.ipynb) 
 
