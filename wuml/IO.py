@@ -30,14 +30,12 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	if wtype(value) == 'result_table': 
 		value = value.df
 
+	if display_all_columns: pd.set_option('display.max_columns', None) 
+	if display_all_rows: pd.set_option('display.max_rows', None)
 	if wuml.isnotebook():
 		if wtype(value) == 'DataFrame': 
-			if display_all_rows: pd.set_option('display.max_rows', None)
-			if display_all_columns: pd.set_option('display.max_columns', None) 
 			display(value)
 		elif wtype(value) == 'wData': 
-			if display_all_rows: pd.set_option('display.max_rows', None)
-			if display_all_columns: pd.set_option('display.max_columns', None)
 			display(value.df)
 		elif wtype(value) == 'Index': 
 			value = str(value.tolist())
@@ -271,6 +269,7 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 		df = df.sort_values('ŷ', ascending=ascending)
 
 	if print_out:
+		jupyter_print('\n')
 		jupyter_print(avg_Δ)
 		jupyter_print(df, display_all_rows=True, display_all_columns=True)
 	

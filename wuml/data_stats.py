@@ -29,6 +29,25 @@ import itertools
 import random
 
 
+def get_label_stats(data, print_stat=True):
+	if wtype(data) == 'wData': y = data.Y
+	else: y = ensure_numpy(data)
+
+	l = np.unique(y)
+	t = len(y)
+	table = np.empty((0,3))
+	for i in l:
+		sn = len(np.where(y == i)[0])
+		table = np.vstack((table, np.array([[i, sn, sn/t]])))
+
+	df = pd.DataFrame(table, columns=['class id', 'num sample', 'percentage'])
+	if print_stat: jupyter_print(df)
+	stat = ensure_wData(df)
+
+	return stat
+
+
+
 def get_feature_histograms(X, path=None, title='', ylogScale=False):
 	X = ensure_numpy(X)
 

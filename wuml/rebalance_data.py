@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 from collections import Counter
 from sklearn.datasets import make_classification
 from imblearn.over_sampling import SMOTE 
@@ -23,14 +30,21 @@ class rebalance_data:
 			y = wuml.ensure_numpy(y)
 			
 	
+		yStats = wuml.get_label_stats(y, print_stat=False)
+		sn = yStats.get_columns('num sample')
+		smallest_class_sample_num =  np.min(sn.X)
+		if smallest_class_sample_num < 6: raise ValueError('Error: rebalance data with smote must have at least 6 samples in the smallest class.')
+
 		sm = SMOTE(random_state=42)
 		X_res, y_res = sm.fit_resample(X, y)
 	
 		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, label_column_name=label_column_name, label_type='discrete')
 
 if __name__ == "__main__":
-	X = np.random.randn(100, 10)
-	y = np.append(np.ones(20), np.zeros(80))
+	X1 = np.random.randn(20, 2) + 5
+	X2 = np.random.randn(7, 2) - 5
+	X = np.vstack((X1,X2))
+	y = np.append(np.ones(20), np.zeros(7))
 
 	rebalancer = rebalance_data(X, y)
 	print(rebalancer.balanced_data.shape)
