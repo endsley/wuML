@@ -96,3 +96,7 @@ pip install wuml
 
 ### Feature Map Approximation
 [RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/random_features/random_features.ipynb) 
+
+### Rebalance Skew classification data
+[RFF and SORF](https://github.com/endsley/wuML/blob/main/examples/rebalance_data/ipyn/rebalance_data.ipynb) 
+

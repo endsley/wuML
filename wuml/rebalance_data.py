@@ -9,13 +9,14 @@ if os.path.exists('/home/chieh/code/wuML'):
 
 from collections import Counter
 from sklearn.datasets import make_classification
-from imblearn.over_sampling import SMOTE 
+from imblearn.over_sampling import SMOTE, RandomOverSampler
 import wuml
 import numpy as np
 
 
 class rebalance_data:
 	def __init__(self, data, y=None, method='smote'):
+		'''method : 'smote', 'oversampling' '''
 
 		label_column_name=None
 		if y is None:
@@ -29,16 +30,21 @@ class rebalance_data:
 			X = wuml.ensure_numpy(data)
 			y = wuml.ensure_numpy(y)
 			
+		if method == 'smote':
+			yStats = wuml.get_label_stats(y, print_stat=False)
+			sn = yStats.get_columns('num sample')
+			smallest_class_sample_num =  np.min(sn.X)
+			if smallest_class_sample_num < 6: raise ValueError('Error: rebalance data with smote must have at least 6 samples in the smallest class.')
 	
-		yStats = wuml.get_label_stats(y, print_stat=False)
-		sn = yStats.get_columns('num sample')
-		smallest_class_sample_num =  np.min(sn.X)
-		if smallest_class_sample_num < 6: raise ValueError('Error: rebalance data with smote must have at least 6 samples in the smallest class.')
+			sm = SMOTE(random_state=42)
+			X_res, y_res = sm.fit_resample(X, y)
+		elif method == 'oversampling':
+			ROS = RandomOverSampler()
+			X_res, y_res = ROS.fit_resample(X, y)
 
-		sm = SMOTE(random_state=42)
-		X_res, y_res = sm.fit_resample(X, y)
-	
+
 		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, label_column_name=label_column_name, label_type='discrete')
+
 
 if __name__ == "__main__":
 	X1 = np.random.randn(20, 2) + 5
@@ -46,7 +52,9 @@ if __name__ == "__main__":
 	X = np.vstack((X1,X2))
 	y = np.append(np.ones(20), np.zeros(7))
 
-	rebalancer = rebalance_data(X, y)
+	rebalancer = rebalance_data(X, y, method='oversampling')
+	print(X,'\n')
+
 	print(rebalancer.balanced_data.shape)
 	print(rebalancer.balanced_data)
 	import pdb; pdb.set_trace()
