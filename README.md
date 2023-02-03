@@ -8,6 +8,10 @@ pip install wuml
 
 ## Examples Usages
 
+### Manipulation of wData type
+[Manipulation of wData type](https://github.com/endsley/wuML/blob/main/examples/wData/ipynb/data_manipualation.ipynb) 
+
+
 ### Data Statistics
 [Learn about missing data stats](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/get_stats_on_data_with_missing_entries.ipynb) \
 [Feature wise Correlation Matrices](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/feature_wise_correlation.ipynb) \

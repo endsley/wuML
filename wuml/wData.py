@@ -55,6 +55,7 @@ class wData:
 				self.df = self.df.set_index(list(self.df)[0])
 
 		elif X_npArray is not None:
+			if wtype(column_names) == 'str': column_names = [column_names]
 			self.df = pd.DataFrame(X_npArray, columns=column_names)
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
@@ -214,9 +215,11 @@ class wData:
 		self.df.reset_index(drop=True, inplace=True)	
 		self.update_DataFrame(self.df)
 
-	def append_rows(self, new_data):
+	def append_rows(self, new_data, reset_index=True):
 		df = ensure_DataFrame(new_data, columns=self.columns)
 		self.update_DataFrame(pd.concat([self.df,df], axis=0))
+		if reset_index: self.reset_index()
+
 
 	def append_columns(self, new_data, column_names=None):
 		df = ensure_DataFrame(new_data, columns=column_names)
@@ -243,6 +246,8 @@ class wData:
 		elif type(column_name) == type(0):
 			if column_name in self.df.columns:
 				del self.df[column_name]
+
+		self.columns = self.df.columns
 
 	def info(self):
 		print(self.df.info())

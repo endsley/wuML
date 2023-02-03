@@ -21,7 +21,7 @@ from sklearn.metrics import accuracy_score
 from IPython.display import clear_output, HTML, Math
 from wuml.type_check import *
 
-def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False):
+def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString=''):
 	#font_size is from 1 to 6
 	font_size = int(6 - font_size)
 	if font_size > 6: font_size = 6
@@ -62,7 +62,7 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 		if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 		print(value)
 
-
+	print(endString)
 
 def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
@@ -96,6 +96,11 @@ def csv_load(xpath, ypath=None, shuffle_samples=False):
 def csv_out(X, path, add_row_indices=False, include_column_names=False, float_format='%.4f'):
 	X = wuml.ensure_wData(X)
 	X.to_csv(path, add_row_indices=add_row_indices, include_column_names=include_column_names, float_format=float_format)
+
+
+def label_csv_out(y, path, float_format='%.4f'):
+	np.savetxt(path, y, delimiter=',', fmt=float_format) 
+
 
 def read_txt_file(path):
 	f = open(path, 'r')
