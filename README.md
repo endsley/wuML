@@ -18,7 +18,8 @@ pip install wuml
 
 ### Dependency Measures
 [Comparing HSIC to Correlation](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/comparing_HSIC_to_correlation.ipynb) \
-[Approximate HSIC with fewer samples](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/approximate_HSIC.ipynb)
+[Approximate HSIC with fewer samples](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/approximate_HSIC.ipynb) \
+[Calculate Precision or Recall between labels](https://github.com/endsley/wuML/blob/main/examples/dependencies/ipynb/precision_recall.ipynb)
 
 
 

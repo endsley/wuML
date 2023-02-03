@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 from wuml.opt_gaussian import *
 import pandas as pd
 import numpy as np
@@ -217,6 +219,22 @@ def accuracy(Y, Ŷ):
 	Y = np.squeeze(Y)
 	Ŷ = np.squeeze(Ŷ)
 	return accuracy_score(Y, Ŷ)
+
+def precision(y_true, y_pred):
+	y_true = wuml.ensure_list(y_true)
+	y_pred = wuml.ensure_list(y_pred)
+	if len(np.unique(y_true)) > 2: raise ValueError('Error : precision function currently only takes binary labels')
+
+	return precision_score(y_true, y_pred)
+
+def recall(y_true, y_pred):
+	y_true = wuml.ensure_list(y_true)
+	y_pred = wuml.ensure_list(y_pred)
+	if len(np.unique(y_true)) > 2: raise ValueError('Error : recall function currently only takes binary labels')
+
+	return recall_score(y_true, y_pred)
+
+
 
 
 if __name__ == '__main__':
