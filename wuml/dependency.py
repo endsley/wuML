@@ -221,15 +221,18 @@ def accuracy(Y, Ŷ):
 	return accuracy_score(Y, Ŷ)
 
 def precision(y_true, y_pred):
-	y_true = wuml.ensure_list(y_true)
-	y_pred = wuml.ensure_list(y_pred)
-	if len(np.unique(y_true)) > 2: raise ValueError('Error : precision function currently only takes binary labels')
+	y_true = wuml.ensure_numpy(y_true).astype(int)
+	y_pred = wuml.ensure_numpy(y_pred).astype(int)
 
-	return precision_score(y_true, y_pred)
+	if len(np.unique(y_true)) != 2: 
+		raise ValueError('Error : precision function currently only takes binary labels')
+
+	P = precision_score(y_true, y_pred)
+	return P
 
 def recall(y_true, y_pred):
-	y_true = wuml.ensure_list(y_true)
-	y_pred = wuml.ensure_list(y_pred)
+	y_true = wuml.ensure_numpy(y_true).astype(int)
+	y_pred = wuml.ensure_numpy(y_pred).astype(int)
 	if len(np.unique(y_true)) > 2: raise ValueError('Error : recall function currently only takes binary labels')
 
 	return recall_score(y_true, y_pred)

@@ -141,7 +141,7 @@ class wData:
 				if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
 					wuml.remove_rows_with_missing_labels(self)
 
-	def Data_preprocess(self, preprocess_data):
+	def Data_preprocess(self, preprocess_data='center and scale'):
 		#	Various ways to preprocess the data
 		if preprocess_data == 'center and scale':
 			self.X = preprocessing.scale(self.X)
@@ -164,10 +164,15 @@ class wData:
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 
+	def swap_label(self, column_name_use_for_label):
+		labelC = wuml.ensure_DataFrame(self.Y, columns=self.label_column_name)
+		newLabel = self.pop_column(column_name_use_for_label)
+		self.replace_label(newLabel, label_name=column_name_use_for_label)
+		self.append_columns(labelC)
 
-
-	def replace_label(self, newY):
+	def replace_label(self, newY, label_name=None):
 		self.Y = ensure_numpy(newY)
+		if label_name is not None: self.label_column_name = label_name
 
 	def strip_white_space_from_column_names(self):
 		# make sure to strip white space from column names
@@ -233,6 +238,11 @@ class wData:
 		self.df.columns = column_names
 		self.columns = column_names
 
+	def pop_column(self, column_name):
+		C = self.get_columns(column_name)
+		self.delete_column(column_name)
+		return C
+
 	def delete_column(self, column_name):
 		if type(column_name) == type([]):
 			for name in column_name:
@@ -248,6 +258,7 @@ class wData:
 				del self.df[column_name]
 
 		self.columns = self.df.columns
+		self.update_DataFrame(self.df)
 
 	def info(self):
 		print(self.df.info())
@@ -287,9 +298,14 @@ class wData:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 			self.delete_column(LCn)
 		elif self.Y is not None:
-			self.df['label'] = self.Y
-			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format )
-			self.delete_column('label')
+			if self.label_column_name is not None:
+				self.df[self.label_column_name] = self.Y
+				self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format )
+				self.delete_column(self.label_column_name)
+			else:
+				self.df['label'] = self.Y
+				self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format )
+				self.delete_column('label')
 		else:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 

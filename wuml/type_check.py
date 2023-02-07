@@ -14,6 +14,17 @@ def type_check_with_error(data, desired_type, function_name=''):
 	if wtype(data) != desired_type:
 		raise ValueError('For function %s, you must input type as %s'%(function_name, desired_type))
 
+
+
+def is_binary_label(data):
+	y = ensure_numpy(data)
+	y_labels = np.unique(y)
+
+	if len(y_labels) == 2 and (1 in y_labels) and (0 in y_labels):
+		return True
+	else:
+		return False
+
 def ensure_label(data, y=None, y_column_name=None):
 	NP = ensure_numpy
 	S = np.squeeze
@@ -165,3 +176,13 @@ def ensure_tensor(data, dataType=torch.FloatTensor):
 
 
 
+if __name__ == "__main__":
+
+	y = [1, 0, 0, 0, 1]
+	print(is_binary_label(y))
+
+	y = [True, False, False, True, True]
+	print(is_binary_label(y))
+
+	y = ['red', 'red', 'red', 'blue', 'blue']
+	print(is_binary_label(y))

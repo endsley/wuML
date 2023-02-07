@@ -249,7 +249,7 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 
 		return output
 
-def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=False, print_out=True):
+def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=False, print_out=['histograms', 'mean absolute error', 'true label vs prediction table']):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 	ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
 
@@ -258,14 +258,17 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 	
 	# Draw Histogram
 	Δy = np.absolute(ŷ - y)
-	avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
 
-	H = wplotlib.histograms(Δy, num_bins=15, title='Histogram of Errors', 
-				xlabel='Error Amount', ylabel='Error count',
-				facecolor='blue', α=0.5, path=None)
+	if 'mean absolute error' in print_out:
+		avg_Δ = 'Avg error: %.4f'%(np.sum(Δy)/Δy.shape[0])
+		jupyter_print(avg_Δ)
+
+	if 'histograms' in print_out:
+		wplotlib.histograms(Δy, num_bins=15, title='Histogram of Errors', xlabel='Error Amount', ylabel='Error count',
+					facecolor='blue', α=0.5, path=None)
+
 
 	df = pd.DataFrame(np.hstack((y, ŷ, Δy)), columns=['y', 'ŷ', 'Δy'])
-
 	if sort_by == 'error':
 		df = df.sort_values('Δy', ascending=ascending)
 	elif sort_by == 'label':
@@ -273,9 +276,7 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 	elif sort_by == 'output':
 		df = df.sort_values('ŷ', ascending=ascending)
 
-	if print_out:
-		jupyter_print('\n')
-		jupyter_print(avg_Δ)
+	if 'true label vs prediction table' in print_out:
 		jupyter_print(df, display_all_rows=True, display_all_columns=True)
 	
 	if write_path is not None: wuml.write_to(C, write_path)
@@ -324,20 +325,8 @@ class summarize_regression_result:
 		return wuml.ensure_wData(np.vstack((A,B)))
 
 
-		#import pdb; pdb.set_trace()
-
-		#avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
-		#C = avg_Δ + A + B
-	
-		#if print_result: print(C)
-		#if write_path is not None: wuml.write_to(C, write_path)
-
-		#return ensure_wData(C, column_names=None)
-		#return C
-	
-
 class summarize_classification_result:
-	def __init__(self, y, ŷ):
+	def __init__(self, y, ŷ, print_out=['avg error', 'true v predict labels']):
 		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
 	
@@ -347,23 +336,27 @@ class summarize_classification_result:
 		self.y = y
 		self.ŷ = ŷ
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
-
 		self.Δy = np.absolute(self.ŷ - self.y)
+
+		# Printing out the result
+		if print_out is not None:
+			if 'avg error' in print_out:
+				avgE = self.avg_error()
+				jupyter_print('The average classification error is %.4f'%avgE)
+	
+
+			if is_binary_label(y):
+				P = wuml.precision(self.y, self.ŷ)
+				R = wuml.recall(self.y, self.ŷ)
+				jupyter_print('Precision: %.4f (probability that a positive prediction is correct)'%avgE)
+				jupyter_print('Recall: %.4f (probability that we catch a positive event)'%avgE)
+
+			if 'true v predict labels' in print_out:
+				self.true_vs_predict(print_result=True)
 
 	def avg_error(self):
 		Acc= accuracy_score(self.y, self.ŷ)
 		return Acc
-
-	def error_histogram(self):
-		pass
-
-		#Δy = self.Δy
-		#avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
-	
-		#H = wplotlib.histograms()
-		#H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
-		#			xlabel='Error Amount', ylabel='Error count',
-		#			facecolor='blue', α=0.5, path=None)
 		
 	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=False):
 		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
@@ -377,7 +370,9 @@ class summarize_classification_result:
 		C = avg_Δ + A + B
 	
 		if print_result: print(C)
-		if write_path is not None: wuml.write_to(C, write_path)
+		if write_path is not None: 
+			wuml.write_to(C, write_path)
+
 		return C
 	
 

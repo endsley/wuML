@@ -254,9 +254,13 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 
 	X_train = ensure_wData(X_train, column_names=data.df.columns)
 	X_train.Y = y_train
+	X_train.label_type = data.label_type
+	X_train.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
 
 	X_test = ensure_wData(X_test, column_names=data.df.columns)
 	X_test.Y = y_test
+	X_test.label_type = data.label_type
+	X_test.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
 
 	return [X_train, X_test, y_train, y_test]
 

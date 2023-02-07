@@ -21,7 +21,7 @@ class rebalance_data:
 		label_column_name=None
 		if y is None:
 			if wuml.wtype(data) == 'wData':
-				y = X.Y
+				y = data.Y
 				X = data.X
 			else:
 				raise ValueError('data must be wData if the label y is None')
@@ -43,7 +43,9 @@ class rebalance_data:
 			X_res, y_res = ROS.fit_resample(X, y)
 
 
-		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, label_column_name=label_column_name, label_type='discrete')
+		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, 
+										column_names=data.columns, label_column_name=data.label_column_name, label_column_id=data.label_column_id,
+										label_type='discrete')
 
 
 if __name__ == "__main__":
