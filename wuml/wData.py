@@ -22,9 +22,10 @@ from torch.utils.data import Dataset, DataLoader
 class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, path_prefix='',
 					label_column_name=None, label_column_id=None,
-					dataFrame=None, X_npArray=None, Y_npArray=None, first_row_is_label=False, 
+					dataFrame=None, X_npArray=None, Y_npArray=None, Y2_npArray=None,
+					first_row_is_label=False, 
 					row_id_with_feature_names=None, first_column_as_sample_index=False, 
-					label_type=None, #it should be either 'continuous' or 'discrete'
+					label_type=None, label2_type=None, #it should be either 'continuous' or 'discrete'
 					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
 					batch_size=32, randomly_shuffle_batch=True, columns_to_ignore=None,
@@ -37,7 +38,7 @@ class wData:
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 			first_column_as_sample_index: if the first column is used as sample ID
-
+			Y2_npArray: is the 2nd label if there is one, it currently must input npArray including label2_type
 			path_prefix: string or list, if list, automatically goes through potential folders where the data might be
 		'''
 		self.label_column_name = label_column_name
@@ -79,6 +80,8 @@ class wData:
 
 		self.strip_white_space_from_column_names()
 		self.Y = None
+		self.Y2 = None		# if there exists a 2nd label
+
 		if Y_npArray is not None:
 			self.Y = Y_npArray
 			if encode_discrete_label_to_one_hot:
@@ -114,6 +117,13 @@ class wData:
 			self.delete_column(label_column_id)
 
 
+		if Y2_npArray is not None:
+			self.Y2 = Y2_npArray
+			if label2_type is None: raise ValueError('If you are using labels for Y2, you must include the argument label2_type= "continuout" or "discrete"')
+
+
+
+
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
 		self.columns = self.df.columns
 
@@ -126,12 +136,18 @@ class wData:
 		self.Data_preprocess(preprocess_data)
 		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
 
+		self.check_for_missingness()
+
+
+
+	def check_for_missingness(self):
 		# raise a warning if there are missing entries within the data
 		try:
 			mL = np.sum(np.isnan(self.X))
 			if mL > 0: print('\nWarning: %d entries are missing.'%(mL))
 		except: pass
 
+		if self.Y is None: return
 		missingLabels = wuml.identify_missing_labels(self.Y)
 		if missingLabels is not None: 
 			if missingLabels > 0: 
@@ -140,6 +156,20 @@ class wData:
 				removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
 				if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
 					wuml.remove_rows_with_missing_labels(self)
+
+
+		if self.Y2 is None: return
+		
+		missingLabels = wuml.identify_missing_labels(self.Y2)
+		if missingLabels is not None: 
+			if missingLabels > 0: 
+				mL = np.sum(np.isnan(self.Y2))
+				print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
+				#removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
+				#if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
+				#	wuml.remove_rows_with_missing_labels(self)
+
+
 
 	def Data_preprocess(self, preprocess_data='center and scale'):
 		#	Various ways to preprocess the data
@@ -275,7 +305,7 @@ class wData:
 			#self.df.values[subset]
 			return self.df.values
 		if data_type == 'DataLoader':		# and self.torchloader is None 
-			self.DM = wuml.DManager(self.df.values, self.Y)
+			self.DM = wuml.DManager(self.df.values, self.Y, self.Y2)
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 

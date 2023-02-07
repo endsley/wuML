@@ -10,7 +10,8 @@ from sklearn import preprocessing
 import numpy as np
 
 class DManager(Dataset):
-	def __init__(self, X, Y=None): #, data_path, label_path, Torch_dataType, center_data=False):
+	def __init__(self, X, Y=None, Y2=None): 
+	# X: data, Y: label, Y2: 2nd label
 
 		self.X = X
 		self.N = self.X.shape[0]
@@ -20,12 +21,18 @@ class DManager(Dataset):
 		self.Y = Y
 		if Y is not None: self.Y_Var = torch.tensor(self.Y, requires_grad=False)
 
-	def __getitem__(self, index):
-		if self.Y is None:
-			return self.X[index], 0, index
-		else:
-			return self.X[index], self.Y[index], index
+		self.Y2 = Y2
+		if Y2 is not None: self.Y2_Var = torch.tensor(self.Y2, requires_grad=False)
 
+	def __getitem__(self, index):
+
+		if self.Y is None: items = [self.X[index], 0, index]
+		else: items = [self.X[index], self.Y[index], index]
+
+		if self.Y2 is not None:
+			items.append(self.Y2[index])
+
+		return items
 
 	def __len__(self):
 		try: return self.X.shape[0]

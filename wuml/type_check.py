@@ -123,6 +123,8 @@ def ensure_numpy(data, rounding=None):
 			X = np.atleast_2d(data).T
 		else:
 			X = data
+	elif wtype(data) == 'Index': 
+		return data.to_numpy()
 	elif wtype(data) == 'list': 
 		return np.array(data)
 	elif wtype(data) == 'wData': 

@@ -20,6 +20,28 @@ from pathlib import Path
 from sklearn.metrics import accuracy_score
 from IPython.display import clear_output, HTML, Math
 from wuml.type_check import *
+from IPython.display import display_html
+from itertools import chain,cycle
+
+
+
+#	display 2 dataframes side by side
+def DF_display_side_by_side(*args,titles=cycle([''])):
+	#	Example usage
+	#df1 = pd.DataFrame(np.arange(12).reshape((3,4)),columns=['A','B','C','D',])
+	#df2 = pd.DataFrame(np.arange(16).reshape((4,4)),columns=['A','B','C','D',])
+	#display_side_by_side(df1,df2,df1, titles=['Foo','Foo Bar']) 
+
+	html_str=''
+	for df,title in zip(args, chain(titles,cycle(['</br>'])) ):
+		html_str+='<th style="text-align:center"><td style="vertical-align:top">'
+		html_str+=f'<h2 style="text-align: center;">{title}</h2>'
+		html_str+=df.to_html().replace('table','table style="display:inline"')
+		html_str+='</td></th>'
+	display_html(html_str,raw=True)
+
+
+
 
 def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString=''):
 	#font_size is from 1 to 6
