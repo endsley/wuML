@@ -41,6 +41,16 @@ def DF_display_side_by_side(*args,titles=cycle([''])):
 	display_html(html_str,raw=True)
 
 
+def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):
+
+	if wuml.isnotebook() and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
+		wuml.DF_display_side_by_side(M1, M2,titles=['Sort by worse error','Sort by label'])
+	else:
+		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False)
+		eQ = wuml.pretty_np_array(M2, front_tab='', title=title2, auto_print=False)
+		wuml.block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
+
+
 
 
 def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString=''):

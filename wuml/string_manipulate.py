@@ -17,8 +17,6 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 	if wtype(m) =='DataFrame':
 		cName = ensure_numpy(m.columns)
 
-	import pdb; pdb.set_trace()
-
 	m = wuml.ensure_numpy(m)
 	try: m = np.round(m, round_value)
 	except: pass
@@ -68,16 +66,6 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 
 	if auto_print: wuml.jupyter_print(outS)
 	else: return outS
-
-def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):
-
-	if wuml.isnotebook() and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
-		wuml.DF_display_side_by_side(tb1, tb2,titles=['Sort by worse error','Sort by label'])
-	else:
-		eK = pretty_np_array(M1, front_tab='', title=title1, auto_print=False)
-		eQ = pretty_np_array(M2, front_tab='', title=title2, auto_print=False)
-		block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
-
 
 
 

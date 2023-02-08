@@ -259,7 +259,9 @@ class autoencoder():
 			dec_scheduler.step(loss_avg)	
 			if mid_scheduler is not None: mid_scheduler.step(loss_avg)
 			
-			if loss_avg < early_exit_loss_threshold: break;
+			if loss_avg < early_exit_loss_threshold: 
+				print('\n')
+				break;
 			if print_status:
 				#num_elements = (self.X.batch_size*self.X.shape[1])
 				if wtype(all_losses) == 'list':
