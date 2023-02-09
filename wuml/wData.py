@@ -22,7 +22,7 @@ from torch.utils.data import Dataset, DataLoader
 class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, path_prefix='',
 					label_column_name=None, label_column_id=None,
-					dataFrame=None, X_npArray=None, Y_npArray=None, Y2_npArray=None,
+					dataFrame=None, X_npArray=None, Y_npArray=None, extra_data=None,
 					first_row_is_label=False, 
 					row_id_with_feature_names=None, first_column_as_sample_index=False, 
 					label_type=None, label2_type=None, #it should be either 'continuous' or 'discrete'
@@ -38,7 +38,7 @@ class wData:
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 			first_column_as_sample_index: if the first column is used as sample ID
-			Y2_npArray: is the 2nd label if there is one, it currently must input npArray including label2_type
+			extra_data: is a list of data that can be appended to the dataset, it has to be the same number of samples as X and y
 			path_prefix: string or list, if list, automatically goes through potential folders where the data might be
 		'''
 		self.label_column_name = label_column_name
@@ -80,58 +80,57 @@ class wData:
 
 		self.strip_white_space_from_column_names()
 		self.Y = None
-		self.Y2 = None		# if there exists a 2nd label
+		self.extra_data = None		# if there exists a 2nd label
 
-		if Y_npArray is not None:
-			self.Y = Y_npArray
-			if encode_discrete_label_to_one_hot:
-				self.Y = wuml.one_hot_encoding(self.Y)
-
-		elif ypath is not None: 
-			ypth = wuml.append_prefix_to_path(path_prefix, ypath)
-
-			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-			self.Y = np.loadtxt(ypth, delimiter=',', dtype=np.float32)			
-			if label_type == 'discrete': 
-				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-				if encode_discrete_label_to_one_hot:
-					self.Y = wuml.one_hot_encoding(self.Y)
-
-		elif label_column_name is not None:
-			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-			self.Y = self.df[label_column_name].values
-			if label_type == 'discrete': 
-				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-				if encode_discrete_label_to_one_hot:
-					self.Y = wuml.one_hot_encoding(self.Y)
-
-			self.delete_column(label_column_name)
-		elif label_column_id is not None:
-			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-			self.Y = self.df[label_column_id].values
-			if label_type == 'discrete': 
-				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-				if encode_discrete_label_to_one_hot:
-					self.Y = wuml.one_hot_encoding(self.Y)
-
-			self.delete_column(label_column_id)
-
-
-		if Y2_npArray is not None:
-			self.Y2 = Y2_npArray
-			if label2_type is None: raise ValueError('If you are using labels for Y2, you must include the argument label2_type= "continuout" or "discrete"')
-
+#		if Y_npArray is not None:
+#			self.Y = Y_npArray
+#			if encode_discrete_label_to_one_hot:
+#				self.Y = wuml.one_hot_encoding(self.Y)
+#
+#		elif ypath is not None: 
+#			ypth = wuml.append_prefix_to_path(path_prefix, ypath)
+#
+#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+#			self.Y = np.loadtxt(ypth, delimiter=',', dtype=np.float32)			
+#			if label_type == 'discrete': 
+#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+#				if encode_discrete_label_to_one_hot:
+#					self.Y = wuml.one_hot_encoding(self.Y)
+#
+#		elif label_column_name is not None:
+#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+#			self.Y = self.df[label_column_name].values
+#			if label_type == 'discrete': 
+#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+#				if encode_discrete_label_to_one_hot:
+#					self.Y = wuml.one_hot_encoding(self.Y)
+#
+#			self.delete_column(label_column_name)
+#		elif label_column_id is not None:
+#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+#			self.Y = self.df[label_column_id].values
+#			if label_type == 'discrete': 
+#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+#				if encode_discrete_label_to_one_hot:
+#					self.Y = wuml.one_hot_encoding(self.Y)
+#
+#			self.delete_column(label_column_id)
 
 
 
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
-		self.columns = self.df.columns
 
 		self.X = self.df.values
 		self.label_type = label_type
 		self.shape = self.df.shape
 		self.batch_size = batch_size
 		self.torchloader = None
+		self.columns = self.df.columns
+		self.path_prefix = path_prefix
+
+
+		self.format_label(Y_npArray=Y_npArray, ypath=ypath, label_column_name=label_column_name, label_column_id=label_column_id, encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
+
 
 		self.Data_preprocess(preprocess_data)
 		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
@@ -139,6 +138,28 @@ class wData:
 		self.check_for_missingness()
 
 
+	def format_label(self, Y_npArray=None, ypath=None, label_column_name=None, label_column_id=None, encode_discrete_label_to_one_hot=False):
+
+		# as long as label is needed, we must designate continuous or discrete labels
+		if not np.all(np.array([Y_npArray, ypath, label_column_name, label_column_id]) == None):
+			if self.label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+
+		if Y_npArray is not None:
+			self.Y = Y_npArray
+		elif ypath is not None: 
+			ypth = wuml.append_prefix_to_path(self.path_prefix, ypath)
+			self.Y = np.loadtxt(ypth, delimiter=',', dtype=np.float32)			
+		elif label_column_name is not None:
+			self.Y = self.df[label_column_name].values
+			self.delete_column(label_column_name)
+		elif label_column_id is not None:
+			self.Y = self.df[label_column_id].values
+			self.delete_column(label_column_id)
+
+		if self.label_type == 'discrete': 
+			self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
+			if encode_discrete_label_to_one_hot:
+				self.Y = wuml.one_hot_encoding(self.Y)
 
 	def check_for_missingness(self):
 		# raise a warning if there are missing entries within the data
@@ -156,19 +177,6 @@ class wData:
 				removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
 				if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
 					wuml.remove_rows_with_missing_labels(self)
-
-
-		if self.Y2 is None: return
-		
-		missingLabels = wuml.identify_missing_labels(self.Y2)
-		if missingLabels is not None: 
-			if missingLabels > 0: 
-				mL = np.sum(np.isnan(self.Y2))
-				print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
-				#removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
-				#if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
-				#	wuml.remove_rows_with_missing_labels(self)
-
 
 
 	def Data_preprocess(self, preprocess_data='center and scale'):
@@ -305,7 +313,7 @@ class wData:
 			#self.df.values[subset]
 			return self.df.values
 		if data_type == 'DataLoader':		# and self.torchloader is None 
-			self.DM = wuml.DManager(self.df.values, self.Y, self.Y2)
+			self.DM = wuml.DManager(self.df.values, self.Y, self.extra_data)
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 
@@ -340,15 +348,15 @@ class wData:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
 
 	def __getitem__(self, item):
-		#	If item is string, it will return the row corresponding to the string
+		#	If item is string, it will return the column corresponding to the column name
 		#	If item is int, it will return the row
-		if type(item).__name__ == 'str': 
-			return ensure_wData(self.df.loc[item].to_frame().transpose())
 
-		try: 
-			return ensure_wData(self.df.iloc[item].to_frame().transpose())
-		except:
-			return ensure_wData(self.df.loc[item].to_frame().transpose())
+		if type(item).__name__ == 'str': 
+			return self.get_columns(item)
+		elif type(item).__name__ == 'tuple': 
+			return ensure_wData(self.df.iloc[item])
+		else:
+			raise ValueError('Error: recognized input, wData must be [0:3] or [0:2, 0:3] format. You can also get the column by string')
 
 	def __str__(self): 
 		return str(self.df)

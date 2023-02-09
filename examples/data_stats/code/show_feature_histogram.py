@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
+
 import wuml
 
 ## Show featurehistogram after data decimation
 ## 	header : the feature name you want to use to see the histogram. 
 ## 	index_col : if 0, it means the 1st row of dataFrame is the feature names. None would be nothing
-data = wuml.wData('../../data/Chem_decimated_imputed.csv', row_id_with_label=0)
+data = wuml.wData('../../data/Chem_decimated_imputed.csv', first_row_is_label=True)
 
 
 

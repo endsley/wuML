@@ -38,3 +38,4 @@ from .random_features import *
 from .distance_between_distributions import *
 from .measure import *
 from .autoencoder import *
+from .combinedNetwork import *

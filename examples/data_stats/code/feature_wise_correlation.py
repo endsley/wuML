@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
+
 import wuml 
 import numpy as np
 import scipy.stats
@@ -7,20 +15,17 @@ from wplotlib import histograms
 from wplotlib import lines
 
 
-data = wuml.wData('../../data/shap_regress_example_uniform.csv', row_id_with_label=0)
-data.df.style
+data = wuml.wData('../../data/shap_regress_example_uniform.csv', first_row_is_label=True)
+wuml.jupyter_print(data, endString='\n')
 
-#print(wuml.feature_wise_correlation(data).df.style)
 corrMatrix = wuml.feature_wise_correlation(data)
-corrMatrix.df.style
-
+wuml.jupyter_print(corrMatrix)
 
 top_correlated_pair = wuml.feature_wise_correlation(data, get_top_corr_pairs=True)
-top_correlated_pair.df.style
-
+wuml.jupyter_print(top_correlated_pair, endString='\n')
 
 most_correlated_to_label = wuml.feature_wise_correlation(data, label_name='label', get_top_corr_pairs=True)
-most_correlated_to_label.df.style
+wuml.jupyter_print(most_correlated_to_label, endString='\n')
 
 
 

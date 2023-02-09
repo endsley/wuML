@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 
-import wuml 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
+import wuml
 import numpy as np
 import scipy.stats
 from wplotlib import histograms
 from wplotlib import lines
 
 
-data = wuml.wData('../../data/shap_regress_example_uniform.csv', row_id_with_label=0)
+data = wuml.wData('../../data/shap_regress_example_uniform.csv', first_row_is_label=True)
 
 print(wuml.feature_wise_HSIC(data))
 print('\n\n')
@@ -17,14 +24,10 @@ print(wuml.feature_wise_HSIC(data, label_name='label', get_top_dependent_pairs=T
 
 
 # This function handles missing data as well by removing missing entries during pairwise HSIC
-data = wuml.wData('../../data/missin_example.csv', row_id_with_label=0)
+data = wuml.wData('../../data/missin_example.csv', first_row_is_label=True)
 print(data)
 print('\n\n')
 print(wuml.feature_wise_HSIC(data))
 
 
-X = data[:,0:3]
-Ys = data[:,3:5]
-depList = wuml.HSIC_of_feature_groups_vs_label_list(X, Ys)
-print(depList)
 

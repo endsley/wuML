@@ -14,13 +14,13 @@ from wuml.type_check import *
 
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space='', round_value=3):
 
-	if wtype(m) =='DataFrame':
-		cName = ensure_numpy(m.columns)
+	cName = None
+	if wtype(m) =='DataFrame': cName = ensure_numpy(m.columns)
 
 	m = wuml.ensure_numpy(m)
 	try: m = np.round(m, round_value)
 	except: pass
-	m = np.vstack((cName,m))
+	if cName is not None: m = np.vstack((cName,m))
 	m = str(m)
 
 	if verticalize:

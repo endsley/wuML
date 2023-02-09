@@ -275,6 +275,7 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 		jupyter_print(output, display_all_rows=True)
 	else:
 		output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
+
 		if labels is not None:
 			output = wuml.pretty_np_array(labels) + output
 		print(output)
