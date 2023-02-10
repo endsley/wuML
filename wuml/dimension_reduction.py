@@ -105,6 +105,7 @@ class dimension_reduction:
 
 
 def show_multiple_dimension_reduction_results(data, learning_rate=15, n_neighbors=5, gamma=1):
+	if wuml.get_commandLine_input()[1] == 'disabled': return
 	methods = ['PCA', 'TSNE', 'KPCA', 'isoMap', 'LLE', 'MDS', 'Spectral Embedding','Factor Analysis']
 
 	results = {}

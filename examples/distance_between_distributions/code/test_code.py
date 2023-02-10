@@ -2,10 +2,9 @@
 
 import sys
 import os
-  
+
 code_list = []
-code_list.append('interpret_result.py')
-code_list.append('run_regression.py')
+code_list.append('wasserstein_example.py')
 
 print('Running data_stats folder')
 for code in code_list:

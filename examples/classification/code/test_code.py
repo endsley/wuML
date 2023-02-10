@@ -15,7 +15,7 @@ for code in code_list:
 print('Generate ipynb files')
 for code in code_list:
 	print('\tGenerating ' + code)
-	os.system('p2j -o ' + code)
+	os.system('p2j -o ' + code + ' > /dev/null 2>&1')
 	ipynb = code.replace('.py', '.ipynb')
 	os.system('jupyter nbconvert --to notebook --execute ' + ipynb + ' > /dev/null 2>&1')
 
