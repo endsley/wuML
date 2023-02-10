@@ -23,7 +23,7 @@ wuml.jupyter_print('Original Data')
 wuml.jupyter_print(data, endString='\n')
 
 wuml.jupyter_print('Get a slice of the submatrix')
-wuml.jupyter_print(X[:,0:1])
+wuml.jupyter_print(X[:,0:2])
 
 C = data.get_columns('C')	
 data.delete_column('C')
