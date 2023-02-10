@@ -381,6 +381,7 @@ class wData:
 
 
 	def plot_2_columns_as_scatter(self, column1, column2):
+		if wuml.get_commandLine_input()[1] == 'disabled': return
 		X = self.df[column1].to_numpy()
 		Y = self.df[column2].to_numpy()
 		

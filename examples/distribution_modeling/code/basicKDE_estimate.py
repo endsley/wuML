@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 import wuml 
 import numpy as np
 import scipy.stats
@@ -16,7 +21,7 @@ estimatedProb = Pₓ(X)
 newX = Pₓ.generate_samples(300)
 cdf_val = Pₓ.integrate(-7, 0)		# you can get the cdf by integration.
 Pₓ.save('kde.model')				# save the model for later usage
-print('Half of the distribution should yield 0.5, and we got %.3f'%cdf_val)
+wuml.jupyter_print('Half of the distribution should yield 0.5, and we got %.3f'%cdf_val)
 
 
 #plot out the result

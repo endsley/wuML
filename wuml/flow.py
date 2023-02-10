@@ -3,6 +3,7 @@ import wuml
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+import sys
 from torch import nn
 from wuml.type_check import *
 
@@ -81,6 +82,7 @@ class flow:
 		'''
 			max_patience: an early stopping is used, if training doesn't improve for longer than 20 epochs, it is stopped
 		'''
+		if wuml.get_commandLine_input()[1] == 'disabled': max_epochs = 20
 
 		self.netW = M = network_width
 		self.lr = lr
@@ -197,7 +199,7 @@ class flow:
 	
 			if max_patience is not None:
 				if patience > max_patience:
-					print('\n\tFinal epoch: %d, Avg Loss: %.4f, patience: %d'%((e), loss, patience))
+					wuml.jupyter_print('\n\tFinal epoch: %d, Avg Loss: %.4f, patience: %d'%((e), loss, patience))
 					break
 	
 		nll_val = np.asarray(nll_val)

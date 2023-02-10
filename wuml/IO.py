@@ -43,8 +43,10 @@ def DF_display_side_by_side(*args,titles=cycle([''])):
 
 def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):
 
-	if wuml.isnotebook() and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
-		wuml.DF_display_side_by_side(M1, M2,titles=['Sort by worse error','Sort by label'])
+	if wuml.isnotebook():			# and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
+		M1 = ensure_DataFrame(M1)
+		M2 = ensure_DataFrame(M2)
+		wuml.DF_display_side_by_side(M1, M2,titles=[title1, title2])
 	else:
 		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False)
 		eQ = wuml.pretty_np_array(M2, front_tab='', title=title2, auto_print=False)
@@ -70,6 +72,8 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	if wuml.isnotebook():
 		if wtype(value) == 'DataFrame': 
 			display(value)
+		elif wtype(value) == 'ndarray': 
+			display(ensure_DataFrame(value))
 		elif wtype(value) == 'wData': 
 			display(value.df)
 		elif wtype(value) == 'Index': 
@@ -234,6 +238,8 @@ def clear_current_line():
 	sys.stdout.flush()
 
 def write_to_current_line(txt):
+	if get_commandLine_input()[1] == 'disabled': return
+
 	clear_current_line()
 	clear_output(wait = True)
 	sys.stdout.write(txt)

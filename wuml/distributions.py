@@ -21,7 +21,7 @@ class multivariate_gaussian: #Assuming that data is 1 dimension
 
 	def generate_samples(self, num_of_samples, return_data_type='wData'):
 		dat = self.pₓ.rvs(size=num_of_samples, random_state=None)
-		return ensure_data_type(dat, type_name=return_data_type)
+		return wuml.ensure_data_type(dat, type_name=return_data_type)
 
 
 	def __call__(self, data, return_log_likelihood=False, return_data_type='wData'):
@@ -31,7 +31,7 @@ class multivariate_gaussian: #Assuming that data is 1 dimension
 		if return_log_likelihood: output = np.log(prob)
 		else: output = prob
 
-		return ensure_data_type(output, type_name=return_data_type)
+		return wuml.ensure_data_type(output, type_name=return_data_type)
 
 
 class exponential: #Assuming that data is 1 dimension
@@ -55,7 +55,7 @@ class exponential: #Assuming that data is 1 dimension
 		return S
 
 
-	def generate_samples(size=1):
+	def generate_samples(self, size=1):
 		# λ exp(-λx) , μ=1/λ
 		return np.random.exponential(scale=self.λ, size=size)
 

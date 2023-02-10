@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 import wuml
 import wplotlib
 import numpy as np
@@ -19,6 +25,6 @@ wplotlib.lines(Xp,P, color='blue', title='Basic Histogram', xlabel='value', ylab
 
 
 A = E.cdf(1)
-print('True λ: %.3f, Approximated λ: %.3f'%(2, E.λ))
-print('True cdf to 1: %.3f, Approximated cdf to 1: %.3f'%(0.865, A))
+wuml.jupyter_print('True λ: %.3f, Approximated λ: %.3f'%(2, E.λ))
+wuml.jupyter_print('True cdf to 1: %.3f, Approximated cdf to 1: %.3f'%(0.865, A))
 
