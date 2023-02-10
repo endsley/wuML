@@ -124,6 +124,8 @@ class regression:
 		#	permutation : for all models
 		#	both : if possible plot both models side by side
 
+		if wuml.get_commandLine_input()[1] == 'disabled': return
+
 		NP = ensure_numpy
 		regressor = self.regressor
 		Cnames = wuml.ensure_list(Column_names)
@@ -141,7 +143,6 @@ class regression:
 			plt.ylabel('Features', fontsize=axis_fontsize)
 			plt.xlabel('Features Influence on Results', fontsize=axis_fontsize)
 			plt.yticks(fontsize=ticker_fontsize, rotation=yticker_rotate, ticks=ytick_locations, labels=ytick_labels )
-
 			plt.show()
 
 		elif regressor == 'RandomForest':

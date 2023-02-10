@@ -170,6 +170,8 @@ class basicNetwork:
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
+		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
+
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
 		self.early_exit_loss_threshold = early_exit_loss_threshold
