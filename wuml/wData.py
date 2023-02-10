@@ -165,7 +165,7 @@ class wData:
 		# raise a warning if there are missing entries within the data
 		try:
 			mL = np.sum(np.isnan(self.X))
-			if mL > 0: print('\nWarning: %d entries are missing.'%(mL))
+			if mL > 0: wuml.jupyter_print('\nWarning: %d entries are missing.'%(mL))
 		except: pass
 
 		if self.Y is None: return
@@ -173,7 +173,7 @@ class wData:
 		if missingLabels is not None: 
 			if missingLabels > 0: 
 				mL = np.sum(np.isnan(self.Y))
-				print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
+				wuml.jupyter_print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
 				removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
 				if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
 					wuml.remove_rows_with_missing_labels(self)
@@ -299,7 +299,7 @@ class wData:
 		self.update_DataFrame(self.df)
 
 	def info(self):
-		print(self.df.info())
+		wuml.jupyter_print(self.df.info())
 
 	def get_data_as(self, data_type): #'DataFrame', 'read_csv', 'Tensor'
 		if data_type == 'wData': return self

@@ -94,7 +94,7 @@ def missing_data_stats(data, y=None, save_plots=False):
 	wuml.ensure_path_exists(header)
 
 	missingLabels = identify_missing_labels(y)
-	if missingLabels is not None: print('\nPercetage of labels missing: %.5f\n'%missingLabels)
+	if missingLabels is not None: jupyter_print('\nPercetage of labels missing: %.5f\n'%missingLabels)
 
 	mdp = np.array(identify_missing_data_per_feature(df))*100
 	missingTable = pd.DataFrame([mdp], columns=ensure_list(df.columns)).T

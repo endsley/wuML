@@ -15,6 +15,8 @@ from wplotlib import histograms
 from wplotlib import lines
 
 
+#cmds = wuml.get_commandLine_input()
+
 data = wuml.wData('../../data/shap_regress_example_uniform.csv', first_row_is_label=True)
 wuml.jupyter_print(data, endString='\n')
 

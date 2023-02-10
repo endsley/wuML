@@ -53,7 +53,10 @@ def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=Tru
 
 
 
-def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString=''):
+def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString='', testing_mode=''):
+	cmds = wuml.get_commandLine_input()
+	if testing_mode == 'disabled' or cmds[1] == 'disabled': return
+
 	#font_size is from 1 to 6
 	font_size = int(6 - font_size)
 	if font_size > 6: font_size = 6
@@ -278,9 +281,20 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 
 		if labels is not None:
 			output = wuml.pretty_np_array(labels) + output
-		print(output)
+		wuml.jupyter_print(output)
 
 		return output
+
+
+def get_commandLine_input(num_of_args=10):
+	command_list = []	
+	for i in range(num_of_args):
+		try:
+			command_list.append(sys.argv[i])
+		except:
+			command_list.append('')
+
+	return command_list
 
 def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=False, print_out=['histograms', 'mean absolute error', 'true label vs prediction table']):
 	y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
