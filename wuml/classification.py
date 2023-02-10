@@ -141,11 +141,15 @@ class classification:
 
 		return pX
 			
-	def output_sorted_feature_importance_table(self, Column_names, show_top_few=5): 	# feature importance computed via permutation_importance
+	def output_sorted_feature_importance_table(self, column_names=None, show_top_few=5): 	# feature importance computed via permutation_importance
 		NP = wuml.ensure_numpy
 
-		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
-		Cnames = wuml.ensure_list(Column_names)
+		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR', 'LogisticRegression']
+
+		if column_names is None:
+			Cnames = wuml.ensure_wData(self.data).columns
+		else:
+			Cnames = wuml.ensure_list(column_names)
 
 		importance_GP = permutation_importance(self.model, NP(self.X_train), self.y_train, scoring='accuracy')
 		importance = importance_GP.importances_mean
@@ -160,6 +164,7 @@ class classification:
 	def plot_feature_importance(self, title, Column_names, title_fontsize=12, axis_fontsize=9, xticker_rotate=0, ticker_fontsize=9,
 								yticker_rotate=0, ytick_locations=None, ytick_labels=None): # feature importance computed via permutation_importance
 
+		if wuml.get_commandLine_input()[1] == 'disabled': return
 		NP = wuml.ensure_numpy
 		all_classifiers =['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR']
 		Cnames = wuml.ensure_list(Column_names)
@@ -192,7 +197,7 @@ class classification:
 			data = np.array([[self.original_classifier_name, self.Train_acc]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
-		if print_out: print('\n', df)
+		if print_out: wuml.jupyter_print('\n', df)
 		self.results = df
 		return df
 
@@ -221,7 +226,7 @@ class classification:
 
 
 def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None, kernel='rbf',
-						regressors=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']	):
+						classifiers=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']	):
 	'''
 	data is type wData
 	order_by: 'Test', 'Train'
@@ -232,7 +237,7 @@ def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=No
 	
 	if q is None: q = int(data.shape[1]/2)
 	df = pd.DataFrame()
-	for reg in regressors:
+	for reg in classifiers:
 		wuml.write_to_current_line('Running %s'%reg)
 		results[reg] = classification(data, y=y, classifier=reg, split_train_test=True, q=q, kernel='rbf')
 		df = df.append(results[reg].result_summary(print_out=False))

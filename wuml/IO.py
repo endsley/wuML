@@ -380,6 +380,7 @@ class summarize_regression_result:
 
 class summarize_classification_result:
 	def __init__(self, y, ŷ, print_out=['avg error', 'true v predict labels']):
+
 		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
 	
@@ -391,6 +392,7 @@ class summarize_classification_result:
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
 		self.Δy = np.absolute(self.ŷ - self.y)
 
+		if wuml.get_commandLine_input()[1] == 'disabled': return
 		# Printing out the result
 		if print_out is not None:
 			if 'avg error' in print_out:

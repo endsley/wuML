@@ -20,4 +20,3 @@ summary = wuml.summarize_classification_result(data.Y, ӯ)
 jupyter_print('\nIf we use the entire 10 models and obtain labels by voting, we get')
 jupyter_print('Avg Error: %.3f'%summary.avg_error())
 
-import pdb; pdb.set_trace()
