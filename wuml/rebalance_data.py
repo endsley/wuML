@@ -18,14 +18,19 @@ class rebalance_data:
 	def __init__(self, data, y=None, method='smote'):
 		'''method : 'smote', 'oversampling' '''
 
-		label_column_name=None
+		self.label_column_name=None
+		self.columns = None
+		self.label_column_id = None
+
 		if y is None:
 			if wuml.wtype(data) == 'wData':
 				y = data.Y
 				X = data.X
+				self.columns = data.columns
+				self.label_column_name = data.get_column_names_as_a_list()
+				self.label_column_id = data.label_column_id
 			else:
 				raise ValueError('data must be wData if the label y is None')
-			label_column_name = data.get_column_names_as_a_list()
 		else:
 			X = wuml.ensure_numpy(data)
 			y = wuml.ensure_numpy(y)
@@ -43,9 +48,8 @@ class rebalance_data:
 			X_res, y_res = ROS.fit_resample(X, y)
 
 
-		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, 
-										column_names=data.columns, label_column_name=data.label_column_name, label_column_id=data.label_column_id,
-										label_type='discrete')
+		self.balanced_data = wuml.wData(X_npArray=X_res, Y_npArray=y_res, first_row_is_label=False, label_type='discrete',
+										column_names=self.columns, label_column_name=self.label_column_name, label_column_id=self.label_column_id)
 
 
 if __name__ == "__main__":
