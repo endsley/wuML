@@ -2,9 +2,9 @@
 
 import sys
 import os
-
+  
 code_list = []
-code_list.append('jupyter_print.py')
+code_list.append('selection_by_hsic.py')
 
 print('Running data_stats folder')
 for code in code_list:
