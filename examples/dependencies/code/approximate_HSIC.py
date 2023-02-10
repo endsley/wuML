@@ -33,9 +33,9 @@ sine_hsic_1000 = wuml.HSIC(sine_data_1000[:,0], sine_data_1000[:,1], sigma_type=
 sine_hsic_1500 = wuml.HSIC(sine_data_1500[:,0], sine_data_1500[:,1], sigma_type='opt', normalize_hsic=False)
 
 
-print('\tHSIC full size     : ', sine_hsic, ', size:', sine_data.shape)
-print('\tHSIC approximation : ', sine_hsic_100, ', size:', sine_data_100.shape)
-print('\tHSIC approximation : ', sine_hsic_200, ', size:', sine_data_200.shape)
-print('\tHSIC approximation : ', sine_hsic_500, ', size:', sine_data_500.shape)
-print('\tHSIC approximation : ', sine_hsic_1000, ', size:', sine_data_1000.shape)
-print('\tHSIC approximation : ', sine_hsic_1500, ', size:', sine_data_1500.shape)
+wuml.jupyter_print('\tHSIC full size     : %.2f, size: %s'%(sine_hsic, str(sine_data.shape)))
+wuml.jupyter_print('\tHSIC approximation : %.2f, size: %s'%(sine_hsic_100,  str(sine_data_100.shape)))
+wuml.jupyter_print('\tHSIC approximation : %.2f, size: %s'%(sine_hsic_200,  str(sine_data_200.shape)))
+wuml.jupyter_print('\tHSIC approximation : %.2f, size: %s'%(sine_hsic_500,  str(sine_data_500.shape)))
+wuml.jupyter_print('\tHSIC approximation : %.2f, size: %s'%(sine_hsic_1000, str(sine_data_1000.shape)))
+wuml.jupyter_print('\tHSIC approximation : %.2f, size: %s'%(sine_hsic_1500, str(sine_data_1500.shape)))

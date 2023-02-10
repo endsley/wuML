@@ -63,6 +63,8 @@ class clustering:
 		return str(self.labels)
 
 	def plot_scatter_result(self, dimension_reduction_method='all'):
+		if wuml.get_commandLine_input()[1] == 'disabled': return
+
 		methods = ['PCA', 'TSNE', 'KPCA']
 		if dimension_reduction_method == 'all':
 			for i, m in enumerate(methods):
@@ -91,7 +93,7 @@ class clustering:
 		data = np.array([[self.method, nmi]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
-		if print_out: print(df)
+		if print_out: wuml.jupyter_print(df)
 		self.results = df
 		return df
 

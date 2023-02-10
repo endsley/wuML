@@ -37,11 +37,11 @@ plinear_nmi = np.round(normalized_mutual_info_score(XP_data_nmi, YP_data_nmi),2)
 plinear_hsic = np.round(wuml.HSIC(plinear_data[:,0], plinear_data[:,1], sigma_type='mpd'),2)	
 plinear_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
-print('Linear Relationship:')
-print('\tCorrelation : ', plinear_pc)
-print('\tNMI : ', plinear_nmi)
-print('\tpps : ', plinear_pps)
-print('\tHSIC : ', plinear_hsic)
+wuml.jupyter_print('Linear Relationship:')
+wuml.jupyter_print('\tCorrelation : %.3f'% plinear_pc)
+wuml.jupyter_print('\tNMI : %.3f'% plinear_nmi)
+wuml.jupyter_print('\tpps : %.3f'% plinear_pps)
+wuml.jupyter_print('\tHSIC : %.3f'% plinear_hsic)
 
 
 #	Linear Data
@@ -59,11 +59,11 @@ linear_nmi = np.round(normalized_mutual_info_score(XL_data_nmi, YL_data_nmi),2)
 linear_hsic = np.round(wuml.HSIC(linear_data[:,0], linear_data[:,1], sigma_type='opt'),2)	
 linear_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
-print('Linear Relationship:')
-print('\tCorrelation : ', linear_pc)
-print('\tNMI : ', linear_nmi)
-print('\tpps : ', linear_pps)
-print('\tHSIC : ', linear_hsic)
+wuml.jupyter_print('Linear Relationship:')
+wuml.jupyter_print('\tCorrelation : %.3f'% linear_pc)
+wuml.jupyter_print('\tNMI : %.3f'% linear_nmi)
+wuml.jupyter_print('\tpps : %.3f'% linear_pps)
+wuml.jupyter_print('\tHSIC : %.3f'% linear_hsic)
 
 #	Sine Data
 dat_x = 9.3*np.random.rand(n,1)
@@ -81,11 +81,11 @@ sine_nmi = np.round(normalized_mutual_info_score(Xsine_data_nmi, Ysine_data_nmi)
 sine_hsic = np.round(wuml.HSIC(sine_data[:,0], sine_data[:,1], sigma_type='opt'),2)
 sine_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
-print('Sine Relationship:')
-print('\tCorrelation : ', sine_pc)
-print('\tNMI : ', sine_nmi)
-print('\tpps : ', sine_pps)
-print('\tHSIC : ', sine_hsic)
+wuml.jupyter_print('Sine Relationship:')
+wuml.jupyter_print('\tCorrelation : %.3f'% sine_pc)
+wuml.jupyter_print('\tNMI : %.3f'%sine_nmi)
+wuml.jupyter_print('\tpps : %.3f'%sine_pps)
+wuml.jupyter_print('\tHSIC : %.3f'%sine_hsic)
 
 
 #	Parabola Data
@@ -104,11 +104,11 @@ para_nmi = np.round(normalized_mutual_info_score(Xp_data_nmi, Yp_data_nmi),2)
 para_hsic = np.round(wuml.HSIC(para_data[:,0], para_data[:,1], sigma_type='opt'),2)
 para_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
-print('Parabola Relationship:')
-print('\tCorrelation : ', para_pc)
-print('\tNMI : ', para_nmi)
-print('\tpps : ', para_pps)
-print('\tHSIC : ', para_hsic)
+wuml.jupyter_print('Parabola Relationship:')
+wuml.jupyter_print('\tCorrelation : %.3f'%para_pc)
+wuml.jupyter_print('\tNMI : %.3f'%para_nmi)
+wuml.jupyter_print('\tpps : %.3f'%para_pps)
+wuml.jupyter_print('\tHSIC : %.3f'%para_hsic)
 
 #	Random uniform Data
 unif_data = np.random.rand(n,2)
@@ -125,41 +125,44 @@ unif_hsic = np.round(wuml.HSIC(unif_data[:,0], unif_data[:,1], sigma_type='opt')
 unif_nmi = np.round(normalized_mutual_info_score(Xr_data_nmi, Yr_data_nmi),2)
 unif_pps = np.round(pps.score(df, "x", "y")['ppscore'],2)
 
-print('Random Relationship:')
-print('\tCorrelation : ', unif_pc)
-print('\tNMI : ', unif_nmi)
-print('\tpps : ', unif_pps)
-print('\tHSIC : ', unif_hsic)
+wuml.jupyter_print('Random Relationship:')
+wuml.jupyter_print('\tCorrelation : %.3f'%unif_pc)
+wuml.jupyter_print('\tNMI : %.3f'%unif_nmi)
+wuml.jupyter_print('\tpps : %.3f'%unif_pps)
+wuml.jupyter_print('\tHSIC : %.3f'%unif_hsic)
 
 
-plt.figure(figsize=(13,3))
-
-plt.subplot(151)
-plt.plot(plinear_data[:,0], plinear_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic)  + '\nnmi : ' + str(plinear_nmi))
-#plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic) + '\npps : ' + str(plinear_pps) + ' , nmi : ' + str(plinear_nmi))
-
-plt.subplot(152)
-plt.plot(linear_data[:,0], linear_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + ' \nnmi : ' + str(linear_nmi))
-#plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + '\npps : ' + str(linear_pps) + ' , nmi : ' + str(linear_nmi))
-
-plt.subplot(153)
-plt.plot(sine_data[:,0], sine_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\nnmi : ' + str(sine_nmi))
-#plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\npps : ' + str(sine_pps) + ' , nmi : ' + str(sine_nmi))
-
-plt.subplot(154)
-plt.plot(para_data[:,0], para_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\nnmi : ' + str(para_nmi))
-#plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\npps : ' + str(para_pps) + ' , nmi : ' + str(para_nmi))
-
-plt.subplot(155)
-plt.plot(unif_data[:,0], unif_data[:,1], 'bx')
-plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\nnmi : ' + str(unif_nmi))
-#plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\npps : ' + str(unif_pps) + ' , nmi : ' + str(unif_nmi))
-
-plt.tight_layout()
-plt.show()
+#	not plotting if it is running on test mode
+if wuml.get_commandLine_input()[1] != 'disabled': 
+	#	plotting
+	plt.figure(figsize=(13,3))
+	
+	plt.subplot(151)
+	plt.plot(plinear_data[:,0], plinear_data[:,1], 'bx')
+	plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic)  + '\nnmi : ' + str(plinear_nmi))
+	#plt.title('$\\rho$ : ' + str(plinear_pc) + ' , HSIC : ' + str(plinear_hsic) + '\npps : ' + str(plinear_pps) + ' , nmi : ' + str(plinear_nmi))
+	
+	plt.subplot(152)
+	plt.plot(linear_data[:,0], linear_data[:,1], 'bx')
+	plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + ' \nnmi : ' + str(linear_nmi))
+	#plt.title('$\\rho$ : ' + str(linear_pc) + ' , HSIC : ' + str(linear_hsic) + '\npps : ' + str(linear_pps) + ' , nmi : ' + str(linear_nmi))
+	
+	plt.subplot(153)
+	plt.plot(sine_data[:,0], sine_data[:,1], 'bx')
+	plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\nnmi : ' + str(sine_nmi))
+	#plt.title('$\\rho$ : ' + str(sine_pc) + ' , HSIC : ' + str(sine_hsic) + '\npps : ' + str(sine_pps) + ' , nmi : ' + str(sine_nmi))
+	
+	plt.subplot(154)
+	plt.plot(para_data[:,0], para_data[:,1], 'bx')
+	plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\nnmi : ' + str(para_nmi))
+	#plt.title('$\\rho$ : ' + str(para_pc) + ' , HSIC : ' + str(para_hsic) + '\npps : ' + str(para_pps) + ' , nmi : ' + str(para_nmi))
+	
+	plt.subplot(155)
+	plt.plot(unif_data[:,0], unif_data[:,1], 'bx')
+	plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\nnmi : ' + str(unif_nmi))
+	#plt.title('$\\rho$ : ' + str(unif_pc) + ' , HSIC : ' + str(unif_hsic) + '\npps : ' + str(unif_pps) + ' , nmi : ' + str(unif_nmi))
+	
+	plt.tight_layout()
+	plt.show()
 
 
