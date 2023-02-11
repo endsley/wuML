@@ -18,15 +18,13 @@ import wuml
 
 wuml.set_terminal_print_options(precision=3)
 data = wuml.wData('../../data/missin_example.csv', first_row_is_label=True)
-print(data)
-import pdb; pdb.set_trace()
+wuml.jupyter_print(data)
 
 #	column_threshold=0.95, this will keep features that are at least 95% full
 #	Note that an id column is "required" for this process to document which rows are removes
 dataDecimated = wuml.decimate_data_with_missing_entries(data, column_threshold=0.50, row_threshold=0.70,newDataFramePath='')
-print(dataDecimated)
+wuml.jupyter_print(dataDecimated)
 
 X = wuml.impute(dataDecimated, ignore_first_index_column=True)		# perform mice imputation
-
-print(dataDecimated)
+wuml.jupyter_print(X)
 

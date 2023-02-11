@@ -17,6 +17,7 @@ folder_list.append('wData')
 folder_list.append('clustering')
 folder_list.append('dependencies')
 folder_list.append('measure')
+folder_list.append('preprocess')
 
 
 for f in folder_list:

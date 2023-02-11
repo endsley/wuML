@@ -26,7 +26,6 @@ class flexable_Model(torch.nn.Module):
 				if wtype(Layer_info[0]) == 'str':
 					bn , train_gamma_beta_parameters = Layer_info
 					cmd = ('self.l' + str(l) + '_BN = nn.BatchNorm1d(num_features=' + str(inDim) + ', affine=' + str(train_gamma_beta_parameters) + ')')
-					#print(cmd)
 					exec(cmd)
 				else:
 					layer_width, activation_function = Layer_info
@@ -220,7 +219,7 @@ class basicNetwork:
 			print("\n the data label_type should not be continuous when using 'hindge' as costFunction during classification!!!\n")
 
 	def info(self, printOut=True):
-		 
+		
 		info_str ='Network Info:\n'
 		info_str += '\tLearning rate: %.3f\n'%self.lr
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
@@ -233,7 +232,7 @@ class basicNetwork:
 				info_str += ('\t\t%s , %s\n'%(i,i.activation))
 			except:
 				info_str += ('\t\t%s \n'%(i))
-		if printOut: print(info_str)
+		if printOut: wuml.jupyter_print(info_str)
 		return info_str
 
 	def predict(self, data):

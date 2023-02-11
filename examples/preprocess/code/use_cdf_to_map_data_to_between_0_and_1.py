@@ -3,19 +3,19 @@
 import wuml 
 
 #	We first remove column A because there are too many missing values
-data = wuml.wData('../../data/missin_example.csv', row_id_with_label=0, columns_to_ignore=['A'])
-print('We start with this dataset')
-print(data,'\n')
+data = wuml.wData('../../data/missin_example.csv', first_row_is_label=True, columns_to_ignore=['A'])
+wuml.jupyter_print('We start with this dataset')
+wuml.jupyter_print(data,'\n')
 
 X = wuml.impute(data, ignore_first_index_column=False)
-print('We first impute all the residual missing entries')
-print(X,'\n')
+wuml.jupyter_print('We first impute all the residual missing entries')
+wuml.jupyter_print(X,'\n')
 
 
 X = wuml.map_data_between_0_and_1(X, map_type='linear') # map_type: linear, or cdf
-print(X[0:20,:])
+wuml.jupyter_print(X[0:20,:])
 
 
 X = wuml.map_data_between_0_and_1(X, map_type='cdf') # map_type: linear, or cdf
-print(X[0:20,:])
+wuml.jupyter_print(X[0:20,:])
 
