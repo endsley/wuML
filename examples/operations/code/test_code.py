@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
   
 code_list = []
 code_list.append('eigDecomp.py')
@@ -18,7 +19,6 @@ for code in code_list:
 	os.system('p2j -o ' + code + ' > /dev/null 2>&1')
 	ipynb = code.replace('.py', '.ipynb')
 	os.system('jupyter nbconvert --to notebook --execute ' + ipynb + ' > /dev/null 2>&1')
-
 	ran_ipynb = ipynb.replace('.ipynb', '.nbconvert.ipynb')
 	os.system('mv ' + ran_ipynb + ' ' + ipynb)
 	os.system('mv ' + ipynb + ' ../ipynb/' + ipynb)
