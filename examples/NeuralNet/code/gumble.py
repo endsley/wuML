@@ -36,12 +36,12 @@ for n in range(10000):
 
 Ct = Ct.numpy()/10000
 
-print('True Probability')	
-print(X,'\n')
+wuml.jupyter_print('True Probability')	
+wuml.jupyter_print(X,'\n')
 
-print('Gumbel generated Probability from sampling')
-print(C,'\n')
+wuml.jupyter_print('Gumbel generated Probability from sampling')
+wuml.jupyter_print(C,'\n')
 
-print('Gumbel generated Probability from sampling via pytorch')
-print(Ct,'\n')
+wuml.jupyter_print('Gumbel generated Probability from sampling via pytorch')
+wuml.jupyter_print(Ct,'\n')
 

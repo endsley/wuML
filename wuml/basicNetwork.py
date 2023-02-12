@@ -187,6 +187,9 @@ class basicNetwork:
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 			self.model = flexable_Model(X.shape[1], networkStructure)
 			self.network_output_in_CPU_during_usage = False
+			if X.label_type == 'discrete': 
+				self.Y_dataType = torch.int64		#overide datatype if discrete labels
+
 		else:
 			self.costFunction = costFunction
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
@@ -199,8 +202,6 @@ class basicNetwork:
 			self.NetStructure = θ.NetStructure
 			self.model = θ.model
 			self.network_output_in_CPU_during_usage = True
-
-		if X.label_type == 'discrete': self.Y_dataType = torch.int64		#overide datatype if discrete labels
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'

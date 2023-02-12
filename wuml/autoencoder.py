@@ -97,7 +97,7 @@ class autoencoder():
 			try: info_str += ('\t\t%s , %s\n'%(i,i.activation))
 			except: info_str += ('\t\t%s \n'%(i))
 
-		if printOut: print(info_str)
+		if printOut: wuml.jupyter_print(info_str)
 		return info_str
 
 

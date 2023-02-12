@@ -35,7 +35,7 @@ bNet.train(print_status=True)
 
 #	Check out our predictions
 SR = wuml.summarize_regression_result(data.Y, Ŷ)
-print(SR.true_vs_predict(print_result=False))
+wuml.jupyter_print(SR.true_vs_predict(print_result=False))
 
 
 #	Draw the regression line
@@ -54,7 +54,7 @@ bNet.train(print_status=True)
 
 #	Check out our predictions
 SR = wuml.summarize_regression_result(data.Y, Ŷ)
-print(SR.true_vs_predict(print_result=False))
+wuml.jupyter_print(SR.true_vs_predict(print_result=False))
 
 
 #	Draw the regression line

@@ -69,5 +69,3 @@ wuml.jupyter_print(cf.result_summary(print_out=False))
 cf = wuml.classification(ẙ, classifier='LogisticRegression')
 wuml.jupyter_print(cf.result_summary(print_out=False))
 
-
-import pdb; pdb.set_trace()

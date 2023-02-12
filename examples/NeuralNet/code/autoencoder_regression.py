@@ -51,7 +51,7 @@ AE.fit()
 
 #	Result of the data reconstruction
 ŷ = AE(data)
-print('\n\n')
+wuml.jupyter_print('\n\n')
 recontructed = wuml.pretty_np_array(ŷ[0:5,0:5], front_tab='', title='recontruction')
 original = wuml.pretty_np_array(data.X[0:5,0:5], front_tab=' ', title='original')
 wuml.block_two_string_concatenate(recontructed, original, spacing='\t', auto_print=True)
@@ -61,7 +61,7 @@ wuml.block_two_string_concatenate(recontructed, original, spacing='\t', auto_pri
 #	This is the bottleneck output which is d=12
 x̂ = AE.reduce_dimension(data, output_type='wData')
 wuml.jupyter_print(x̂)
-print('\n')
+wuml.jupyter_print('\n')
 
 
 #	This is the objective network output Training error
@@ -72,4 +72,3 @@ res = wuml.output_regression_result(y_train, ẙ, sort_by='error')
 ẙ = AE.objective_network(X_test)
 res = wuml.output_regression_result(y_test, ẙ, sort_by='error')
 
-import pdb; pdb.set_trace()

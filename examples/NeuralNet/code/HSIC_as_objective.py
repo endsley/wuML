@@ -20,13 +20,11 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 #	Remember that you are trying to "minimize" this objective
 def costFunction(x, y, ŷ, ind):
 	H = HSIC(ŷ, y, X_kernel='linear', Y_kernel='linear', sigma_type='mpd' )
-
 	# compare the HSIC value against numpy library
 	#y = y.detach().cpu().numpy()
 	#ŷ = ŷ.detach().cpu().numpy()
 	#H2 = HSIC(ŷ, y, X_kernel='linear', Y_kernel='linear', sigma_type='mpd' )
 	#import pdb; pdb.set_trace()
-
 	return -H  
 
 

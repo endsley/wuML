@@ -105,3 +105,9 @@ pip install wuml
 ### Rebalance Skew classification data
 [Rebalance skewed data with oversampling and smote](https://github.com/endsley/wuML/blob/main/examples/rebalance_data/ipynb/rebalance_data.ipynb) 
 
+### Repeat Run of algorithm 
+[Run simple k-fold cross validation](https://github.com/endsley/wuML/blob/main/examples/repeat_Runs_or_K_fold/ipynb/simple_run_k_fold.ipynb)\
+[Run complex 10-fold](https://github.com/endsley/wuML/blob/main/examples/repeat_Runs_or_K_fold/ipynb/complex_10_fold.ipynb)\
+[Repeat Experiments on Different Settings](https://github.com/endsley/wuML/blob/main/examples/repeat_Runs_or_K_fold/ipynb/repeat_experiment_on_diff_settings.ipynb)
+
+

@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
+
 import wuml
 import numpy as np
 import torch
@@ -20,7 +28,6 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 
 def costFunction(x, y, ŷ, ind):
 	lossFun = nn.CrossEntropyLoss() 
-	import pdb; pdb.set_trace()
 	loss = lossFun(ŷ, y) #weird from pytorch, dim of y is 1, and ŷ is 20x3	
 	return loss
 
@@ -35,9 +42,8 @@ bNet.train(print_status=False)
 #	Report Results
 Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
 CR = wuml.summarize_classification_result(data.Y, Ŷ)
-print('\nAccuracy : %.3f\n\n'%CR.avg_error())
-print(CR.true_vs_predict(sort_based_on_label=True, print_result=False))
-import pdb; pdb.set_trace()
+wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
+wuml.jupyter_print(CR.true_vs_predict(sort_based_on_label=True, print_result=False))
 
 
 
