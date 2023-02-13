@@ -45,7 +45,7 @@ def run_each_fold(fold_id, one_fold_data_list):
 		return torch.sum(W*((y - ŷ)**2))/n + 0.8*penalty
 #
 #	
-	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(400,'relu'),(400,'relu'),(400,'relu'),(1,'none')], max_epoch=8000, learning_rate=0.001)
+	bNet = wuml.basicNetwork(costFunction, single_fold_train_data, networkStructure=[(400,'relu'),(400,'relu'),(400,'relu'),(1,'none')], max_epoch=80, learning_rate=0.001)
 	bNet.train()
 #
 	Ŷ_train = bNet(single_fold_train_data, output_type='ndarray')

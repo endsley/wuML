@@ -49,8 +49,8 @@ structures.append([(200,'relu'),(200,'relu'),(1,'none')])
 structures.append([(100,'relu'),(100,'relu'),(1,'none')])
 structures.append([(100,'relu'),(1,'none')])
 structures.append([(60,'relu'),(1,'none')])
-epochs = [100, 200, 400, 800, 1600, 3200, 6000]
-#epochs = [1, 2, 4, 8]
+#epochs = [100, 200, 400, 800, 1600, 3200, 6000]
+epochs = [1, 2, 4, 8]
 variousSettings = list(zip(structures, epochs))
 
 for S in structures:

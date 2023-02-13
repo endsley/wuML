@@ -18,6 +18,7 @@ folder_list.append('clustering')
 folder_list.append('dependencies')
 folder_list.append('measure')
 folder_list.append('preprocess')
+folder_list.append('NeuralNet')
 
 
 for f in folder_list:
