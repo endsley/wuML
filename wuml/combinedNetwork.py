@@ -8,6 +8,7 @@ class combinedNetwork():
 	def __init__(self, data, netStructureList, netInputDimList, costFunction,
 						early_exit_loss_threshold=0.0000001, 
 						on_new_epoch_call_back = None, max_epoch=1000, 	
+						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
 						network_usage_output_type='Tensor', learning_rate=0.001):
 		'''
 			data: must be a wData
@@ -19,11 +20,19 @@ class combinedNetwork():
 		self.costFunction = costFunction
 		self.networkList = []
 
+		self.X_dataType = X_dataType
+		self.Y_dataType = Y_dataType
+		self.extra_dataType=extra_dataType
+		if wtype(extra_dataType) != 'list':
+			self.extra_dataType = [extra_dataType]
+
+
+
+
 		self.trainLoader = data.get_data_as('DataLoader')
 		self.lr = learning_rate
 		self.max_epoch = max_epoch
 		self.early_exit_loss_threshold = early_exit_loss_threshold
-		self.costFunction = costFunction
 
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 		self.network_output_in_CPU_during_usage = False
@@ -32,28 +41,20 @@ class combinedNetwork():
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 		for NetStruct, dim in zip(netStructureList, netInputDimList):
-			newNet = flexable_Model(dim, NetStruct)
-			newNet.to(self.device)		# store the network weights in gpu or cpu device
+			#newNet = flexable_Model(dim, NetStruct)
+			newNet = basicNetwork(costFunction, data, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim)
+			#newNet.to(self.device)		# store the network weights in gpu or cpu device
 			self.networkList.append(newNet)
 
 		self.info()
 
 
 	def info(self, printOut=True):
-		 
-		info_str ='Autoencoder Info:\n'
-		info_str += '\tLearning rate: %.3f\n'%self.lr
-		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
-		info_str += '\tCost Function: %s\n'%str(self.costFunction)
-		info_str += '\tTrain Loop Callback: %s\n'%str(self.on_new_epoch_call_back)
-		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
-		info_str += '\tEncoder Structure\n'
-
+		info_str = 'All Networks\n' 
 		for j, net in enumerate(self.networkList):
-			info_str += 'Network %d\n'%j
-			for i in net.children():
-				try: info_str += ('\t\t%s , %s\n'%(i,i.activation))
-				except: info_str += ('\t\t%s \n'%(i))
+			single_info_str = 'Networks %d\n'%j 
+			single_info_str += net.info(printOut=False)
+			info_str += wuml.append_same_string_infront_of_block_of_string('\t', single_info_str)
 
 		if printOut: wuml.jupyter_print(info_str)
 		return info_str
@@ -76,8 +77,19 @@ class combinedNetwork():
 	
 			loss_history = []	
 			for (i, data) in enumerate(self.trainLoader):
-				import pdb; pdb.set_trace()
-				all_losses = loss_function(data)	# all_losses is a list of losses, but the 1st one is always the main loss
+				x = Variable(data[0].type(self.X_dataType), requires_grad=False)
+				y = Variable(data[1].type(self.Y_dataType), requires_grad=False)
+				x= x.to(self.device, non_blocking=True )
+				y= y.to(self.device, non_blocking=True )
+				formatted_data = [x, y, data[2]]
+			
+				for j, dtype in enumerate(self.extra_dataType): 
+					extraDat = Variable(data[j+3].type(dtype), requires_grad=False)
+					extraDat= extraDat.to(self.device, non_blocking=True )
+					formatted_data.append(extraDat)
+
+				for opt in netOptimizers: opt.zero_grad()
+				all_losses = self.costFunction(formatted_data, self.networkList)	# all_losses is a list of losses, but the 1st one is always the main loss
 	
 				all_losses[0].backward()
 				for opt in netOptimizers: opt.step()

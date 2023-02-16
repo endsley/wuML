@@ -162,7 +162,8 @@ class basicNetwork:
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], early_exit_loss_threshold=0.000000001, 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
 						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
-						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True): 
+						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True,
+						override_network_input_width_as=None): 
 		'''
 			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
@@ -185,10 +186,15 @@ class basicNetwork:
 			self.costFunction = costFunction
 			self.NetStructure = networkStructure
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-			self.model = flexable_Model(X.shape[1], networkStructure)
 			self.network_output_in_CPU_during_usage = False
 			if X.label_type == 'discrete': 
 				self.Y_dataType = torch.int64		#overide datatype if discrete labels
+
+			if override_network_input_width_as is None:	#This is done during customized complex nework structures
+				self.model = flexable_Model(X.shape[1], networkStructure)
+			else:
+				self.model = flexable_Model(override_network_input_width_as, networkStructure)
+
 
 		else:
 			self.costFunction = costFunction
@@ -219,6 +225,10 @@ class basicNetwork:
 		elif costFunction == 'hindge' and X.label_type == 'continuous':
 			print("\n the data label_type should not be continuous when using 'hindge' as costFunction during classification!!!\n")
 
+
+	def parameters(self):
+		return self.model.parameters()
+
 	def info(self, printOut=True):
 		
 		info_str ='Network Info:\n'
@@ -233,6 +243,7 @@ class basicNetwork:
 				info_str += ('\t\t%s , %s\n'%(i,i.activation))
 			except:
 				info_str += ('\t\t%s \n'%(i))
+		
 		if printOut: wuml.jupyter_print(info_str)
 		return info_str
 
@@ -250,12 +261,13 @@ class basicNetwork:
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
 			x= x.to(self.device, non_blocking=True )
 		elif type(data).__name__ == 'Tensor': 
-			x = Variable(x.type(self.X_dataType), requires_grad=False)
+			x = data
 			x= x.to(self.device, non_blocking=True )
 		elif type(data).__name__ == 'wData': 
 			x = data.get_data_as('Tensor')
 		else:
 			raise
+
 		yout = self.model(x)
 
 		if self.network_usage_output_dim == 0 or self.network_usage_output_dim == 1:

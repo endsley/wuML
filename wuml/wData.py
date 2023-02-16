@@ -22,7 +22,8 @@ from torch.utils.data import Dataset, DataLoader
 class wData:
 	def __init__(self, xpath=None, ypath=None, column_names=None, path_prefix='',
 					label_column_name=None, label_column_id=None,
-					dataFrame=None, X_npArray=None, Y_npArray=None, extra_data=None,
+					dataFrame=None, X_npArray=None, Y_npArray=None, 
+					extra_data=None, extra_data_preprocessing=None,
 					first_row_is_label=False, 
 					row_id_with_feature_names=None, first_column_as_sample_index=False, 
 					label_type=None, label2_type=None, #it should be either 'continuous' or 'discrete'
@@ -38,13 +39,75 @@ class wData:
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
 			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 			first_column_as_sample_index: if the first column is used as sample ID
-			extra_data: is a list of data that can be appended to the dataset, it has to be the same number of samples as X and y
+			extra_data: is a list of data that can be appended to the dataset, it has to be the same number of samples as X and y, if not a list, then it will be casted into a list
+			extra_data_preprocessing is a list of lists including commands to preprocess, e.g., given 2 extra data [['center and scale'],['ensure_ proper discrete labels']]
 			path_prefix: string or list, if list, automatically goes through potential folders where the data might be
 		'''
+		self.path_prefix = path_prefix
 		self.label_column_name = label_column_name
 		self.label_column_id = label_column_id
-
 		self.randomly_shuffle_batch = randomly_shuffle_batch
+		self.row_id_with_feature_names = row_id_with_feature_names
+		self.first_row_is_label = first_row_is_label
+		self.replace_this_entry_with_nan = replace_this_entry_with_nan
+		self.first_column_as_sample_index = first_column_as_sample_index
+		self.xpath = xpath
+		self.Y = None
+		self.extra_data_preprocessing = extra_data_preprocessing
+		self.extra_data_dictionary = {}
+		self.extra_data_dictionary['extra_data'] = extra_data
+		self.extra_data_dictionary['numpy'] = []
+		self.extra_data_dictionary['df'] = []
+
+
+		# format the data
+		self.format_data_based_on_input_type(X_npArray, dataFrame, columns_to_ignore)
+		self.format_extra_data_based_on_input_type()
+
+
+		self.label_type = label_type
+		self.shape = self.df.shape
+		self.batch_size = batch_size
+		self.torchloader = None
+		self.columns = self.df.columns
+
+
+		self.format_label(Y_npArray=Y_npArray, ypath=ypath, label_column_name=label_column_name, label_column_id=label_column_id, encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
+		self.Data_preprocess(preprocess_data)
+		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
+
+		self.check_for_missingness()
+
+	def format_extra_data_based_on_input_type(self):
+		extra_data = self.extra_data_dictionary['extra_data']
+		if extra_data is None: return 
+
+		if wtype(extra_data) == 'str': 		#if string, it is the load path
+			pth = wuml.append_prefix_to_path(self.path_prefix, extra_data)
+			extra_data = pd.read_csv (pth, header=None)
+
+		if wtype(extra_data) != 'list': 
+			extra_data = [extra_data]
+
+		if wtype(self.extra_data_preprocessing) == 'str':
+			self.extra_data_preprocessing = [[self.extra_data_preprocessing]]
+
+
+		self.extra_data_dictionary['extra_data'] = extra_data
+		for i, data in enumerate(extra_data):
+			Dat_np = ensure_numpy(data)
+			if self.extra_data_preprocessing is not None:
+				for j in self.extra_data_preprocessing[i]:
+					if j == 'center and scale':
+						Dat_np = preprocessing.scale(Dat_np)
+					elif j == 'ensure_ proper discrete labels':
+						Dat_np = LabelEncoder().fit_transform(Dat_np)	#Make sure label start from 0
+
+			self.extra_data_dictionary['numpy'].append(ensure_numpy(Dat_np))
+			self.extra_data_dictionary['df'].append(ensure_DataFrame(Dat_np))
+
+	def format_data_based_on_input_type(self, X_npArray, dataFrame, columns_to_ignore):
+		first_row_is_label = self.first_row_is_label
 
 		if dataFrame is not None:
 			self.df = dataFrame
@@ -52,7 +115,7 @@ class wData:
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
 	
-			if first_column_as_sample_index: 
+			if self.first_column_as_sample_index: 
 				self.df = self.df.set_index(list(self.df)[0])
 
 		elif X_npArray is not None:
@@ -61,81 +124,24 @@ class wData:
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
 	
-			if first_column_as_sample_index: 
+			if self.first_column_as_sample_index: 
 				self.df = self.df.set_index(list(self.df)[0])
 
 		else:
-			pth = wuml.append_prefix_to_path(path_prefix, xpath)
+			pth = wuml.append_prefix_to_path(self.path_prefix, self.xpath)
 			self.df = pd.read_csv (pth, header=None)
-			if first_column_as_sample_index: first_column_as_sample_index = 0
+			if self.first_column_as_sample_index: self.first_column_as_sample_index = 0
 			if first_row_is_label: 
-				self.df = pd.read_csv (pth, header=0, index_col=first_column_as_sample_index)
+				self.df = pd.read_csv (pth, header=0, index_col=self.first_column_as_sample_index)
 			else:
-				self.df = pd.read_csv (pth, header=row_id_with_feature_names, index_col=first_column_as_sample_index)
+				self.df = pd.read_csv (pth, header=self.row_id_with_feature_names, index_col=self.first_column_as_sample_index)
 
-
-
-		if replace_this_entry_with_nan is not None:
-			self.df = self.df.replace(replace_this_entry_with_nan, np.nan)
+		if self.replace_this_entry_with_nan is not None:
+			self.df = self.df.replace(self.replace_this_entry_with_nan, np.nan)
 
 		self.strip_white_space_from_column_names()
-		self.Y = None
-		self.extra_data = None		# if there exists a 2nd label
-
-#		if Y_npArray is not None:
-#			self.Y = Y_npArray
-#			if encode_discrete_label_to_one_hot:
-#				self.Y = wuml.one_hot_encoding(self.Y)
-#
-#		elif ypath is not None: 
-#			ypth = wuml.append_prefix_to_path(path_prefix, ypath)
-#
-#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-#			self.Y = np.loadtxt(ypth, delimiter=',', dtype=np.float32)			
-#			if label_type == 'discrete': 
-#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-#				if encode_discrete_label_to_one_hot:
-#					self.Y = wuml.one_hot_encoding(self.Y)
-#
-#		elif label_column_name is not None:
-#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-#			self.Y = self.df[label_column_name].values
-#			if label_type == 'discrete': 
-#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-#				if encode_discrete_label_to_one_hot:
-#					self.Y = wuml.one_hot_encoding(self.Y)
-#
-#			self.delete_column(label_column_name)
-#		elif label_column_id is not None:
-#			if label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
-#			self.Y = self.df[label_column_id].values
-#			if label_type == 'discrete': 
-#				self.Y = LabelEncoder().fit_transform(self.Y)	#Make sure label start from 0
-#				if encode_discrete_label_to_one_hot:
-#					self.Y = wuml.one_hot_encoding(self.Y)
-#
-#			self.delete_column(label_column_id)
-
-
-
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
-
 		self.X = self.df.values
-		self.label_type = label_type
-		self.shape = self.df.shape
-		self.batch_size = batch_size
-		self.torchloader = None
-		self.columns = self.df.columns
-		self.path_prefix = path_prefix
-
-
-		self.format_label(Y_npArray=Y_npArray, ypath=ypath, label_column_name=label_column_name, label_column_id=label_column_id, encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
-
-
-		self.Data_preprocess(preprocess_data)
-		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
-
-		self.check_for_missingness()
 
 
 	def format_label(self, Y_npArray=None, ypath=None, label_column_name=None, label_column_id=None, encode_discrete_label_to_one_hot=False):
@@ -313,7 +319,7 @@ class wData:
 			#self.df.values[subset]
 			return self.df.values
 		if data_type == 'DataLoader':		# and self.torchloader is None 
-			self.DM = wuml.DManager(self.df.values, self.Y, self.extra_data)
+			self.DM = wuml.DManager(self.df.values, self.Y, self.extra_data_dictionary)
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 

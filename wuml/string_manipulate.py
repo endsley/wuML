@@ -39,6 +39,13 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 	if auto_print: wuml.jupyter_print(out_str)
 	else: return out_str
 
+def append_same_string_infront_of_block_of_string(front_string, back_block_string):
+
+	new_str = front_string.join(back_block_string.splitlines(True))
+	new_str = front_string + new_str
+	return new_str
+
+
 def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_print=False):
 	str1 = str(str1)
 	str2 = str(str2)
