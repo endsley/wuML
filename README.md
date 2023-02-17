@@ -51,11 +51,11 @@ pip install wuml
 [Simple Regression with/without Batch Normalization](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
 [Weighted Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/weighted_regression.ipynb) \
 [Using HSIC as an objective with batch samples](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/HSIC_as_objective.ipynb) \ 
--\
+\
 [Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) \
 [Basic Autoencoder Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/autoencoder.ipynb) \
 [Basic Autoencoder Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/autoencoder_regression.ipynb)\ 
--\
+\
 [Complex mixture of Networks/Objectives](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/complexNet.ipynb) 
 
 ### Distance Between Distributions
