@@ -55,6 +55,8 @@ pip install wuml
 [Simple Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicClassification.ipynb) \
 [Basic Autoencoder Classification](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/autoencoder.ipynb) \
 [Basic Autoencoder Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/autoencoder_regression.ipynb) 
+\
+[Complex mixture of Networks/Objectives](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/complexNet.ipynb) 
 
 ### Distance Between Distributions
 [Wasserstein Distance Example](https://github.com/endsley/wuML/blob/main/examples/distance_between_distributions/ipynb/wasserstein_example.ipynb) \
