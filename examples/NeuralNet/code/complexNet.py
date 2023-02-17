@@ -32,10 +32,10 @@ def network_behavior_on_call(all_data, all_networks):
 	X = all_data[0]
 	y = all_data[1]
 	y2= all_data[2]
-
+#
 	ŷₐ = net1(X)
 	ŷᵦ = net2(ŷₐ)
-
+#
 	labels = wuml.softmax(ŷₐ)
 	return [labels, ŷᵦ]
 
@@ -51,7 +51,7 @@ def costFunction(all_data, all_networks):
 	y = all_data[1]
 	indx = all_data[2]
 	y2= all_data[3]
-
+#
 	# run data through the networks
 	ŷₐ = net1(X)
 	ŷᵦ = net2(ŷₐ)
@@ -79,8 +79,8 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 Y2 = data.extra_data_dictionary['numpy'][0]
 
 netStructureList = []
-netStructureList.append([(10,'relu'),(3,'none')])
-netStructureList.append([(5,'relu'),(1,'none')])
+netStructureList.append([(100,'relu'),(3,'none')])
+netStructureList.append([(50,'relu'),(1,'none')])
 netInputDimList = [13, 3]
 
 cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, max_epoch=2000,

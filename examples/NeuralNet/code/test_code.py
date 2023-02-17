@@ -4,14 +4,14 @@ import sys
 import os
   
 code_list = []
-code_list.append('autoencoder.py')
-code_list.append('autoencoder_regression.py')
-code_list.append('basicClassification.py')
-code_list.append('basicRegression.py')
-code_list.append('gumble.py')
-code_list.append('HSIC_as_objective.py')
-code_list.append('weighted_regression.py')
-#code_list.append('complexNet.py')
+#code_list.append('autoencoder.py')
+#code_list.append('autoencoder_regression.py')
+#code_list.append('basicClassification.py')
+#code_list.append('basicRegression.py')
+#code_list.append('gumble.py')
+#code_list.append('HSIC_as_objective.py')
+#code_list.append('weighted_regression.py')
+code_list.append('complexNet.py')
 
 
 print('Running data_stats folder')
