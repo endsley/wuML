@@ -7,7 +7,8 @@ import numpy as np
 class combinedNetwork():
 	def __init__(self, data, netStructureList, netInputDimList, costFunction,
 						early_exit_loss_threshold=0.0000001, 
-						on_new_epoch_call_back = None, max_epoch=1000, 	
+						on_new_epoch_call_back = None, network_behavior_on_call=None,
+						max_epoch=1000, 	
 						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
 						network_usage_output_type='Tensor', learning_rate=0.001):
 		'''
@@ -18,6 +19,7 @@ class combinedNetwork():
 		self.netStructureList = netStructureList
 		self.netInputDimList = netInputDimList
 		self.costFunction = costFunction
+		self.network_behavior_on_call = network_behavior_on_call
 		self.networkList = []
 
 		self.X_dataType = X_dataType
@@ -89,70 +91,51 @@ class combinedNetwork():
 					formatted_data.append(extraDat)
 
 				for opt in netOptimizers: opt.zero_grad()
-				all_losses = self.costFunction(formatted_data, self.networkList)	# all_losses is a list of losses, but the 1st one is always the main loss
-	
-				all_losses[0].backward()
+				all_losses = self.costFunction(formatted_data, self.networkList)	
+
+				if wtype(all_losses) == 'list': main_loss = all_losses[0]		# all_losses is a list of losses, but the 1st one is always the main loss
+				else: main_loss = all_losses
+
+				main_loss.backward()
 				for opt in netOptimizers: opt.step()
-				loss_history.append(loss.item())
+				loss_history.append(main_loss.item())
 	
 			loss_avg = np.array(loss_history).mean()
 			for sched in netSchedulers: sched.step(loss_avg)
-			if loss_avg < early_exit_loss_threshold: break;
+			if loss_avg < self.early_exit_loss_threshold: break;
 
+
+			#	The default status printing is just the main loss, but if you return a list of loss, 
+			#	you can print your own style by adding the function on_new_epoch_call_back()
 			if print_status:
 				if self.on_new_epoch_call_back is not None:
-					self.on_new_epoch_call_back(all_losses, (epoch+1), enc_scheduler._last_lr[0])
+					self.on_new_epoch_call_back(all_losses, (epoch+1), netSchedulers[0]._last_lr[0])
 				else:
 					txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
 					write_to_current_line(txt)
 
+	def __call__(self, data, output_type='Tensor', out_structural=None):
+		'''
+			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
+		'''
+
+		if self.network_behavior_on_call is None: return 
+		X = ensure_tensor(data, dataType=torch.FloatTensor)
+		y = ensure_tensor(data.Y, dataType=torch.FloatTensor)
+		formatted_data = [X,y]
 
 
-#	def objective_network(self, data, output_type='wData'):
-#		x = ensure_tensor(data, dataType=torch.FloatTensor)
-#		x̂ = self.encoder(x)
-#		ẙ = self.midcoder(x̂)
-#
-#		ẙ = ensure_data_type(ẙ, type_name=output_type)
-#		if wtype(ẙ) == 'wData': ẙ.Y = data.Y
-#		return ẙ
-#
-#
-#	def reduce_dimension(self, data, output_type='wData', outPath=None):
-#		x = ensure_tensor(data, dataType=torch.FloatTensor)
-#		x̂ = self.encoder(x)
-#
-#		x̂ = ensure_data_type(x̂, type_name=output_type)
-#		#if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
-#		#	x̂ = x̂.detach().cpu().numpy()
-#		#elif output_type == 'wData':
-#		#	x̂ = ensure_wData(x̂)
-#		#elif self.network_output_in_CPU_during_usage:
-#		#	x̂ = x̂.detach().cpu()
-#
-#		if outPath is not None:
-#			wD = ensure_wData(x̂)
-#			wD.to_csv(outPath)
-#
-#		if wtype(x̂) == 'wData': x̂.Y = data.Y
-#		return x̂
-#
-#	def __call__(self, data, output_type='Tensor', out_structural=None):
-#		'''
-#			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
-#		'''
-#
-#		x = ensure_tensor(data, dataType=torch.FloatTensor)
-#		x̂ = self.encoder(x)
-#		ŷ = self.decoder(x̂)
-#
-#		if output_type == 'ndarray' or self.network_usage_output_type == 'ndarray':
-#			return ŷ.detach().cpu().numpy()
-#		elif self.network_output_in_CPU_during_usage:
-#			return ŷ.detach().cpu()
-#
-#		return ŷ
-#
-#
-#
+		if wtype(data) == 'wData':
+			extra_data = data.extra_data_dictionary['extra_data']
+			if extra_data is not None:
+				for j, xData in enumerate(extra_data): 
+					newD = ensure_tensor(xData, dataType=self.extra_dataType[j])
+					formatted_data.append(newD)
+
+		all_net_output = self.network_behavior_on_call(formatted_data, self.networkList)	
+		return wuml.cast_each_item_in_list_as(all_net_output, output_type)
+
+
+
+
 

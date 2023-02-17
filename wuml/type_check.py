@@ -9,6 +9,13 @@ from torch.autograd import Variable
 def wtype(data):
 	return type(data).__name__
 
+def cast_each_item_in_list_as(list_of_data, cast_type):
+	casted_list = [] 
+	for dat in list_of_data:
+		casted_dat = ensure_data_type(dat, type_name=cast_type)
+		casted_list.append(casted_dat)
+
+	return casted_list
 
 def type_check_with_error(data, desired_type, function_name=''):
 	if wtype(data) != desired_type:

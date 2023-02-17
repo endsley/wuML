@@ -52,6 +52,7 @@ class wData:
 		self.replace_this_entry_with_nan = replace_this_entry_with_nan
 		self.first_column_as_sample_index = first_column_as_sample_index
 		self.xpath = xpath
+		self.column_names = column_names
 		self.Y = None
 		self.extra_data_preprocessing = extra_data_preprocessing
 		self.extra_data_dictionary = {}
@@ -119,8 +120,8 @@ class wData:
 				self.df = self.df.set_index(list(self.df)[0])
 
 		elif X_npArray is not None:
-			if wtype(column_names) == 'str': column_names = [column_names]
-			self.df = pd.DataFrame(X_npArray, columns=column_names)
+			if wtype(self.column_names) == 'str': self.column_names = [self.column_names]
+			self.df = pd.DataFrame(X_npArray, columns=self.column_names)
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
 	
