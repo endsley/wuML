@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 class combinedNetwork():
-	def __init__(self, data, netStructureList, netInputDimList, costFunction,
+	def __init__(self, data, netStructureList, netInputDimList, costFunction, optimizer_steps_order, 
 						early_exit_loss_threshold=0.0000001, 
 						on_new_epoch_call_back = None, network_behavior_on_call=None,
 						max_epoch=1000, 	
@@ -16,22 +16,31 @@ class combinedNetwork():
 			netStructureList: must be a list, can have multiple networks all working together
 			on_new_epoch_call_back: end of each epoch calls this function
 		'''
+		dat = wuml.ensure_wData(data)
+
+		self.batch_size = data.batch_size
 		self.netStructureList = netStructureList
 		self.netInputDimList = netInputDimList
 		self.costFunction = costFunction
+		self.optimizer_steps_order = optimizer_steps_order
 		self.network_behavior_on_call = network_behavior_on_call
 		self.networkList = []
 
 		self.X_dataType = X_dataType
 		self.Y_dataType = Y_dataType
 		self.extra_dataType=extra_dataType
-		if wtype(extra_dataType) != 'list':
+		if wtype(extra_dataType) != 'list' and extra_dataType is not None:
 			self.extra_dataType = [extra_dataType]
 
+		# double check that extra data is properly defined
+		if dat.extra_data_dictionary['extra_data'] is not None:
+			if extra_dataType is None:
+				ValueError('Error: If you have extra data within input, define the extra_dataType parameter as a list of data types.')
+			if len(dat.extra_data_dictionary['extra_data']) != len(extra_dataType):
+				raise ValueError('Error: If you have extra data within input, you must have a list of the same length for extra_dataType, e.g., extra_dataType=[torch.FloatTensor, torch.LongTensor]')
 
 
-
-		self.trainLoader = data.get_data_as('DataLoader')
+		self.trainLoader = dat.get_data_as('DataLoader')
 		self.lr = learning_rate
 		self.max_epoch = max_epoch
 		self.early_exit_loss_threshold = early_exit_loss_threshold
@@ -44,7 +53,7 @@ class combinedNetwork():
 		else: self.device = 'cpu'
 		for NetStruct, dim in zip(netStructureList, netInputDimList):
 			#newNet = flexable_Model(dim, NetStruct)
-			newNet = basicNetwork(costFunction, data, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim)
+			newNet = basicNetwork(costFunction, dat, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim, max_epoch=self.max_epoch)
 			#newNet.to(self.device)		# store the network weights in gpu or cpu device
 			self.networkList.append(newNet)
 
@@ -53,6 +62,7 @@ class combinedNetwork():
 
 	def info(self, printOut=True):
 		info_str = 'All Networks\n' 
+		info_str += '\tBatch size: %.d: '%self.batch_size
 		for j, net in enumerate(self.networkList):
 			single_info_str = 'Networks %d\n'%j 
 			single_info_str += net.info(printOut=False)
@@ -97,7 +107,9 @@ class combinedNetwork():
 				else: main_loss = all_losses
 
 				main_loss.backward()
-				for opt in netOptimizers: opt.step()
+				self.optimizer_steps_order(netOptimizers)
+				#for opt in netOptimizers: opt.step()
+
 				loss_history.append(main_loss.item())
 	
 			loss_avg = np.array(loss_history).mean()

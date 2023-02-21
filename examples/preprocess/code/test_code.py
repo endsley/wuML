@@ -4,6 +4,7 @@ import sys
 import os
   
 code_list = []
+code_list.append('split_data_to_train_test.py')
 code_list.append('deal_with_missing_data.py')
 code_list.append('get_N_samples_from_each_class.py')
 code_list.append('map_data_to_between_0_and_1.py')

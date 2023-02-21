@@ -75,6 +75,14 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	else: return outS
 
 
+def block_matrix_concatenate(matrix_list, spacing='\t'):
+	
+	strList = []
+	for m in matrix_list:
+		M = wuml.ensure_numpy(m)
+		strList.append(pretty_np_array(M).strip())
+
+	return block_string_concatenate(strList, spacing=spacing)
 
 def block_string_concatenate(strList, spacing='\t'):
 	all_concat = ''

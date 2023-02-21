@@ -234,7 +234,7 @@ class basicNetwork:
 		info_str ='Network Info:\n'
 		info_str += '\tLearning rate: %.3f\n'%self.lr
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
-		info_str += '\tCost Function: %s\n'%str(self.costFunction)
+		info_str += '\tCost Function: %s\n'%str(self.costFunction.__name__)
 		info_str += '\tTrain Loop Callback: %s\n'%str(self.on_new_epoch_call_back)
 		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
 		info_str += '\tNetwork Structure\n'

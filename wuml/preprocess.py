@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn import preprocessing
 import pandas as pd
 import numpy as np
-import sys
-import os
 
 #if os.path.exists('/home/chieh/code/wPlotLib'):
 #	sys.path.insert(0,'/home/chieh/code/wPlotLib')
@@ -226,7 +231,19 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 	if type(data).__name__ == 'wData' and data.Y is not None: Y = data.Y
 	if Y is None: raise ValueError('Error: The label Y is currently None, did you define it?')
 
-	X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
+	input_dat_list = [X, Y]
+
+	if type(data).__name__ == 'wData':
+		if len(data.extra_data_dictionary['numpy']) > 0:
+			input_dat_list.extend(data.extra_data_dictionary['numpy'])
+
+	split_list = train_test_split(*input_dat_list, test_size=test_percentage, random_state=42)
+	#X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
+	X_train = split_list[0]
+	X_test = split_list[1]
+	y_train = split_list[2]
+	y_test = split_list[3]
+	
 
 	if data_path is not None:
 		Train_dat = data_path + data_name + '_train.csv'
@@ -252,12 +269,19 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 			XTrain_df.to_csv(Train_dat, index=False, header=True)
 			XTest_df.to_csv(Test_dat, index=False, header=True)
 
-	X_train = ensure_wData(X_train, column_names=data.df.columns)
+	# if there are extra data for training
+	if len(split_list) > 4:	xDat = split_list[4:][::2]	# get all the training extra data
+	else: xDat = None
+
+	X_train = ensure_wData(X_train, column_names=data.df.columns, extra_data=xDat)
 	X_train.Y = y_train
 	X_train.label_type = data.label_type
 	X_train.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
 
-	X_test = ensure_wData(X_test, column_names=data.df.columns)
+	if len(split_list) > 4:	xDat = split_list[4:][1::2]	# get all the test extra data
+	else: xDat = None
+
+	X_test = ensure_wData(X_test, column_names=data.df.columns, extra_data=xDat)
 	X_test.Y = y_test
 	X_test.label_type = data.label_type
 	X_test.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)

@@ -62,9 +62,13 @@ def costFunction(all_data, all_networks):
 #
 	return [total_loss, CE_loss, Regress_loss]
 
+def optimizer_steps_order(all_optimizers):
+	#	The optimizers are in the order of the network structure you originally defined
+	opt1 = all_optimizers[0]
+	opt2 = all_optimizers[1]
 
-
-
+	opt2.step()
+	opt1.step()
 
 
 #	This data has both regression and classification labels (3 classes)
@@ -83,8 +87,9 @@ netStructureList.append([(100,'relu'),(3,'none')])
 netStructureList.append([(50,'relu'),(1,'none')])
 netInputDimList = [13, 3]
 
-cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, max_epoch=2000,
-							on_new_epoch_call_back=status_printing,
+cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
+							optimizer_steps_order=optimizer_steps_order,
+							max_epoch=2000, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
 cNet.fit()

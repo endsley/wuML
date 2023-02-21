@@ -35,6 +35,7 @@ pip install wuml
 ### Data Preprocessing
 [Obtain sample weight based on label likelihood](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/weight_sample_by_rarity.ipynb) \
 [Show histogram of a feature](https://github.com/endsley/wuML/blob/main/examples/data_stats/ipynb/show_feature_histogram.ipynb) \
+[Basic Split data into Training Test](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/split_data_to_train_test.ipynb) \
 [Split data into Training Test + Look at the histogram of their labels](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_histogram.ipynb) \
 [Split data into Training Test + Run a basic Neural Network](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/train_test_on_basic_network.ipynb)\
 \

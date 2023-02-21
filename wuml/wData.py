@@ -29,7 +29,8 @@ class wData:
 					label_type=None, label2_type=None, #it should be either 'continuous' or 'discrete'
 					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
-					batch_size=32, randomly_shuffle_batch=True, columns_to_ignore=None,
+					columns_to_ignore=None, mv_columns_to_extra_data=None,
+					batch_size=32, randomly_shuffle_batch=True, 
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
 			first_row_is_label :  True of False
@@ -42,6 +43,7 @@ class wData:
 			extra_data: is a list of data that can be appended to the dataset, it has to be the same number of samples as X and y, if not a list, then it will be casted into a list
 			extra_data_preprocessing is a list of lists including commands to preprocess, e.g., given 2 extra data [['center and scale'],['ensure_ proper discrete labels']]
 			path_prefix: string or list, if list, automatically goes through potential folders where the data might be
+			mv_columns_to_extra_data: a list of column names 
 		'''
 		self.path_prefix = path_prefix
 		self.label_column_name = label_column_name
@@ -54,10 +56,12 @@ class wData:
 		self.xpath = xpath
 		self.column_names = column_names
 		self.Y = None
+
+		self.mv_columns_to_extra_data = mv_columns_to_extra_data
 		self.extra_data_preprocessing = extra_data_preprocessing
 		self.extra_data_dictionary = {}
 		self.extra_data_dictionary['extra_data'] = extra_data
-		self.extra_data_dictionary['numpy'] = []
+		self.extra_data_dictionary['numpy'] = self.xDat = []
 		self.extra_data_dictionary['df'] = []
 
 
@@ -81,7 +85,10 @@ class wData:
 
 	def format_extra_data_based_on_input_type(self):
 		extra_data = self.extra_data_dictionary['extra_data']
-		if extra_data is None: return 
+		if extra_data is None and self.mv_columns_to_extra_data is None: return 
+		if extra_data is None and self.mv_columns_to_extra_data is not None: extra_data = []								# make sure extra_data is a list 
+		if wtype(self.mv_columns_to_extra_data) == 'str': self.mv_columns_to_extra_data = [self.mv_columns_to_extra_data]	# make sure it is in list format
+
 
 		if wtype(extra_data) == 'str': 		#if string, it is the load path
 			pth = wuml.append_prefix_to_path(self.path_prefix, extra_data)
@@ -89,6 +96,11 @@ class wData:
 
 		if wtype(extra_data) != 'list': 
 			extra_data = [extra_data]
+
+		if self.mv_columns_to_extra_data is not None:
+			for col in self.mv_columns_to_extra_data:
+				extra_data.append(self.pop_column(col))
+
 
 		if wtype(self.extra_data_preprocessing) == 'str':
 			self.extra_data_preprocessing = [[self.extra_data_preprocessing]]
@@ -105,7 +117,7 @@ class wData:
 						Dat_np = LabelEncoder().fit_transform(Dat_np)	#Make sure label start from 0
 
 			self.extra_data_dictionary['numpy'].append(ensure_numpy(Dat_np))
-			self.extra_data_dictionary['df'].append(ensure_DataFrame(Dat_np))
+			#self.extra_data_dictionary['df'].append(ensure_DataFrame(Dat_np))
 
 	def format_data_based_on_input_type(self, X_npArray, dataFrame, columns_to_ignore):
 		first_row_is_label = self.first_row_is_label

@@ -41,15 +41,15 @@ def DF_display_side_by_side(*args,titles=cycle([''])):
 	display_html(html_str,raw=True)
 
 
-def print_two_matrices_side_by_side(M1, M2, title1='', title2='', auto_print=True):
+def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print=True):
 
 	if wuml.isnotebook():			# and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
 		M1 = ensure_DataFrame(M1)
 		M2 = ensure_DataFrame(M2)
 		wuml.DF_display_side_by_side(M1, M2,titles=[title1, title2])
 	else:
-		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False)
-		eQ = wuml.pretty_np_array(M2, front_tab='', title=title2, auto_print=False)
+		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False).strip()
+		eQ = wuml.pretty_np_array(M2, front_tab='', title=title2, auto_print=False).strip()
 		wuml.block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
 
 
@@ -245,12 +245,14 @@ def write_to_current_line(txt):
 	sys.stdout.write(txt)
 	sys.stdout.flush()
 
-def clear_previous_line():
-	clear_current_line()
-	sys.stdout.write("\r")
-	sys.stdout.write("\033[F")
-	sys.stdout.flush()
-	clear_current_line()
+def clear_previous_line(num_of_lines=None):
+	if num_of_lines is None: num_of_lines = 1
+	for i in range(num_of_lines):
+		clear_current_line()
+		sys.stdout.write("\r")
+		sys.stdout.write("\033[F")
+		sys.stdout.flush()
+		clear_current_line()
 
 def loss_optimization_printout(db, epoch, avgLoss, avgGrad, epoc_loop, slope):
 	sys.stdout.write("\r\t\t%d/%d, MaxLoss : %f, AvgGra : %f, progress slope : %f" % (epoch, epoc_loop, avgLoss, avgGrad, slope))

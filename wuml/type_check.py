@@ -22,6 +22,15 @@ def type_check_with_error(data, desired_type, function_name=''):
 		raise ValueError('For function %s, you must input type as %s'%(function_name, desired_type))
 
 
+def ensure_column(data):
+	X = ensure_numpy(data)
+	if len(X.shape) == 1:
+		X = X.expand_dim().T
+
+	elif len(X.shape) == 2:
+		if X.shape[0] == 1:
+			X = X.T
+	return X
 
 def is_binary_label(data):
 	y = ensure_numpy(data)
@@ -81,23 +90,23 @@ def ensure_list(data):
 		return npD.tolist()
 
 
-def ensure_wData(data, column_names=None):
+def ensure_wData(data, column_names=None, extra_data=None):
 	if wtype(data) == 'ndarray': 
-		return wuml.wData(X_npArray=data, column_names=column_names)
+		return wuml.wData(X_npArray=data, column_names=column_names, extra_data=extra_data)
 	elif wtype(data) == 'Index': 
 		ArrayType = np.array(data.tolist())
-		return wuml.wData(X_npArray=ArrayType, column_names=column_names)
+		return wuml.wData(X_npArray=ArrayType, column_names=column_names, extra_data=extra_data)
 	elif wtype(data) == 'wData': 
 		return data
 	elif wtype(data) == 'DataFrame': 
-		return wuml.wData(dataFrame=data, column_names=column_names)
+		return wuml.wData(dataFrame=data, column_names=column_names, extra_data=extra_data)
 	elif wtype(data) == 'Tensor': 
 		X = data.detach().cpu().numpy()
-		return wuml.wData(X_npArray=X, column_names=column_names)
+		return wuml.wData(X_npArray=X, column_names=column_names, extra_data=extra_data)
 	elif wtype(data) == 'dimension_reduction': 
-		return wuml.wData(X_npArray=data.Ӽ)
+		return wuml.wData(X_npArray=data.Ӽ, extra_data=extra_data)
 	elif wtype(data) == 'Series': 
-		return wuml.wData(X_npArray=data.to_numpy(), column_names=column_names)
+		return wuml.wData(X_npArray=data.to_numpy(), column_names=column_names, extra_data=extra_data)
 
 def ensure_DataFrame(data, columns=None, index=None):
 	columns = ensure_list(columns)
