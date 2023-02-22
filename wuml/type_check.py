@@ -17,6 +17,12 @@ def cast_each_item_in_list_as(list_of_data, cast_type):
 
 	return casted_list
 
+def get_function_name(function):
+	if callable(function):
+		return function.__name__
+	else:
+		return 'None'
+
 def type_check_with_error(data, desired_type, function_name=''):
 	if wtype(data) != desired_type:
 		raise ValueError('For function %s, you must input type as %s'%(function_name, desired_type))

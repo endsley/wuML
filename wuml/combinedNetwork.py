@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 class combinedNetwork():
-	def __init__(self, data, netStructureList, netInputDimList, costFunction, optimizer_steps_order, 
+	def __init__(self, data, netStructureList, netInputDimList, costFunction, optimizer_steps_order=None, 
 						early_exit_loss_threshold=0.0000001, 
 						on_new_epoch_call_back = None, network_behavior_on_call=None,
 						max_epoch=1000, 	
@@ -52,24 +52,33 @@ class combinedNetwork():
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
 		for NetStruct, dim in zip(netStructureList, netInputDimList):
-			#newNet = flexable_Model(dim, NetStruct)
-			newNet = basicNetwork(costFunction, dat, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim, max_epoch=self.max_epoch)
-			#newNet.to(self.device)		# store the network weights in gpu or cpu device
+			newNet = flexable_Model(dim, NetStruct)
+			newNet.to(self.device)		# store the network weights in gpu or cpu device
+			#newNet = basicNetwork(costFunction, dat, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim, max_epoch=self.max_epoch)
 			self.networkList.append(newNet)
 
 		self.info()
 
-
 	def info(self, printOut=True):
 		info_str = 'All Networks\n' 
-		info_str += '\tBatch size: %.d: '%self.batch_size
+		info_str += '\tBatch size: %.d: \n'%self.batch_size
+		info_str += '\tLearning rate: %.3f\n'%self.lr
+		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
+		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
+		info_str += '\toptimizer_steps_order Function: %s\n'%wuml.get_function_name(self.optimizer_steps_order)
+		info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
+		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
+
 		for j, net in enumerate(self.networkList):
-			single_info_str = 'Networks %d\n'%j 
-			single_info_str += net.info(printOut=False)
-			info_str += wuml.append_same_string_infront_of_block_of_string('\t', single_info_str)
+			info_str += '\tNetworks %d Structure\n'%(j) 
+
+			for i in net.children():
+				try: info_str += ('\t\t%s , %s\n'%(i,i.activation))
+				except: info_str += ('\t\t%s \n'%(i))
 
 		if printOut: wuml.jupyter_print(info_str)
 		return info_str
+
 
 	def fit(self, print_status=True):
 		netParams = []
@@ -107,8 +116,10 @@ class combinedNetwork():
 				else: main_loss = all_losses
 
 				main_loss.backward()
-				self.optimizer_steps_order(netOptimizers)
-				#for opt in netOptimizers: opt.step()
+				if self.optimizer_steps_order is None:
+					for opt in netOptimizers: opt.step()
+				else:
+					self.optimizer_steps_order(netOptimizers)
 
 				loss_history.append(main_loss.item())
 	

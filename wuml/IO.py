@@ -55,7 +55,7 @@ def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print
 
 
 
-def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=3, latex=False, endString='', testing_mode=''):
+def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=1, latex=False, endString=None, testing_mode=''):
 	cmds = wuml.get_commandLine_input()
 	if testing_mode == 'disabled' or cmds[1] == 'disabled': return
 
@@ -87,6 +87,7 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 		elif wtype(value) == 'str': 
 			value = value.replace('\r','<br>')
 			value = value.replace('\n','<br>')
+			value = value.replace('\t','&nbsp &nbsp')
 			if latex:
 				display(Math(r'%s'%value))
 			else:
@@ -101,7 +102,7 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 		if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 		print(value)
 
-	print(endString)
+	if endString is not None: print(endString)
 
 def set_terminal_print_options(precision=3):
 	np.set_printoptions(precision=precision)
@@ -388,7 +389,7 @@ class summarize_classification_result:
 	
 		if y.shape[0] == 1: y = y.T
 		if ŷ.shape[0] == 1: ŷ = ŷ.T
-		
+
 		self.y = y
 		self.ŷ = ŷ
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
@@ -401,7 +402,6 @@ class summarize_classification_result:
 				avgE = self.avg_error()
 				jupyter_print('The average classification error is %.4f'%avgE)
 	
-
 			if is_binary_label(y):
 				P = wuml.precision(self.y, self.ŷ)
 				R = wuml.recall(self.y, self.ŷ)
