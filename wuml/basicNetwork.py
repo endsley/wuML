@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import collections
 from wuml import wtype
+import marshal
 
 class flexable_Model(torch.nn.Module):
 	#	Note that currently batch normalization is automatically included, so eval must be called before running test data
@@ -161,13 +162,13 @@ class basicNetwork:
 	def __init__(self, costFunction, X, 
 						Y=None, networkStructure=[(3,'relu'),(3,'relu'),(3,'none')], early_exit_loss_threshold=0.000000001, 
 						on_new_epoch_call_back = None, max_epoch=1000, 	X_dataType=torch.FloatTensor, 
-						Y_dataType=torch.FloatTensor, learning_rate=0.001, simplify_network_for_storage=None,
+						Y_dataType=torch.FloatTensor, learning_rate=0.001, pickled_network_info=None,
 						network_usage_output_type='Tensor', network_usage_output_dim='none', network_info_print=True,
 						override_network_input_width_as=None): 
 		'''
 			X : This should be wData type
 			possible activation functions: softmax, relu, tanh, sigmoid, none
-			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
+			pickled_network_info: if a network info package is passed as this argument, we create a new network strip of unnecessary stuff
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
@@ -175,7 +176,7 @@ class basicNetwork:
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
 		self.early_exit_loss_threshold = early_exit_loss_threshold
-		if simplify_network_for_storage is None:
+		if pickled_network_info is None:
 			#	X should be in wuml format
 			self.trainLoader = X.get_data_as('DataLoader')
 
@@ -200,13 +201,13 @@ class basicNetwork:
 			self.costFunction = costFunction
 			self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 
-			θ = simplify_network_for_storage
-			self.lr = θ.lr
-			self.max_epoch = θ.max_epoch
-			self.X_dataType = θ.X_dataType
-			self.Y_dataType = θ.Y_dataType
-			self.NetStructure = θ.NetStructure
-			self.model = θ.model
+			θ = pickled_network_info
+			self.lr = θ['lr']
+			self.max_epoch = θ['max_epoch']
+			self.X_dataType = θ['X_dataType']
+			self.Y_dataType = θ['Y_dataType']
+			self.NetStructure = θ['NetStructure']
+			self.model = θ['model']
 			self.network_output_in_CPU_during_usage = True
 
 		if torch.cuda.is_available(): 
@@ -224,6 +225,22 @@ class basicNetwork:
 			print("\n the data label_type should not be continuous when using 'CE' as costFunction during classification!!!\n")
 		elif costFunction == 'hindge' and X.label_type == 'continuous':
 			print("\n the data label_type should not be continuous when using 'hindge' as costFunction during classification!!!\n")
+
+	def output_network_data_for_storage(self):
+		net = {}
+		net['name'] = self.__class__.__name__
+		net['cfunction'] = marshal.dumps(self.costFunction.__code__)
+		if self.on_new_epoch_call_back is None: net['on_new_epoch_call_back'] = None
+		else: net['on_new_epoch_call_back'] = marshal.dumps(self.on_new_epoch_call_back.__code__)
+
+		net['lr'] = self.lr
+		net['max_epoch'] = self.max_epoch
+		net['X_dataType'] = self.X_dataType
+		net['Y_dataType'] = self.Y_dataType
+		net['NetStructure'] = self.NetStructure
+		net['model'] = self.model
+		net['network_output_in_CPU_during_usage'] = self.network_output_in_CPU_during_usage
+		return net
 
 
 	def parameters(self):

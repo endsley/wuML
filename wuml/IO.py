@@ -15,6 +15,7 @@ import numpy as np
 import wuml
 
 import wplotlib
+import marshal
 import pandas as pd
 from pathlib import Path
 from sklearn.metrics import accuracy_score
@@ -147,6 +148,30 @@ def read_txt_file(path):
 	content = f.read()
 	f.close()
 	return content
+
+def save_torch_network(network_obj, path):
+	N = network_obj
+	netData  = N.output_network_data_for_storage()
+	pickle_dump(netData, path)
+
+def load_torch_network(path):
+	netData = pickle_load(path)
+
+	if netData['name'] == 'basicNetwork':
+		net = wuml.basicNetwork(None, None, pickled_network_info=netData)
+
+	return net
+
+#Then in the remote process (after transferring code_string):
+#
+#import marshal, types
+#
+#code = marshal.loads(code_string)
+#func = types.FunctionType(code, globals(), "some_func_name")
+#
+#func(10)  # gives 100
+
+
 
 def pickle_dump(obj, path):
 	pickle.dump( obj, open( path, "wb" ) )
@@ -340,16 +365,16 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 
 
 class summarize_regression_result:
-	def __init__(self, y, ŷ):
-		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
-		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
+	def __init__(self, y, ŷ, rounding=3):
+		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=rounding))
+		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=rounding))
 	
 		if y.shape[0] == 1: y = y.T
 		if ŷ.shape[0] == 1: ŷ = ŷ.T
 		
 		self.y = y
 		self.ŷ = ŷ
-		self.Δy = np.absolute(self.ŷ - self.y)
+		self.Δy = np.round(np.absolute(self.ŷ - self.y), 3)
 		self.mean_absolute_error = self.avg_error()
 
 	def avg_error(self):
@@ -396,7 +421,6 @@ class summarize_classification_result:
 		self.ŷ = ŷ
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
 		self.Δy = np.absolute(self.ŷ - self.y)
-
 
 		self.accuracy = self.avg_error()
 		if len(np.unique(self.y)) == 2: 

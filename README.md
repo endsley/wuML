@@ -49,7 +49,8 @@ pip install wuml
 [Get data subset with N samples from each Class](https://github.com/endsley/wuML/blob/main/examples/preprocess/ipynb/get_N_samples_from_each_class.ipynb) 
 
 ### Build Neural Networks via Pytorch
-[Simple Regression with/without Batch Normalization](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
+[Simple Regression with/without Batch Normalization + saving the network](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/basicRegression.ipynb) \
+[Loading a saved and trained network for usage](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/load_use_network.ipynb) \
 [Weighted Regression](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/weighted_regression.ipynb) \
 [Using HSIC as an objective with batch samples](https://github.com/endsley/wuML/blob/main/examples/NeuralNet/ipynb/HSIC_as_objective.ipynb) \ 
 \
