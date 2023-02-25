@@ -66,7 +66,7 @@ def optimizer_steps_order(all_optimizers):
 	#	The optimizers are in the order of the network structure you originally defined
 	opt1 = all_optimizers[0]
 	opt2 = all_optimizers[1]
-
+#
 	opt2.step()
 	opt1.step()
 
@@ -100,7 +100,7 @@ CR = wuml.summarize_classification_result(data.Y, labels)
 wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
 
 SR = wuml.summarize_regression_result(Y2, ŷᵦ)
-Reg_result = SR.true_vs_predict(print_result=False)
+Reg_result = SR.true_vs_predict(print_out=False)
 wuml.jupyter_print(Reg_result, display_all_rows=True)
 
 

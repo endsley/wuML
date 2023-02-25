@@ -23,6 +23,8 @@ class autoencoder():
 			possible activation functions: softmax, relu, tanh, sigmoid, none
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 		'''
+		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
+
 		self.X = X
 		bottleneck_size = int(bottleneck_size)
 
@@ -263,17 +265,17 @@ class autoencoder():
 				print('\n')
 				break;
 			if print_status:
-				#num_elements = (self.X.batch_size*self.X.shape[1])
-				if wtype(all_losses) == 'list':
-					l1 = loss_avg
-					l2 = np.array(recons_loss_list).mean()
-					l3 = np.array(objective_loss_list).mean()
-
-					txt = '\tepoch: %d, Total Loss/dimension: %.4f, Reconstruct loss: %.4f, Objective loss: %.4f, Learning Rate: %.8f'%((epoch+1), l1, l2, l3, enc_scheduler._last_lr[0])
-					write_to_current_line(txt)
-				else:
-					txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
-					write_to_current_line(txt)
+				if get_commandLine_input()[1] != 'disabled': 
+					if wtype(all_losses) == 'list':
+						l1 = loss_avg
+						l2 = np.array(recons_loss_list).mean()
+						l3 = np.array(objective_loss_list).mean()
+	
+						txt = '\tepoch: %d, Total Loss/dimension: %.4f, Reconstruct loss: %.4f, Objective loss: %.4f, Learning Rate: %.8f'%((epoch+1), l1, l2, l3, enc_scheduler._last_lr[0])
+						write_to_current_line(txt)
+					else:
+						txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
+						write_to_current_line(txt)
 	
 			if on_new_epoch_call_back is not None:
 				on_new_epoch_call_back(loss_avg, (epoch+1), enc_scheduler._last_lr[0])

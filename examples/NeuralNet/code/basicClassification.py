@@ -43,7 +43,7 @@ bNet.train(print_status=False)
 Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
 CR = wuml.summarize_classification_result(data.Y, Ŷ)
 wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
-wuml.jupyter_print(CR.true_vs_predict(sort_based_on_label=True, print_result=False))
+CR.true_vs_predict(sort_by='label', print_out=True)
 
 
 

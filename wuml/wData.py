@@ -242,7 +242,7 @@ class wData:
 
 		self.df.columns = update_col_names
 
-	def sort_by(self, column_name, ascending=True):
+	def sort_by(self, column_name, ascending=False):
 		self.df = self.df.sort_values(column_name, ascending=ascending)
 		self.update_DataFrame(self.df)
 

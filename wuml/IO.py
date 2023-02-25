@@ -323,7 +323,6 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 		wplotlib.histograms(Δy, num_bins=15, title='Histogram of Errors', xlabel='Error Amount', ylabel='Error count',
 					facecolor='blue', α=0.5, path=None)
 
-
 	df = pd.DataFrame(np.hstack((y, ŷ, Δy)), columns=['y', 'ŷ', 'Δy'])
 	if sort_by == 'error':
 		df = df.sort_values('Δy', ascending=ascending)
@@ -332,11 +331,12 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 	elif sort_by == 'output':
 		df = df.sort_values('ŷ', ascending=ascending)
 
-	if 'true label vs prediction table' in print_out:
-		jupyter_print(df, display_all_rows=True, display_all_columns=True)
+	if not wuml.isnotebook():
+		if 'true label vs prediction table' in print_out:
+			jupyter_print(df, display_all_rows=True, display_all_columns=True)
 	
-	if write_path is not None: wuml.write_to(C, write_path)
-	return df
+	if write_path is not None: wuml.write_to(str(df), write_path)
+	return wuml.ensure_wData(df)
 
 
 class summarize_regression_result:
@@ -349,9 +349,8 @@ class summarize_regression_result:
 		
 		self.y = y
 		self.ŷ = ŷ
-		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
-
 		self.Δy = np.absolute(self.ŷ - self.y)
+		self.mean_absolute_error = self.avg_error()
 
 	def avg_error(self):
 		Δy = self.Δy
@@ -362,23 +361,26 @@ class summarize_regression_result:
 		Δy = self.Δy
 		avg_Δ = 'Avg error: %.4f\n\n'%(np.sum(Δy)/Δy.shape[0])
 	
-		H = wplotlib.histograms()
-		H.histogram(Δy, num_bins=15, title='Histogram of Errors', 
+		H = wplotlib.histograms(Δy, num_bins=15, title='Histogram of Errors', 
 					xlabel='Error Amount', ylabel='Error count',
 					facecolor='blue', α=0.5, path=None)
 		
-	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=False):
-		#A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
-		A = np.array([['y', 'ŷ']])
-		if sort_based_on_label:
-			Yjoing = np.hstack((self.y, np.round(self.ŷ,3)))
-			sorted_df = wuml.sort_matrix_rows_by_a_column(Yjoing, 0)
-			#B = wuml.pretty_np_array(sorted_df.values)
-			B = sorted_df.values
-		else: 
-			B = np.hstack((self.y, self.ŷ))
+	def true_vs_predict(self, write_path=None, sort_by='none', ascending=False, print_out=False):
+		cnames = np.array(['y', 'ŷ', 'Δy'])
+		Yjoin = np.hstack((self.y, self.ŷ, self.Δy))
+		df = pd.DataFrame(Yjoin, columns=cnames)
 
-		return wuml.ensure_wData(np.vstack((A,B)))
+		if sort_by == 'error':
+			df = df.sort_values('Δy', ascending=ascending)
+		elif sort_by == 'label':
+			df = df.sort_values('y', ascending=ascending)
+		elif sort_by == 'output':
+			df = df.sort_values('ŷ', ascending=ascending)
+
+		if print_out:
+			jupyter_print(df)
+
+		return wuml.ensure_wData(df)
 
 
 class summarize_classification_result:
@@ -395,42 +397,47 @@ class summarize_classification_result:
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
 		self.Δy = np.absolute(self.ŷ - self.y)
 
+
+		self.accuracy = self.avg_error()
+		if len(np.unique(self.y)) == 2: 
+			self.Precision = wuml.precision(self.y, self.ŷ)
+			self.Recall = wuml.recall(self.y, self.ŷ)
+
 		if wuml.get_commandLine_input()[1] == 'disabled': return
 		# Printing out the result
 		if print_out is not None:
 			if 'avg error' in print_out:
-				avgE = self.avg_error()
-				jupyter_print('The average classification error is %.4f'%avgE)
+				jupyter_print('The average classification error is %.4f'%self.accuracy)
 	
 			if is_binary_label(y):
-				P = wuml.precision(self.y, self.ŷ)
-				R = wuml.recall(self.y, self.ŷ)
-				jupyter_print('Precision: %.4f (probability that a positive prediction is correct)'%avgE)
-				jupyter_print('Recall: %.4f (probability that we catch a positive event)'%avgE)
+				jupyter_print('Precision: %.4f (probability that a positive prediction is correct)'%self.Precision)
+				jupyter_print('Recall: %.4f (probability that we catch a positive event)'%self.Recall)
 
 			if 'true v predict labels' in print_out:
-				self.true_vs_predict(print_result=True)
+				self.true_vs_predict(print_out=True)
 
 	def avg_error(self):
 		Acc= accuracy_score(self.y, self.ŷ)
 		return Acc
 		
-	def true_vs_predict(self, write_path=None, sort_based_on_label=False, print_result=False):
-		A = wuml.pretty_np_array(np.array([['y', 'ŷ']]))
+	def true_vs_predict(self, add_to_label='', write_path=None, sort_by='none', ascending=False, print_out=False):
+		cnames = np.array(['y'+add_to_label, 'ŷ'+ add_to_label, 'Δy'+add_to_label])
+		Yjoin = np.hstack((self.y, self.ŷ, self.Δy))
+		df = pd.DataFrame(Yjoin, columns=cnames)
 
-		if sort_based_on_label:
-			Yjoing = np.hstack((self.y, self.ŷ))
-			sorted_df = wuml.sort_matrix_rows_by_a_column(Yjoing, 0)
-			B = wuml.pretty_np_array(sorted_df.values)
-		else: B = wuml.pretty_np_array(np.hstack((self.y, self.ŷ)))
-		avg_Δ = 'Avg error: %.4f\n\n'%(self.avg_error())
-		C = avg_Δ + A + B
-	
-		if print_result: print(C)
-		if write_path is not None: 
-			wuml.write_to(C, write_path)
+		if sort_by == 'error':
+			df = df.sort_values('Δy', ascending=ascending)
+		elif sort_by == 'label':
+			df = df.sort_values('y', ascending=ascending)
+		elif sort_by == 'output':
+			df = df.sort_values('ŷ', ascending=ascending)
 
-		return C
+		if print_out:
+			jupyter_print(df)
+
+		return wuml.ensure_wData(df)
+
+
 	
 
 class result_table:

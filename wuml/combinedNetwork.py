@@ -10,12 +10,15 @@ class combinedNetwork():
 						on_new_epoch_call_back = None, network_behavior_on_call=None,
 						max_epoch=1000, 	
 						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
-						network_usage_output_type='Tensor', learning_rate=0.001):
+						network_usage_output_type='Tensor', learning_rate=0.001, lr_decay_rate=0.5, lr_decay_patience=50):
 		'''
 			data: must be a wData
 			netStructureList: must be a list, can have multiple networks all working together
 			on_new_epoch_call_back: end of each epoch calls this function
+			lr_decay_rate: the current lr multiply by this value to decay, 1 would be no decay
+			lr_decay_patience: the number of epochs which sees no improvement then trigger decay
 		'''
+		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
 		dat = wuml.ensure_wData(data)
 
 		self.batch_size = data.batch_size
@@ -42,6 +45,8 @@ class combinedNetwork():
 
 		self.trainLoader = dat.get_data_as('DataLoader')
 		self.lr = learning_rate
+		self.lr_decay_patience = lr_decay_patience
+		self.lr_decay_rate = lr_decay_rate
 		self.max_epoch = max_epoch
 		self.early_exit_loss_threshold = early_exit_loss_threshold
 
@@ -88,7 +93,9 @@ class combinedNetwork():
 		for net in self.networkList:
 			params = net.parameters()
 			optimizer = torch.optim.Adam(params, lr=self.lr)
-			scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=0.5, min_lr=1e-10, patience=50, verbose=False)
+			scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( optimizer, factor=self.lr_decay_rate, min_lr=1e-10, patience=50, verbose=False)	
+					# factor is the decay rate
+					# patience is how many epoch until trigger decay
 
 			netParams.append(params)
 			netSchedulers.append(scheduler)
@@ -134,8 +141,9 @@ class combinedNetwork():
 				if self.on_new_epoch_call_back is not None:
 					self.on_new_epoch_call_back(all_losses, (epoch+1), netSchedulers[0]._last_lr[0])
 				else:
-					txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
-					write_to_current_line(txt)
+					if get_commandLine_input()[1] != 'disabled': 
+						txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
+						write_to_current_line(txt)
 
 	def __call__(self, data, output_type='Tensor', out_structural=None):
 		'''
