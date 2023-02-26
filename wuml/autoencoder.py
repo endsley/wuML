@@ -14,7 +14,7 @@ class autoencoder():
 	def __init__(self, bottleneck_size, X, Y=None, mask=None, costFunction=None,
 						EncoderStructure=None, DecoderStructure=None, encoder_output_weight_structure=None, 
 						default_depth=4, default_activation_function='relu',
-						early_exit_loss_threshold=0.0000001, 
+						early_exit_loss_threshold=0.0000001, pickled_network_info=None,
 						on_new_epoch_call_back = None, max_epoch=1000, 	
 						X_dataType=None, Y_dataType=None, network_usage_output_type='Tensor',
 						learning_rate=0.001):
@@ -24,43 +24,59 @@ class autoencoder():
 			simplify_network_for_storage: if a network is passed as this argument, we create a new network strip of unnecessary stuff
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
-
-		self.X = X
-		bottleneck_size = int(bottleneck_size)
-
-		if EncoderStructure is None or DecoderStructure is None:
-			[self.encoder_structure, self.decoder_structure] = self.get_default_encoder_decoder(X, bottleneck_size, default_depth, default_activation_function)
-		else:
-			self.encoder_structure = EncoderStructure
-			self.decoder_structure = DecoderStructure
-
-
-		self.encoder = flexable_Model(X.shape[1], self.encoder_structure)
-		self.decoder = flexable_Model(bottleneck_size, self.decoder_structure)
-		if encoder_output_weight_structure is None:
-			self.midcoder = None
-		else:
-			self.midcoder = flexable_Model(bottleneck_size, encoder_output_weight_structure)
-
-		self.trainLoader = X.get_data_as('DataLoader')
-
-		self.network_usage_output_type = network_usage_output_type
-		self.lr = learning_rate
-		self.max_epoch = max_epoch
-		self.early_exit_loss_threshold = early_exit_loss_threshold
-
-		# use the default wData type unless strictly set to something else
-		# if label is discrete, Y should default set to torch.LongTensor for integer values
-		if X_dataType is not None: self.X_dataType = X_dataType
-		else: self.X_dataType = X.xtorchDataType
-		if Y_dataType is not None: self.Y_dataType = Y_dataType
-		else: self.Y_dataType = X.ytorchDataType
-
-
-		if costFunction is None: costFunction = torch.nn.MSELoss()
-		else: self.costFunction = costFunction
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-		self.network_output_in_CPU_during_usage = False
+
+		# 	if we are loading a saved network from pickle, the behavior would be different
+		if pickled_network_info is None:
+			self.X = X
+			bottleneck_size = int(bottleneck_size)
+	
+			if EncoderStructure is None or DecoderStructure is None:
+				[self.encoder_structure, self.decoder_structure] = self.get_default_encoder_decoder(X, bottleneck_size, default_depth, default_activation_function)
+			else:
+				self.encoder_structure = EncoderStructure
+				self.decoder_structure = DecoderStructure
+	
+	
+			self.encoder = flexable_Model(X.shape[1], self.encoder_structure)
+			self.decoder = flexable_Model(bottleneck_size, self.decoder_structure)
+			if encoder_output_weight_structure is None:
+				self.midcoder = None
+			else:
+				self.midcoder = flexable_Model(bottleneck_size, encoder_output_weight_structure)
+	
+			self.trainLoader = X.get_data_as('DataLoader')
+	
+			self.network_usage_output_type = network_usage_output_type
+			self.lr = learning_rate
+			self.max_epoch = max_epoch
+			self.early_exit_loss_threshold = early_exit_loss_threshold
+	
+			# use the default wData type unless strictly set to something else
+			# if label is discrete, Y should default set to torch.LongTensor for integer values
+			if X_dataType is not None: self.X_dataType = X_dataType
+			else: self.X_dataType = X.xtorchDataType
+			if Y_dataType is not None: self.Y_dataType = Y_dataType
+			else: self.Y_dataType = X.ytorchDataType
+	
+	
+			if costFunction is None: costFunction = torch.nn.MSELoss()
+			else: self.costFunction = costFunction
+			self.network_output_in_CPU_during_usage = False
+		else:
+			pDat = pickled_network_info
+			self.costFunction = pDat['costFunction']
+	
+			self.lr = pDat['lr']
+			self.max_epoch = pDat['max_epoch']
+			self.encoder_structure = pDat['encoder_structure']
+			self.decoder_structure = pDat['decoder_structure']
+	
+			self.encoder = pDat['encoder']
+			self.decoder = pDat['decoder']
+			self.midcoder = pDat['midcoder']
+
+
 
 		if torch.cuda.is_available(): 
 			self.device = 'cuda'
@@ -74,13 +90,33 @@ class autoencoder():
 		self.info()
 
 
+	def output_network_data_for_storage(self):
+		net = {}
+		net['name'] = self.__class__.__name__
+		net['costFunction'] = marshal.dumps(self.costFunction.__code__)
+
+		net['lr'] = self.lr
+		net['max_epoch'] = self.max_epoch
+		net['X_dataType'] = self.X_dataType
+		net['Y_dataType'] = self.Y_dataType
+
+		net['encoder_structure'] = self.encoder_structure
+		net['decoder_structure'] = self.decoder_structure
+
+		net['encoder'] = self.encoder
+		net['decoder'] = self.decoder
+		net['midcoder'] = self.midcoder
+
+		return net
+
+
 	def info(self, printOut=True):
 		 
 		info_str ='Autoencoder Info:\n'
 		info_str += '\tLearning rate: %.3f\n'%self.lr
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
-		info_str += '\tCost Function: %s\n'%str(self.costFunction)
-		info_str += '\tTrain Loop Callback: %s\n'%str(self.on_new_epoch_call_back)
+		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
+		if self.on_new_epoch_call_back is not None: info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
 		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
 		info_str += '\tEncoder Structure\n'
 		for i in self.encoder.children():

@@ -36,14 +36,13 @@ def costFunction(x, y, ŷ, ind):
 #You can define a costFunction, but for classification it can be directly set to 'CE'
 #bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
 bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(100,'relu'),(100,'relu'),(3,'none')], 
-						Y_dataType=torch.LongTensor, max_epoch=100, learning_rate=0.001)
+						Y_dataType=torch.LongTensor, max_epoch=400, learning_rate=0.001)
 bNet.train(print_status=False)
 
 #	Report Results
 Ŷ = bNet(data.X, output_type='ndarray', out_structural='1d_labels')
 CR = wuml.summarize_classification_result(data.Y, Ŷ)
-wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
-CR.true_vs_predict(sort_by='label', print_out=True)
+
 
 
 

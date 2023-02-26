@@ -36,7 +36,7 @@ def network_behavior_on_call(all_data, all_networks):
 	ŷₐ = net1(X)
 	ŷᵦ = net2(ŷₐ)
 #
-	labels = wuml.softmax(ŷₐ)
+	labels = wuml.softmax(ŷₐ, turn_into_label=True)
 	return [labels, ŷᵦ]
 
 
@@ -89,15 +89,18 @@ netInputDimList = [13, 3]
 
 cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
 							optimizer_steps_order=optimizer_steps_order,
-							max_epoch=2000, on_new_epoch_call_back=status_printing,
+							max_epoch=1000, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
 cNet.fit()
 [labels, ŷᵦ] = cNet(data)
 
+#	Note that we will save this network for later use, check load_use_network.py file 
+wuml.save_torch_network(cNet, './ComplexNet.pk')
+
 
 CR = wuml.summarize_classification_result(data.Y, labels)
-wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
+#wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
 
 SR = wuml.summarize_regression_result(Y2, ŷᵦ)
 Reg_result = SR.true_vs_predict(print_out=False)

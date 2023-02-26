@@ -45,6 +45,7 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 AE = wuml.autoencoder(12, data, default_depth=2, costFunction=costFunction, # costFunction and costFunction2 both works
 						max_epoch=2000, encoder_output_weight_structure=[(3,'none')] ) 
 AE.fit()
+wuml.save_torch_network(AE, './autoencoder.pk')
 
 #	Notice that the reconstruction did a reasonable job
 ŷ = AE(data)

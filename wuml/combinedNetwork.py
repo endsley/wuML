@@ -5,9 +5,9 @@ import torch
 import numpy as np
 
 class combinedNetwork():
-	def __init__(self, data, netStructureList, netInputDimList, costFunction, optimizer_steps_order=None, 
+	def __init__(self, data, netStructureList, netInputDimList, costFunction, network_behavior_on_call, optimizer_steps_order=None, 
 						early_exit_loss_threshold=0.0000001, 
-						on_new_epoch_call_back = None, network_behavior_on_call=None,
+						on_new_epoch_call_back = None, pickled_network_info=None,
 						max_epoch=1000, 	
 						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
 						network_usage_output_type='Tensor', learning_rate=0.001, lr_decay_rate=0.5, lr_decay_patience=50):
@@ -17,52 +17,85 @@ class combinedNetwork():
 			on_new_epoch_call_back: end of each epoch calls this function
 			lr_decay_rate: the current lr multiply by this value to decay, 1 would be no decay
 			lr_decay_patience: the number of epochs which sees no improvement then trigger decay
+			network_behavior_on_call:  what happens if you call  net(data) after instantiation
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
-		dat = wuml.ensure_wData(data)
 
-		self.batch_size = data.batch_size
-		self.netStructureList = netStructureList
-		self.netInputDimList = netInputDimList
-		self.costFunction = costFunction
-		self.optimizer_steps_order = optimizer_steps_order
 		self.network_behavior_on_call = network_behavior_on_call
-		self.networkList = []
-
-		self.X_dataType = X_dataType
-		self.Y_dataType = Y_dataType
-		self.extra_dataType=extra_dataType
-		if wtype(extra_dataType) != 'list' and extra_dataType is not None:
-			self.extra_dataType = [extra_dataType]
-
-		# double check that extra data is properly defined
-		if dat.extra_data_dictionary['extra_data'] is not None:
-			if extra_dataType is None:
-				ValueError('Error: If you have extra data within input, define the extra_dataType parameter as a list of data types.')
-			if len(dat.extra_data_dictionary['extra_data']) != len(extra_dataType):
-				raise ValueError('Error: If you have extra data within input, you must have a list of the same length for extra_dataType, e.g., extra_dataType=[torch.FloatTensor, torch.LongTensor]')
-
-
-		self.trainLoader = dat.get_data_as('DataLoader')
-		self.lr = learning_rate
-		self.lr_decay_patience = lr_decay_patience
-		self.lr_decay_rate = lr_decay_rate
-		self.max_epoch = max_epoch
-		self.early_exit_loss_threshold = early_exit_loss_threshold
-
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
-		self.network_output_in_CPU_during_usage = False
+		self.costFunction = costFunction
 
 
 		if torch.cuda.is_available(): self.device = 'cuda'
 		else: self.device = 'cpu'
-		for NetStruct, dim in zip(netStructureList, netInputDimList):
-			newNet = flexable_Model(dim, NetStruct)
-			newNet.to(self.device)		# store the network weights in gpu or cpu device
-			#newNet = basicNetwork(costFunction, dat, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim, max_epoch=self.max_epoch)
-			self.networkList.append(newNet)
+
+		if pickled_network_info is None:
+			dat = wuml.ensure_wData(data)
+	
+			self.batch_size = data.batch_size
+			self.netStructureList = netStructureList
+			self.netInputDimList = netInputDimList
+			self.optimizer_steps_order = optimizer_steps_order
+			self.networkList = []
+	
+			self.X_dataType = X_dataType
+			self.Y_dataType = Y_dataType
+			self.extra_dataType=extra_dataType
+			if wtype(extra_dataType) != 'list' and extra_dataType is not None:
+				self.extra_dataType = [extra_dataType]
+	
+			# double check that extra data is properly defined
+			if dat.extra_data_dictionary['extra_data'] is not None:
+				if extra_dataType is None:
+					ValueError('Error: If you have extra data within input, define the extra_dataType parameter as a list of data types.')
+				if len(dat.extra_data_dictionary['extra_data']) != len(extra_dataType):
+					raise ValueError('Error: If you have extra data within input, you must have a list of the same length for extra_dataType, e.g., extra_dataType=[torch.FloatTensor, torch.LongTensor]')
+	
+	
+			self.trainLoader = dat.get_data_as('DataLoader')
+			self.lr = learning_rate
+			self.lr_decay_patience = lr_decay_patience
+			self.lr_decay_rate = lr_decay_rate
+			self.max_epoch = max_epoch
+			self.early_exit_loss_threshold = early_exit_loss_threshold
+	
+
+			for NetStruct, dim in zip(netStructureList, netInputDimList):
+				newNet = flexable_Model(dim, NetStruct)
+				newNet.to(self.device)		# store the network weights in gpu or cpu device
+				#newNet = basicNetwork(costFunction, dat, networkStructure=NetStruct, network_info_print=False, override_network_input_width_as=dim, max_epoch=self.max_epoch)
+				self.networkList.append(newNet)
+
+		else:
+			self.lr = pickled_network_info['lr']
+			self.max_epoch = pickled_network_info['max_epoch']
+			self.netStructureList = pickled_network_info['netStructureList'] 
+			self.networkList = pickled_network_info['networkList']
+			self.extra_dataType = pickled_network_info['extra_dataType']
+			self.batch_size = 32
 
 		self.info()
+
+
+	def output_network_data_for_storage(self):
+		net = {}
+		net['name'] = self.__class__.__name__
+		net['network_behavior_on_call'] = marshal.dumps(self.network_behavior_on_call.__code__)
+		net['costFunction'] = marshal.dumps(self.costFunction.__code__)
+
+		#if self.on_new_epoch_call_back is None: net['on_new_epoch_call_back'] = None
+		#else: net['on_new_epoch_call_back'] = marshal.dumps(self.on_new_epoch_call_back.__code__)
+
+		net['lr'] = self.lr
+		net['max_epoch'] = self.max_epoch
+		net['X_dataType'] = self.X_dataType
+		net['Y_dataType'] = self.Y_dataType
+		net['netStructureList'] = self.netStructureList
+		net['networkList'] = self.networkList
+		net['extra_dataType'] = self.extra_dataType
+
+		return net
+
 
 	def info(self, printOut=True):
 		info_str = 'All Networks\n' 
@@ -70,8 +103,7 @@ class combinedNetwork():
 		info_str += '\tLearning rate: %.3f\n'%self.lr
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
 		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
-		info_str += '\toptimizer_steps_order Function: %s\n'%wuml.get_function_name(self.optimizer_steps_order)
-		info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
+		if self.on_new_epoch_call_back is not None: info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
 		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
 
 		for j, net in enumerate(self.networkList):
@@ -144,13 +176,14 @@ class combinedNetwork():
 					if get_commandLine_input()[1] != 'disabled': 
 						txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
 						write_to_current_line(txt)
+		wuml.jupyter_print('\n')
+
 
 	def __call__(self, data, output_type='Tensor', out_structural=None):
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
 
-		if self.network_behavior_on_call is None: return 
 		X = ensure_tensor(data, dataType=torch.FloatTensor)
 		y = ensure_tensor(data.Y, dataType=torch.FloatTensor)
 		formatted_data = [X,y]

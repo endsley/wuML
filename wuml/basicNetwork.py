@@ -229,9 +229,9 @@ class basicNetwork:
 	def output_network_data_for_storage(self):
 		net = {}
 		net['name'] = self.__class__.__name__
-		net['cfunction'] = marshal.dumps(self.costFunction.__code__)
-		if self.on_new_epoch_call_back is None: net['on_new_epoch_call_back'] = None
-		else: net['on_new_epoch_call_back'] = marshal.dumps(self.on_new_epoch_call_back.__code__)
+		#net['cfunction'] = marshal.dumps(self.costFunction.__code__)
+		#if self.on_new_epoch_call_back is None: net['on_new_epoch_call_back'] = None
+		#else: net['on_new_epoch_call_back'] = marshal.dumps(self.on_new_epoch_call_back.__code__)
 
 		net['lr'] = self.lr
 		net['max_epoch'] = self.max_epoch

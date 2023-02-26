@@ -39,4 +39,4 @@ from .distance_between_distributions import *
 from .measure import *
 from .autoencoder import *
 from .combinedNetwork import *
-from .loss_functions import *
+from .torch_functions import *

@@ -15,7 +15,7 @@ import numpy as np
 import wuml
 
 import wplotlib
-import marshal
+import marshal, types
 import pandas as pd
 from pathlib import Path
 from sklearn.metrics import accuracy_score
@@ -159,15 +159,22 @@ def load_torch_network(path):
 
 	if netData['name'] == 'basicNetwork':
 		net = wuml.basicNetwork(None, None, pickled_network_info=netData)
+	elif netData['name'] == 'combinedNetwork':
+		code = marshal.loads(netData['network_behavior_on_call'])
+		network_behavior_on_call = types.FunctionType(code, globals(), "network_behavior_on_call")
+
+		code = marshal.loads(netData['costFunction'])
+		costFunction = types.FunctionType(code, globals(), "costFunction")
+		net = wuml.combinedNetwork(None, None, None, costFunction, network_behavior_on_call, pickled_network_info=netData)
+	elif netData['name'] == 'autoencoder':
+		code = marshal.loads(netData['costFunction'])
+		costFunction = types.FunctionType(code, globals(), "costFunction")
+		net = wuml.autoencoder(None, None, costFunction=costFunction, pickled_network_info=netData)
+	else:
+		raise ValueError('\n\tError loading torch network: %s is unrecognized network class'%netData['name'])
 
 	return net
 
-#Then in the remote process (after transferring code_string):
-#
-#import marshal, types
-#
-#code = marshal.loads(code_string)
-#func = types.FunctionType(code, globals(), "some_func_name")
 #
 #func(10)  # gives 100
 
@@ -249,11 +256,13 @@ def remove_files(folder_path):	# make sure to end the path with /
 #	Terminal Printing
 
 def print_status(percent):
+	if get_commandLine_input()[1] == 'disabled': return
 	clear_current_line()
 	write_to_current_line('Completion Status: %.3f'%percent)
 	sys.stdout.flush()
 
 def clear_current_line():
+	if get_commandLine_input()[1] == 'disabled': return
 	#print(..., end="")
 	#sys.stdout.write('\033[2K\033[1G')
 	sys.stdout.write("\r")		#jump to the beginning of line
@@ -272,6 +281,7 @@ def write_to_current_line(txt):
 	sys.stdout.flush()
 
 def clear_previous_line(num_of_lines=None):
+	if get_commandLine_input()[1] == 'disabled': return
 	if num_of_lines is None: num_of_lines = 1
 	for i in range(num_of_lines):
 		clear_current_line()
@@ -365,7 +375,7 @@ def output_regression_result(y, ŷ, write_path=None, sort_by='none', ascending=F
 
 
 class summarize_regression_result:
-	def __init__(self, y, ŷ, rounding=3):
+	def __init__(self, y, ŷ, print_out=['avg absolute error', 'true v predict'], rounding=3):
 		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=rounding))
 		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=rounding))
 	
@@ -376,6 +386,21 @@ class summarize_regression_result:
 		self.ŷ = ŷ
 		self.Δy = np.round(np.absolute(self.ŷ - self.y), 3)
 		self.mean_absolute_error = self.avg_error()
+
+		if print_out is not None:
+			if 'avg absolute error' in print_out:
+				jupyter_print('Mean Absolute Error: %.4f'%self.mean_absolute_error)
+
+			if 'true v predict' in print_out:
+				self.true_vs_predict(print_out=True)
+
+		self.check_for_errors(print_out)
+
+	def check_for_errors(self, print_out):
+		for i in print_out:
+			if i not in ['avg absolute error', 'true v predict']:
+				raise ValueError('\n\tError in summarize_regression_result: %s is not recognized print_out option'%i)
+
 
 	def avg_error(self):
 		Δy = self.Δy
@@ -409,7 +434,7 @@ class summarize_regression_result:
 
 
 class summarize_classification_result:
-	def __init__(self, y, ŷ, print_out=['avg error', 'true v predict labels']):
+	def __init__(self, y, ŷ, print_out=['accuracy', 'true v predict labels']):
 
 		y = np.atleast_2d(wuml.ensure_numpy(y, rounding=2))
 		ŷ = np.atleast_2d(wuml.ensure_numpy(ŷ, rounding=2))
@@ -422,7 +447,7 @@ class summarize_classification_result:
 		self.side_by_side_Y = np.hstack((self.y, self.ŷ))
 		self.Δy = np.absolute(self.ŷ - self.y)
 
-		self.accuracy = self.avg_error()
+		self.accuracy = self.get_accuracy()
 		if len(np.unique(self.y)) == 2: 
 			self.Precision = wuml.precision(self.y, self.ŷ)
 			self.Recall = wuml.recall(self.y, self.ŷ)
@@ -430,8 +455,8 @@ class summarize_classification_result:
 		if wuml.get_commandLine_input()[1] == 'disabled': return
 		# Printing out the result
 		if print_out is not None:
-			if 'avg error' in print_out:
-				jupyter_print('The average classification error is %.4f'%self.accuracy)
+			if 'accuracy' in print_out:
+				jupyter_print('Classification Accuracy: %.4f'%self.accuracy)
 	
 			if is_binary_label(y):
 				jupyter_print('Precision: %.4f (probability that a positive prediction is correct)'%self.Precision)
@@ -440,7 +465,14 @@ class summarize_classification_result:
 			if 'true v predict labels' in print_out:
 				self.true_vs_predict(print_out=True)
 
-	def avg_error(self):
+		self.check_for_errors(print_out)
+
+	def check_for_errors(self, print_out):
+		for i in print_out:
+			if i not in ['accuracy', 'true v predict labels']:
+				raise ValueError('Error in summarize_classification_result: %s is not recognized print_out option'%i)
+
+	def get_accuracy(self):
 		Acc= accuracy_score(self.y, self.ŷ)
 		return Acc
 		
@@ -457,7 +489,7 @@ class summarize_classification_result:
 			df = df.sort_values('ŷ', ascending=ascending)
 
 		if print_out:
-			jupyter_print(df)
+			jupyter_print(df, display_all_rows=True, display_all_columns=True)
 
 		return wuml.ensure_wData(df)
 
