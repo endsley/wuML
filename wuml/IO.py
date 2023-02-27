@@ -86,14 +86,15 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 			str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 			display(HTML(data=str2html))
 		elif wtype(value) == 'str': 
-			value = value.replace('\r','<br>')
-			value = value.replace('\n','<br>')
-			value = value.replace('\t','&nbsp &nbsp')
+			#value = value.replace('\r','<br>')
+			#value = value.replace('\n','<br>')
+			#value = value.replace('\t','&nbsp &nbsp')
 			if latex:
 				display(Math(r'%s'%value))
 			else:
-				str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
-				display(HTML(data=str2html))
+				wuml.write_to_current_line(value)
+				#str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
+				#display(HTML(data=str2html))
 		else:
 			if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 			print(value)
@@ -397,6 +398,7 @@ class summarize_regression_result:
 		self.check_for_errors(print_out)
 
 	def check_for_errors(self, print_out):
+		if print_out is None: return
 		for i in print_out:
 			if i not in ['avg absolute error', 'true v predict']:
 				raise ValueError('\n\tError in summarize_regression_result: %s is not recognized print_out option'%i)
@@ -419,6 +421,12 @@ class summarize_regression_result:
 		cnames = np.array(['y', 'ŷ', 'Δy'])
 		Yjoin = np.hstack((self.y, self.ŷ, self.Δy))
 		df = pd.DataFrame(Yjoin, columns=cnames)
+
+		# round the data frame decimals correctly
+		y_ndeci = len(str(np.squeeze(self.y)[0]).split('.')[1])
+		ŷ_ndeci = len(str(np.squeeze(self.ŷ)[0]).split('.')[1])
+		Δy_ndeci = len(str(np.squeeze(self.Δy)[0]).split('.')[1])
+		df = df.round({'y':y_ndeci, 'ŷ':ŷ_ndeci, 'Δy':Δy_ndeci})
 
 		if sort_by == 'error':
 			df = df.sort_values('Δy', ascending=ascending)
@@ -468,6 +476,7 @@ class summarize_classification_result:
 		self.check_for_errors(print_out)
 
 	def check_for_errors(self, print_out):
+		if print_out is None: return
 		for i in print_out:
 			if i not in ['accuracy', 'true v predict labels']:
 				raise ValueError('Error in summarize_classification_result: %s is not recognized print_out option'%i)

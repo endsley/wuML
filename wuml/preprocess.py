@@ -272,7 +272,7 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 	# if there are extra data for training
 	if len(split_list) > 4:	xDat = split_list[4:][::2]	# get all the training extra data
 	else: xDat = None
-
+	
 	X_train = ensure_wData(X_train, column_names=data.df.columns, extra_data=xDat)
 	X_train.Y = y_train
 	X_train.label_type = data.label_type

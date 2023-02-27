@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 
 import numpy as np
 import wuml
@@ -20,7 +26,7 @@ def generate_data_from_same_distribution(n=30, with_regression=True, distributio
 		Y.append(y)
 	
 	if with_regression:
-		dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
+		dat = wuml.wData(X_npArray=X, Y_npArray=Y, column_names=['A','B','C','D'], label_type='continuous')
 		dat.to_csv('shap_regress_example_gaussian.csv', add_row_indices=False, include_column_names=True)
 	else:
 		Y = np.array(Y)
@@ -28,7 +34,7 @@ def generate_data_from_same_distribution(n=30, with_regression=True, distributio
 		Y[Y > m] = 1
 		Y[Y < m] = 0
 	
-		dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
+		dat = wuml.wData(X_npArray=X, Y_npArray=Y, column_names=['A','B','C','D'], label_type='discrete')
 		dat.to_csv('shap_classifier_example.csv', add_row_indices=False, include_column_names=True)
 
 def generate_data_from_diff_distribution(n=30, with_regression=True):
@@ -49,16 +55,16 @@ def generate_data_from_diff_distribution(n=30, with_regression=True):
 		Y.append(y)
 	
 	if with_regression:
-		dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
-		dat.to_csv('shap_regress_example_mix_distributions.csv', add_row_indices=False, include_column_names=True)
+		dat = wuml.wData(X_npArray=X, Y_npArray=Y, first_row_is_label=True, column_names=['A','B','C','D'])
+		dat.to_csv('shap_regress_example_mix_distributions.csv', add_row_indices=False, include_column_names=True, label_type='continuous')
 	else:
 		Y = np.array(Y)
 		m = np.mean(Y)
 		Y[Y > m] = 1
 		Y[Y < m] = 0
 	
-		dat = wuml.wData(X_npArray=X, Y_npArray=Y, row_id_with_label=0, column_names=['A','B','C','D'])
+		dat = wuml.wData(X_npArray=X, Y_npArray=Y, first_row_is_label=True, column_names=['A','B','C','D'], label_type='discrete')
 		#dat.to_csv('shap_classifier_example.csv', add_row_indices=False, include_column_names=True)
 
 
-generate_data_from_diff_distribution(n=30, with_regression=True)
+generate_data_from_same_distribution(n=30, with_regression=False)

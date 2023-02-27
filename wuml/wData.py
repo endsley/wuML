@@ -134,6 +134,7 @@ class wData:
 		elif X_npArray is not None:
 			if wtype(self.column_names) == 'str': self.column_names = [self.column_names]
 			self.df = pd.DataFrame(X_npArray, columns=self.column_names)
+
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
 	
@@ -161,7 +162,7 @@ class wData:
 
 		# as long as label is needed, we must designate continuous or discrete labels
 		if not np.all(np.array([Y_npArray, ypath, label_column_name, label_column_id]) == None):
-			if self.label_type is None: raise ValueError('If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
+			if self.label_type is None: raise ValueError('\n\tError : If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
 
 		if Y_npArray is not None:
 			self.Y = Y_npArray
@@ -372,10 +373,10 @@ class wData:
 
 		if type(item).__name__ == 'str': 
 			return self.get_columns(item)
-		elif type(item).__name__ == 'tuple': 
+		elif type(item).__name__ == 'tuple' or type(item).__name__ == 'int' or type(item).__name__ == 'slice': 
 			return ensure_wData(self.df.iloc[item])
 		else:
-			raise ValueError('Error: recognized input, wData must be [0:3] or [0:2, 0:3] format. You can also get the column by string')
+			raise ValueError('Error: unrecognized input %s, wData must be [0:3] or [0:2, 0:3] format. You can also get the column by string'%type(item))
 
 	def __str__(self): 
 		return str(self.df)

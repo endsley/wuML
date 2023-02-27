@@ -61,10 +61,10 @@ def ensure_label(data, y=None, y_column_name=None):
 
 	return Y
 
-def ensure_data_type(data, type_name='ndarray'):
+def ensure_data_type(data, type_name='ndarray', ensure_column_format=True):
 
 	if type_name=='ndarray':
-		return ensure_numpy(data)
+		return ensure_numpy(data, ensure_column_format=ensure_column_format)
 	elif type_name=='DataFrame':
 		return ensure_DataFrame(data)
 	elif type_name=='Tensor':
@@ -138,10 +138,10 @@ def ensure_DataFrame(data, columns=None, index=None):
 	return df
 
 
-def ensure_numpy(data, rounding=None):
+def ensure_numpy(data, rounding=None, ensure_column_format=True):
 
 	if wtype(data) == 'ndarray': 
-		if len(data.shape) == 1:
+		if ensure_column_format and len(data.shape) == 1:
 			X = np.atleast_2d(data).T
 		else:
 			X = data

@@ -37,10 +37,12 @@ class classification:
 	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=True, 	
 				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
 				reduce_dimension_first_method=None, # 'LDA'
+				output_y_as='column_format',
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2,
 				accuracy_rounding=3, regularization_weight=1):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
+		self.output_y_as = output_y_as
 
 		self.X_train = None
 		self.data = data
@@ -63,15 +65,16 @@ class classification:
 			if wuml.wtype(test_data) == 'wData': self.X_test = test_data.X
 			elif wuml.wtype(test_data) == 'ndarray': self.X_test = test_data
 			
-			if testY is None: y_test = test_data.Y
-			else:y_test = testY
+			if testY is None: self.y_test = test_data.Y
+			else: self.y_test = testY
 			split_train_test = True
 		else:
 			if split_train_test:
-				self.X_train, self.X_test, self.y_train, y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
+				self.X_train, self.X_test, self.y_train, self.y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
 			else:
 				self.X_train = NP(X)
 				self.y_train = NP(y)
+
 
 		#Check for dimension reduction, example LDA+SVM
 		cfname = classifier.split('+')
@@ -119,7 +122,7 @@ class classification:
 
 		if split_train_test:
 			self.ŷ_test = model.predict(NP(self.X_test))
-			self.Test_acc = NPR(wuml.accuracy(S(NP(y_test)), self.ŷ_test), accuracy_rounding)
+			self.Test_acc = NPR(wuml.accuracy(S(NP(self.y_test)), self.ŷ_test), accuracy_rounding)
 
 		#import pdb; pdb.set_trace()
 		self.split_train_test = split_train_test
@@ -214,7 +217,11 @@ class classification:
 		try: [self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
 		except: self.ŷ = self.model.predict(X)
 
-		self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
+		if self.output_y_as == 'column_format':
+			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
+		else:
+			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__, ensure_column_format=False)
+
 		try: return [self.ŷ, self.σ]
 		except: return self.ŷ
 
