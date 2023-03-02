@@ -38,11 +38,11 @@ class regression:
 	'''
 
 	def __init__(self, data, y=None, y_column_name=None, split_train_test=True, regressor='GP',  
-				alpha=0.5, gamma=1, l1_ratio=0.5, network_info_print=False, output_y_as='column_format',
+				alpha=0.5, gamma=1, l1_ratio=0.5, network_info_print=False, 
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
 		NP = ensure_numpy
 		S = np.squeeze
-		self.output_y_as = output_y_as
+		self.explainer_mode = False
 
 		X = NP(data)
 		y = ensure_label(data, y=y, y_column_name=y_column_name)
@@ -217,10 +217,10 @@ class regression:
 		except:
 			self.ŷ = self.model.predict(X)
 
-		if self.output_y_as == 'column_format':
-			return ensure_data_type(self.ŷ, type_name=type(data).__name__)
-		else:
+		if self.explainer_mode:
 			return ensure_data_type(self.ŷ, type_name=type(data).__name__, ensure_column_format=False)
+		else:
+			return ensure_data_type(self.ŷ, type_name=type(data).__name__)
 
 		
 

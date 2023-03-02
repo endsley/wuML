@@ -15,27 +15,30 @@ from wuml.type_check import *
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space='', round_value=3):
 
 	cName = None
-	if wtype(m) =='DataFrame': cName = ensure_numpy(m.columns)
+	if wtype(m) =='DataFrame': 
+		out_str = str(m.round(round_value))
+	else:
+		cName = ensure_numpy(m.columns)
 
-	m = wuml.ensure_numpy(m)
-	try: m = np.round(m, round_value)
-	except: pass
-	if cName is not None: m = np.vstack((cName,m))
-	m = str(m)
-
-	if verticalize:
-		if len(m.shape) == 1:
-			m = np.atleast_2d(m).T
-
-	out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
-	out_str = str(out_str).replace('.]',']')
-
-	if type(title).__name__ == 'str':
-		L1 = out_str.split('\n')
-		L1_max_width = len(max(L1, key=len))
-		t1 = str.center(title, L1_max_width)
-		out_str = t1 + '\n' + out_str
-
+		m = wuml.ensure_numpy(m)
+		try: m = np.round(m, round_value)
+		except: pass
+		if cName is not None: m = np.vstack((cName,m))
+		m = str(m)
+	
+		if verticalize:
+			if len(m.shape) == 1:
+				m = np.atleast_2d(m).T
+	
+		out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
+		out_str = str(out_str).replace('.]',']')
+	
+		if type(title).__name__ == 'str':
+			L1 = out_str.split('\n')
+			L1_max_width = len(max(L1, key=len))
+			t1 = str.center(title, L1_max_width)
+			out_str = t1 + '\n' + out_str
+	
 	if auto_print: wuml.jupyter_print(out_str)
 	else: return out_str
 

@@ -37,12 +37,11 @@ class classification:
 	def __init__(self, data, y=None, test_data=None, testY=None, y_column_name=None, split_train_test=True, 	
 				classifier='GP', kernel='rbf', 	# kernels = 'rbf', 'linear'
 				reduce_dimension_first_method=None, # 'LDA'
-				output_y_as='column_format',
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001, q=2,
 				accuracy_rounding=3, regularization_weight=1):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
-		self.output_y_as = output_y_as
+		self.explainer_mode = False
 
 		self.X_train = None
 		self.data = data
@@ -115,7 +114,7 @@ class classification:
 		else: raise ValueError('Unrecognized Classifier')
 
 		NPR = np.round
-
+		
 		model.fit(NP(self.X_train), S(NP(self.y_train)))
 		self.ŷ_train = model.predict(NP(self.X_train))
 		self.Train_acc = NPR(wuml.accuracy(S(NP(self.y_train)), self.ŷ_train), accuracy_rounding)
@@ -217,10 +216,10 @@ class classification:
 		try: [self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
 		except: self.ŷ = self.model.predict(X)
 
-		if self.output_y_as == 'column_format':
-			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
-		else:
+		if self.explainer_mode:
 			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__, ensure_column_format=False)
+		else:
+			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
 
 		try: return [self.ŷ, self.σ]
 		except: return self.ŷ

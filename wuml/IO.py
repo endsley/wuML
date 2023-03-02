@@ -55,7 +55,6 @@ def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print
 
 
 
-
 def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=1, latex=False, endString=None, testing_mode=''):
 	cmds = wuml.get_commandLine_input()
 	if testing_mode == 'disabled' or cmds[1] == 'disabled': return
@@ -103,7 +102,6 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 	else:
 		if wtype(value) == 'Tensor': value = wuml.ensure_numpy(value)
 		print(value)
-
 	if endString is not None: print(endString)
 
 def set_terminal_print_options(precision=3):

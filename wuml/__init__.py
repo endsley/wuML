@@ -19,7 +19,7 @@ from .run_k_fold_on_function import *
 from .sampling import *
 from .operations import *
 from .matrix_manipulate import *
-#from .explainer import *
+from .explainer import *
 from .dimension_reduction import *
 from .system import *
 from .regression import *

@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+import os 
+import sys
+
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 
 import torch
 import numpy as np
@@ -172,6 +179,7 @@ class basicNetwork:
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
+		self.explainer_mode = False
 
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
@@ -271,19 +279,22 @@ class basicNetwork:
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
-
 		if out_structural is None: out_structural = self.out_structural
-		if type(data).__name__ == 'ndarray': 
+		if wtype(data) == 'ndarray': 
 			x = torch.from_numpy(data)
 			x = Variable(x.type(self.X_dataType), requires_grad=False)
 			x= x.to(self.device, non_blocking=True )
-		elif type(data).__name__ == 'Tensor': 
+		elif wtype(data) == 'Tensor': 
 			x = data
 			x= x.to(self.device, non_blocking=True )
-		elif type(data).__name__ == 'wData': 
+		elif wtype(data) == 'wData': 
 			x = data.get_data_as('Tensor')
+		elif wtype(data)=='DataFrame':
+			x = torch.from_numpy(data.values)
+			x = Variable(x.type(self.X_dataType), requires_grad=False)
+			x= x.to(self.device, non_blocking=True )
 		else:
-			raise
+			raise ValueError('\n\tError torch network input as %s is unrecognized'%wtype(data))
 
 		yout = self.model(x)
 
@@ -307,7 +318,14 @@ class basicNetwork:
 		elif self.network_output_in_CPU_during_usage:
 			return yout.detach().cpu()
 
-		return yout
+		if self.explainer_mode:
+			yout = wuml.ensure_numpy(yout)
+			yout = np.squeeze(wuml.ensure_numpy(yout))
+			if len(yout.shape) == 0: yout = np.array([yout])
+			return yout
+		else:
+			return yout
+
 
 	def eval(self, output_type='ndarray', out_structural=None):		#	Turn this on to run test results
 		self.network_usage_output_type = output_type

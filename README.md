@@ -75,15 +75,8 @@ pip install wuml
 [Unsupervised Filtering via HSIC](https://github.com/endsley/wuML/blob/main/examples/feature_selection/ipynb/selection_by_hsic.ipynb) 
 
 ### Explaining Models
-[Run Default Shap explainer (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/default_regression_explainer.ipynb) \
-[Run Shap on data between 0 and 1 (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_uniform.ipynb) 
-	(Examples of a good result since data is between 0 and 1) \
-[Run Shap on data of Normal Distribution (Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/regression_pytorch_explainer_gaussian.ipynb) 
-	(Examples of a bad result since data can be negative or positive)\
-[Run Shap on data of mixed Distributions that are mapped into distribution between 0 and 1(Regression)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/comparing_shap_results_on_different_data_distributions.ipynb) \
-	(Examples of dealing with data of mixed distribution all map into uniform)\
-\
-[Run Shap Classification](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/classification_pytorch_explainer_uniform.ipynb) 
+[Run basic Shap/lime explainer (Regression/Classification)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/basic_shap_lime_explainer.ipynb) \
+[Run basic Shap/lime explainer on basic network](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/basicNN_explainer.ipynb) 
 
 
 ### Regression / Classification
