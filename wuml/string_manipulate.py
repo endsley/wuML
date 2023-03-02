@@ -32,8 +32,8 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 	
 		out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
 		out_str = str(out_str).replace('.]',']')
-	
-		if type(title).__name__ == 'str':
+
+		if wtype(title) == 'str':
 			L1 = out_str.split('\n')
 			L1_max_width = len(max(L1, key=len))
 			t1 = str.center(title, L1_max_width)

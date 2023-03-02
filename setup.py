@@ -46,6 +46,8 @@ setup(
 		  'ppscore',
           'numpy==1.21.4', 
 		  'ipython',
+		  'ipywidgets',
+		  'interpret',
 		  'imbalanced-learn',
           'pandas',
 		  'xgboost',

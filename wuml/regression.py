@@ -3,6 +3,8 @@ import os
 import sys
 if os.path.exists('/home/chieh/code/wPlotLib'):
 	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -208,9 +210,8 @@ class regression:
 		return df
 
 
-
 	def __call__(self, data):
-		X = ensure_numpy(data)	
+		X = ensure_proper_model_input_format(data)
 
 		try:
 			[self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)

@@ -197,7 +197,15 @@ def ensure_tensor(data, dataType=torch.FloatTensor):
 	return X
 
 
+def ensure_proper_model_input_format(data):
+	X = ensure_numpy(data)	
+	if len(X.shape) == 2:
+		if X.shape[1] == 1:
+			X = X.T
+	if len(X.shape) == 1:
+		X = np.expand_dims(X, axis=0)
 
+	return X
 
 
 if __name__ == "__main__":

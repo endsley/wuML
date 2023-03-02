@@ -58,8 +58,7 @@ class explainer():
 		Dm = wuml.ensure_wData(pd.DataFrame(Dm.values(),index=Dm.keys(), columns=['Most weighted']))
 		D.sort_by('Most chosen', ascending=False)
 		Dm.sort_by('Most weighted', ascending=False)
-
-		if print_out: wuml.print_two_matrices_side_by_side(D.df, Dm.df)
+		if print_out: wuml.print_two_matrices_side_by_side(D.df, Dm.df, title1='', title2='')
 	
 		return [D, Dm]
 		
