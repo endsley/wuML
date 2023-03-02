@@ -41,7 +41,6 @@ class classification:
 				accuracy_rounding=3, regularization_weight=1):
 		NP = wuml.ensure_numpy
 		S = np.squeeze
-		self.explainer_mode = False
 
 		self.X_train = None
 		self.data = data
@@ -216,11 +215,7 @@ class classification:
 		try: [self.ŷ, self.σ] = self.model.predict(X, return_std=True, return_cov=False)
 		except: self.ŷ = self.model.predict(X)
 
-		if self.explainer_mode:
-			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__, ensure_column_format=False)
-		else:
-			self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
-
+		self.ŷ = wuml.ensure_data_type(self.ŷ, type_name=type(data).__name__)
 		try: return [self.ŷ, self.σ]
 		except: return self.ŷ
 

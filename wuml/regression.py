@@ -44,7 +44,6 @@ class regression:
 				networkStructure=[(100,'relu'),(100,'relu'),(1,'none')], max_epoch=500, learning_rate=0.001	):
 		NP = ensure_numpy
 		S = np.squeeze
-		self.explainer_mode = False
 
 		X = NP(data)
 		y = ensure_label(data, y=y, y_column_name=y_column_name)
@@ -218,12 +217,7 @@ class regression:
 		except:
 			self.ŷ = self.model.predict(X)
 
-		if self.explainer_mode:
-			return ensure_data_type(self.ŷ, type_name=type(data).__name__, ensure_column_format=False)
-		else:
-			return ensure_data_type(self.ŷ, type_name=type(data).__name__)
-
-		
+		return ensure_data_type(self.ŷ, type_name=type(data).__name__)		
 
 	def __str__(self):
 		return str(self.result_summary(print_out=False))

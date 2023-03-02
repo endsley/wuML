@@ -180,15 +180,18 @@ class autoencoder():
 				on_new_epoch_call_back = self.on_new_epoch_call_back)
 
 
-	def objective_network(self, data, output_type='wData'):
-		x = ensure_tensor(data, dataType=torch.FloatTensor)
+	def objective_network(self, data, output_type=None):
+		inputType = wtype(data)
+		
+		x = ensure_proper_model_input_format(data)
+		x = ensure_tensor(x, dataType=torch.FloatTensor)
+
 		x̂ = self.encoder(x)
 		ẙ = self.midcoder(x̂)
-
-		ẙ = ensure_data_type(ẙ, type_name=output_type)
+		ẙ = ensure_data_type(ẙ, type_name=inputType)
 		if wtype(ẙ) == 'wData': ẙ.Y = data.Y
-		return ẙ
 
+		return ẙ
 
 	def reduce_dimension(self, data, output_type='wData', outPath=None):
 		x = ensure_tensor(data, dataType=torch.FloatTensor)

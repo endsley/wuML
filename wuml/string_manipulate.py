@@ -18,9 +18,10 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 	if wtype(m) =='DataFrame': 
 		out_str = str(m.round(round_value))
 	else:
+		m = ensure_wData(m)
 		cName = ensure_numpy(m.columns)
-
 		m = wuml.ensure_numpy(m)
+
 		try: m = np.round(m, round_value)
 		except: pass
 		if cName is not None: m = np.vstack((cName,m))

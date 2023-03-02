@@ -157,6 +157,8 @@ def ensure_numpy(data, rounding=None, ensure_column_format=True):
 		X = data.detach().cpu().numpy()
 	elif wtype(data) == 'Series': 
 		X = data.values
+	elif wtype(data) == 'Int64Index': 
+		return data.to_numpy()
 	elif np.isscalar(data):
 		X = np.array([[data]])
 	elif wtype(data) == 'dimension_reduction': 
@@ -206,6 +208,9 @@ def ensure_proper_model_input_format(data):
 		X = np.expand_dims(X, axis=0)
 
 	return X
+
+
+
 
 
 if __name__ == "__main__":

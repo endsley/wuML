@@ -179,7 +179,6 @@ class basicNetwork:
 			network_usage_output_dim: network output dimension, 0, 1 or 2
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
-		self.explainer_mode = False
 
 		self.network_usage_output_type = network_usage_output_type
 		self.network_usage_output_dim = network_usage_output_dim
@@ -318,13 +317,7 @@ class basicNetwork:
 		elif self.network_output_in_CPU_during_usage:
 			return yout.detach().cpu()
 
-		if self.explainer_mode:
-			yout = wuml.ensure_numpy(yout)
-			yout = np.squeeze(wuml.ensure_numpy(yout))
-			if len(yout.shape) == 0: yout = np.array([yout])
-			return yout
-		else:
-			return yout
+		return yout
 
 
 	def eval(self, output_type='ndarray', out_structural=None):		#	Turn this on to run test results

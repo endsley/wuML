@@ -20,6 +20,7 @@ class combinedNetwork():
 			network_behavior_on_call:  what happens if you call  net(data) after instantiation
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
+		self.explainer_mode = False
 
 		self.network_behavior_on_call = network_behavior_on_call
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function

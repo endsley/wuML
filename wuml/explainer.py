@@ -8,6 +8,7 @@ if os.path.exists('/home/chieh/code/interpret'):
 	sys.path.insert(0,'/home/chieh/code/interpret')
 
 import wuml
+from wuml.type_check import *
 import numpy as np
 import pandas as pd
 
@@ -26,9 +27,23 @@ class explainer():
 		'''
 		data = wuml.ensure_wData(data)
 		model.explainer_mode = True
+
+		if wtype(model) == 'autoencoder': self.model_prediction = model.objective_network
+		else: self.model_prediction = model
 		
+
 		explain_types = {'lime':LimeTabular, 'shap':ShapKernel}
-		self.explainer = explain_types[explainer_algorithm](predict_fn=model, data=data.df)
+		self.explainer = explain_types[explainer_algorithm](predict_fn=self.model_predict_wrapper, data=data.df)
+
+	def model_predict_wrapper(self, X_input):
+		y = self.model_prediction(X_input)
+		y = ensure_numpy(y, ensure_column_format=False)
+		y = np.squeeze(y)
+
+		if len(y.shape) == 0: y = np.array([y])
+		return y
+
+
 
 	def __call__(self, data, nsamples=20, display=True):
 		data = wuml.ensure_wData(data)
