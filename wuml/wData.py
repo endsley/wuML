@@ -74,7 +74,7 @@ class wData:
 		self.shape = self.df.shape
 		self.batch_size = batch_size
 		self.torchloader = None
-		self.columns = self.df.columns
+		self.columns = self.column_names = self.df.columns		# you can use columns or column_names, they are exactly the same, columns_names is more descriptive, columns is compatible with pandas dataframe
 
 
 		self.format_label(Y_npArray=Y_npArray, ypath=ypath, label_column_name=label_column_name, label_column_id=label_column_id, encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
@@ -270,7 +270,7 @@ class wData:
 
 	def update_DataFrame(self, df):
 		self.df = df
-		self.columns = self.df.columns
+		self.columns = self.column_names = self.df.columns
 		self.X = self.df.values
 		self.shape = self.df.shape
 	
@@ -294,7 +294,7 @@ class wData:
 
 		column_names = np.squeeze(ensure_numpy(column_names)).tolist()
 		self.df.columns = column_names
-		self.columns = column_names
+		self.columns = self.column_names = column_names
 
 	def pop_column(self, column_name):
 		C = self.get_columns(column_name)
@@ -315,7 +315,7 @@ class wData:
 			if column_name in self.df.columns:
 				del self.df[column_name]
 
-		self.columns = self.df.columns
+		self.columns = self.column_names = self.df.columns
 		self.update_DataFrame(self.df)
 
 	def info(self):

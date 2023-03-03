@@ -25,6 +25,6 @@ data = wuml.wData('../../data/shap_classifier_example.csv', first_row_is_label=T
 					label_type='discrete', label_column_name='label')
 
 model = wuml.classification(data, classifier='LogisticRegression')
-E = wuml.explainer(data, model, explainer_algorithm='lime')
+E = wuml.explainer(data, model, explainer_algorithm='shap')
 exp = E(data)
 
