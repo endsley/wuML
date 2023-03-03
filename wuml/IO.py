@@ -434,7 +434,7 @@ class summarize_regression_result:
 			df = df.sort_values('ŷ', ascending=ascending)
 
 		if print_out:
-			jupyter_print(df)
+			jupyter_print(df, display_all_rows=True, display_all_columns=True)
 
 		return wuml.ensure_wData(df)
 

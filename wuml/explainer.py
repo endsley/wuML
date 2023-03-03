@@ -47,11 +47,15 @@ class explainer():
 
 
 
-	def __call__(self, data, nsamples=20, display=True):
+	def __call__(self, data, y=None, display=True):
 		data = wuml.ensure_wData(data)
 		self.column_names = data.column_names
 		
-		local_explain = self.explainer.explain_local(data.df, data.Y)
+		if y is not None:
+			local_explain = self.explainer.explain_local(data.df, y)
+		else:
+			local_explain = self.explainer.explain_local(data.df, data.Y)
+
 		if display: show(local_explain)
 
 		self.joint_table = self.feature_importance_table(local_explain, print_out=display)
@@ -59,8 +63,6 @@ class explainer():
 		return [self.joint_table, self.global_summary]
 
 	def feature_importance_table(self, local_explain, print_out=True):
-		if self.joint_table is not None: return self.joint_table
-
 		E = local_explain._internal_obj['specific']
 		explain_list = []
 		for local_explain in E:
@@ -78,7 +80,7 @@ class explainer():
 		r2 = result.reindex(columns=cnames)
 		self.joint_table = ensure_wData(r2.reset_index(drop=True))
 
-		if print_out: jupyter_print(self.joint_table, endString='\n')
+		if print_out: jupyter_print(self.joint_table, endString='\n', display_all_rows=True, display_all_columns=True)
 		return self.joint_table
 
 	def most_important_features(self, local_explain, print_out=True):
@@ -105,3 +107,14 @@ class explainer():
 	
 		return [D, Dm]
 		
+
+	def plot_individual_sample_importance(self, one_sample, y=None, sample_id=''):
+		X = ensure_proper_model_input_format(one_sample)
+		[self.joint_table, self.global_summary] = self.__call__(X, y=y, display=False)
+
+		cnames = ensure_list(self.column_names)
+		[y, ŷ, Δy] = ensure_list(np.round(self.joint_table.X, 4)[0])[-3:]
+		pred_str = 'y = %.3f\nŷ = %.3f'%(y, ŷ)
+		feature_importance = ensure_list(ensure_numpy(self.joint_table).round(4))[0]
+		feature_importance = feature_importance[0:len(feature_importance)-3]		# remove the last 3 elements cus they are ['y', 'ŷ', 'Δy']
+		B = wplotlib.bar(cnames, feature_importance, 'Sample %s: '%sample_id, 'Features', 'Importance', horizontal=True, imgText=pred_str, xTextShift=1.05, yTextShift=0)	

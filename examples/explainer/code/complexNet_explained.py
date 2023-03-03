@@ -31,13 +31,12 @@ def network_behavior_on_call(all_data, all_networks):
 	#	the rest will be what you include
 	X = all_data[0]
 	y = all_data[1]
-	y2= all_data[2]
 #
 	ŷₐ = net1(X)
 	ŷᵦ = net2(ŷₐ)
 #
 	labels = wuml.softmax(ŷₐ, turn_into_label=True)
-	return [labels, ŷᵦ]
+	return ŷᵦ
 
 
 
@@ -87,23 +86,20 @@ netStructureList.append([(100,'relu'),(3,'none')])
 netStructureList.append([(50,'relu'),(1,'none')])
 netInputDimList = [13, 3]
 
-cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
+model = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
 							optimizer_steps_order=optimizer_steps_order,
-							max_epoch=1000, on_new_epoch_call_back=status_printing,
+							max_epoch=10, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
-cNet.fit()
-[labels, ŷᵦ] = cNet(data)
-
-#	Note that we will save this network for later use, check load_use_network.py file 
-wuml.save_torch_network(cNet, './ComplexNet.pk')
-
-
-CR = wuml.summarize_classification_result(data.Y, labels)
-#wuml.jupyter_print('\nAccuracy : %.3f\n\n'%CR.avg_error())
+model.fit()
+ŷᵦ = model(data)
 
 SR = wuml.summarize_regression_result(Y2, ŷᵦ)
-Reg_result = SR.true_vs_predict(print_out=False)
-wuml.jupyter_print(Reg_result, display_all_rows=True)
+E = wuml.explainer(data, model, explainer_algorithm='shap')
+exp = E(data[0:10,:], y=Y2)
+
+sample_id = 3
+E.plot_individual_sample_importance(data[sample_id,:], y=Y2[sample_id], sample_id=sample_id)
+
 
 

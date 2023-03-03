@@ -75,7 +75,7 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	for l1, l2 in zip(L1,L2):
 		outS += ('%-' + str(max_width) + 's' + spacing + l2 + '\n') % l1
 
-	if auto_print: wuml.jupyter_print(outS)
+	if auto_print: wuml.jupyter_print(outS, display_all_rows=True, display_all_columns=True)
 	else: return outS
 
 

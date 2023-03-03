@@ -184,10 +184,14 @@ class combinedNetwork():
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
-
-		X = ensure_tensor(data, dataType=torch.FloatTensor)
-		y = ensure_tensor(data.Y, dataType=torch.FloatTensor)
-		formatted_data = [X,y]
+		data = ensure_wData(data)
+		X = ensure_proper_model_input_format(data)
+		X = ensure_tensor(X, dataType=torch.FloatTensor)
+	
+		if data.Y is None: formatted_data = [X,None]
+		else:
+			y = ensure_tensor(data.Y, dataType=torch.FloatTensor)
+			formatted_data = [X,y]
 
 
 		if wtype(data) == 'wData':
@@ -198,7 +202,13 @@ class combinedNetwork():
 					formatted_data.append(newD)
 
 		all_net_output = self.network_behavior_on_call(formatted_data, self.networkList)	
-		return wuml.cast_each_item_in_list_as(all_net_output, output_type)
+		if wtype(all_net_output) == 'list':
+			return wuml.cast_each_item_in_list_as(all_net_output, output_type)
+		elif wtype(all_net_output) == 'Tensor':
+			return ensure_data_type(all_net_output, type_name=output_type)
+		else:
+			return all_net_output
+			
 
 
 

@@ -89,12 +89,12 @@ netInputDimList = [13, 3]
 
 cNet = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
 							optimizer_steps_order=optimizer_steps_order,
-							max_epoch=1000, on_new_epoch_call_back=status_printing,
+							max_epoch=10, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
 cNet.fit()
 [labels, ŷᵦ] = cNet(data)
-
+import pdb; pdb.set_trace()
 #	Note that we will save this network for later use, check load_use_network.py file 
 wuml.save_torch_network(cNet, './ComplexNet.pk')
 
