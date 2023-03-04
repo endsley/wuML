@@ -12,6 +12,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+wuml.set_terminal_print_options(precision=3)
+
 #	This code shows how you can mix and match different networks
 #	This network simultaneously minimize CE and MSE loss
 
@@ -88,7 +90,7 @@ netInputDimList = [13, 3]
 
 model = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
 							optimizer_steps_order=optimizer_steps_order,
-							max_epoch=10, on_new_epoch_call_back=status_printing,
+							max_epoch=1000, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
 model.fit()
@@ -99,7 +101,7 @@ E = wuml.explainer(data, model, explainer_algorithm='shap')
 exp = E(data[0:10,:], y=Y2)
 
 sample_id = 3
-E.plot_individual_sample_importance(data[sample_id,:], y=Y2[sample_id], sample_id=sample_id)
+E.plot_individual_sample_importance(data[sample_id,:], y=Y2[sample_id], sample_id=sample_id, figsize=(6,10))
 
 
 

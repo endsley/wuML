@@ -27,6 +27,13 @@ class explainer():
 			data : need to be in wData
 		'''
 		data = wuml.ensure_wData(data)
+		reduce_down_to = 70
+		if data.shape[0] > reduce_down_to:
+			km = wuml.clustering(data, n_clusters=reduce_down_to, method='KMeans')
+			Cs = km.model.cluster_centers_
+			data = wuml.ensure_wData(Cs, column_names=data.columns)
+			jupyter_print('\nNote: Since there are too many input samples, kmeans was employed to reduce the sample down to %d\n'%reduce_down_to)
+
 		model.explainer_mode = True
 		self.joint_table = None
 
@@ -108,7 +115,7 @@ class explainer():
 		return [D, Dm]
 		
 
-	def plot_individual_sample_importance(self, one_sample, y=None, sample_id=''):
+	def plot_individual_sample_importance(self, one_sample, y=None, sample_id='', figsize=None):
 		X = ensure_proper_model_input_format(one_sample)
 		[self.joint_table, self.global_summary] = self.__call__(X, y=y, display=False)
 
@@ -117,4 +124,4 @@ class explainer():
 		pred_str = 'y = %.3f\nŷ = %.3f'%(y, ŷ)
 		feature_importance = ensure_list(ensure_numpy(self.joint_table).round(4))[0]
 		feature_importance = feature_importance[0:len(feature_importance)-3]		# remove the last 3 elements cus they are ['y', 'ŷ', 'Δy']
-		B = wplotlib.bar(cnames, feature_importance, 'Sample %s: '%sample_id, 'Features', 'Importance', horizontal=True, imgText=pred_str, xTextShift=1.05, yTextShift=0)	
+		B = wplotlib.bar(cnames, feature_importance, 'Sample %s: '%sample_id, 'Features', 'Importance', horizontal=True, imgText=pred_str, xTextShift=1.05, yTextShift=0, figsize=figsize)	

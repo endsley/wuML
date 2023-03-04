@@ -37,21 +37,21 @@ class clustering:
 			except: pass
 
 		if method == 'Spectral Clustering':
-			model = SpectralClustering(n_clusters=n_clusters,assign_labels='discretize', random_state=0, gamma=gamma)
+			self.model = SpectralClustering(n_clusters=n_clusters,assign_labels='discretize', random_state=0, gamma=gamma)
 		elif method == 'KMeans':
-			model = KMeans(n_clusters=n_clusters, random_state=0)
+			self.model = KMeans(n_clusters=n_clusters, random_state=0)
 		elif method == 'GMM':
-			model = GaussianMixture(n_components=n_clusters, random_state=0)
-			model.fit(X)
-			self.labels = model.predict(X)
+			self.model = GaussianMixture(n_components=n_clusters, random_state=0)
+			self.model.fit(X)
+			self.labels = self.model.predict(X)
 		elif method == 'Agglomerative':
-			model= AgglomerativeClustering(n_clusters=n_clusters)
+			self.model= AgglomerativeClustering(n_clusters=n_clusters)
 		else: raise ValueError('Unrecognized Clustering Method')
 
 
 		try:
-			model.fit(X)
-			self.labels = model.labels_
+			self.model.fit(X)
+			self.labels = self.model.labels_
 		except: pass
 
 		self.method = method

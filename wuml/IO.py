@@ -50,7 +50,7 @@ def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print
 		wuml.DF_display_side_by_side(M1, M2,titles=[title1, title2])
 	else:
 		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False).strip()
-		eQ = wuml.pretty_np_array(M2, front_tab='', title=title2, auto_print=False).strip()
+		eQ = wuml.pretty_np_array(M2, front_tab='\t', title=title2, auto_print=False).strip()
 		wuml.block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
 
 
@@ -114,7 +114,9 @@ def set_terminal_print_options(precision=3):
 	torch.set_printoptions(precision=precision)
 	torch.set_printoptions(linewidth=400)
 
-	pd.set_option("display.max_rows", 500)
+	pd.set_option('display.width', 1000)
+	pd.set_option('display.max_columns', 80)
+	#pd.set_option("display.max_rows", 500)
 	pd.set_option("display.precision", precision)
 
 def csv_load(xpath, ypath=None, shuffle_samples=False):

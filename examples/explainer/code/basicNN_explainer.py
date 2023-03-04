@@ -15,7 +15,7 @@ data = wuml.wData('../../data/shap_regress_example_gaussian.csv', first_row_is_l
 					label_type='continuout', label_column_name='label', preprocess_data='center and scale')
 
 
-model = wuml.basicNetwork('mse', data, networkStructure=[(30,'relu'),(50,'relu'),(1,'none')], max_epoch=30)
+model = wuml.basicNetwork('mse', data, networkStructure=[(30,'relu'),(50,'relu'),(1,'none')], max_epoch=200)
 model.train(print_status=True)
 model.output_y_as = 'not column'
 y = model(data)
