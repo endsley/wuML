@@ -61,16 +61,16 @@ def ensure_label(data, y=None, y_column_name=None):
 
 	return Y
 
-def ensure_data_type(data, type_name='ndarray', ensure_column_format=True):
+def ensure_data_type(data, type_name='ndarray', ensure_column_format=True, column_names=None):
 
 	if type_name=='ndarray':
 		return ensure_numpy(data, ensure_column_format=ensure_column_format)
 	elif type_name=='DataFrame':
-		return ensure_DataFrame(data)
+		return ensure_DataFrame(data, columns=column_names)
 	elif type_name=='Tensor':
 		return ensure_tensor(data)
 	elif type_name=='wData':
-		return ensure_wData(data)
+		return ensure_wData(data, column_names=column_names)
 
 
 def ensure_list(data):
@@ -171,9 +171,7 @@ def ensure_numpy(data, rounding=None, ensure_column_format=True):
 
 
 def ensure_tensor(data, dataType=torch.FloatTensor):
-	if torch.cuda.is_available(): 
-		device = 'cuda'
-	else: self.device = 'cpu'
+	device = wuml.get_current_device()
 
 	if wtype(data) == 'ndarray': 
 		x = torch.from_numpy(data)

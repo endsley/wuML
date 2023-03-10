@@ -76,16 +76,11 @@ class autoencoder():
 			self.decoder = pDat['decoder']
 			self.midcoder = pDat['midcoder']
 
-
-
-		if torch.cuda.is_available(): 
-			self.device = 'cuda'
-			self.encoder.to(self.device)		# store the network weights in gpu or cpu device
-			self.decoder.to(self.device)		# store the network weights in gpu or cpu device
-			if self.midcoder is not None:
-				self.midcoder.to(self.device)
-
-		else: self.device = 'cpu'
+		self.device = wuml.get_current_device()
+		self.encoder.to(self.device)		# store the network weights in gpu or cpu device
+		self.decoder.to(self.device)		# store the network weights in gpu or cpu device
+		if self.midcoder is not None:
+			self.midcoder.to(self.device)
 
 		self.info()
 
@@ -117,7 +112,7 @@ class autoencoder():
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
 		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
 		if self.on_new_epoch_call_back is not None: info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
-		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
+		info_str += '\tDevice type: %r\n'%self.device
 		info_str += '\tEncoder Structure\n'
 		for i in self.encoder.children():
 			try: info_str += ('\t\t%s , %s\n'%(i,i.activation))

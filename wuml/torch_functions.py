@@ -1,8 +1,27 @@
+#!/usr/bin/env python
+import os 
+import sys
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
 
+import wuml
 import torch
 import torch.nn as nn
 
+#	Set this variable in the very beginning to cpu to ignore the gpu 
+pytorch_device = None
 
+#	Pytorch helpers
+#	----------------------------------------------
+def get_current_device():
+	if wuml.pytorch_device is not None: return wuml.pytorch_device
+
+	if torch.cuda.is_available(): wuml.pytorch_device = 'cuda'
+	else: wuml.pytorch_device = 'cpu'
+	return wuml.pytorch_device
+
+#	Loss function
+#	----------------------------------------------
 def CrossEntropyLoss(y, ŷ):
 	lossFun = nn.CrossEntropyLoss() 
 

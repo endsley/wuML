@@ -177,9 +177,20 @@ def center_data(X):
 	return X - X.mean(axis=0)
 
 
-def center_and_scale(wuData, return_type=None):
+def center_and_scale(wuData, return_type=None, also_return_mean_and_std=False, mean=None, std=None):
+	wuData = ensure_wData(wuData)
 	X = ensure_numpy(wuData)
-	X = preprocessing.scale(X)
+	if also_return_mean_and_std:
+		μ = np.mean(wuData.X, axis=0)
+		σ = np.std(wuData.X, axis=0)
+
+
+	if mean is None and std is None:
+		X = preprocessing.scale(X)
+	elif mean is not None:
+		X = X - mean
+		if std is not None:
+			X = X/std
 
 	if type(wuData).__name__ == 'wData': 
 		wuData.df = pd.DataFrame(data=X, columns=wuData.df.columns)
@@ -193,9 +204,16 @@ def center_and_scale(wuData, return_type=None):
 	wuData.X = wuData.df.values
 
 	if return_type is None:
-		return ensure_data_type(wuData, type_name=type(wuData).__name__)
+		return_data = ensure_data_type(wuData, type_name=type(wuData).__name__)
 	else:
-		return ensure_data_type(wuData, type_name=return_type)
+		return_data = ensure_data_type(wuData, type_name=return_type)
+
+	if also_return_mean_and_std:
+		if mean is None and std is None: return [return_data, μ, σ]
+		else: return [return_data, mean, std]
+	else:
+		return return_data
+
 
 
 def center_scale_with_missing_data(X, replace_nan_with_0=False): 

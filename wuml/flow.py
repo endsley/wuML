@@ -117,9 +117,7 @@ class flow:
 										nn.Linear(M, M), nn.LeakyReLU(), 
 										nn.Linear(M, d // 2))
 
-		if torch.cuda.is_available(): self.device = 'cuda'
-		else: self.device = 'cpu'
-
+		self.device = wuml.get_current_device()
 		# Prior (a.k.a. the base distribution): Gaussian
 		μ = torch.zeros(d)
 		σ = torch.eye(d)

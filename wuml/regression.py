@@ -266,12 +266,11 @@ class regression:
 
 def run_every_regressor(data, y=None, y_column_name=None, order_by='Test mse', ascending=True, 
 						alpha=1, gamma=1, l1_ratio=0.2, max_epoch=500, learning_rate=0.001,
-						network_info_print=False):
+						network_info_print=False, regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet', 'Lasso', 'Ridge']):
 	'''
 	order_by: 'Train mse', 'Test mse', 'Train r2 Score', 'Test r2 Score', 
 				'Train avg abs error', 'Test avg abs error', 'Train max error', 'Test max error'
 	'''
-	regressors=['Elastic net', 'linear', 'kernel ridge', 'AdaBoost', 'GP', 'NeuralNet', 'RandomForest', 'Predef_NeuralNet', 'Lasso', 'Ridge']
 	results = {}
 
 	df = pd.DataFrame()

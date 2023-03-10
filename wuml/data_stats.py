@@ -161,7 +161,7 @@ def feature_wise_correlation(data, n=10, label_name=None, get_top_corr_pairs=Fal
 	if n > df.shape[1]: n = df.shape[1]
 
 	if label_name is not None and label_name not in df.columns:
-		raise ValueError('Error : %s is an unrecognized column name. \nThe list of names are %s'%(label_name, str(df.columns)))
+		raise ValueError('\n\tError : %s is an unrecognized column name. \nThe list of names are %s'%(label_name, str(df.columns)))
 
 	corrMatrix = df.corr()
 	topCorr = get_top_abs_correlations(corrMatrix, n=n).to_frame()

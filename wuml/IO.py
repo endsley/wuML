@@ -91,7 +91,8 @@ def jupyter_print(value, display_all_rows=False, display_all_columns=False, font
 			if latex:
 				display(Math(r'%s'%value))
 			else:
-				wuml.write_to_current_line(value)
+				print(value)
+				#wuml.write_to_current_line(value)
 				#str2html = '<html><body><h%d>%s</h%d></body></html>'%(font_size, value, font_size)
 				#display(HTML(data=str2html))
 		else:
@@ -155,7 +156,10 @@ def save_torch_network(network_obj, path):
 	netData  = N.output_network_data_for_storage()
 	pickle_dump(netData, path)
 
-def load_torch_network(path):
+def load_torch_network(path, load_as_cpu_or_gpu=None): # load_as_cpu_or_gpu, if set to 'cpu' or 'cuda', it will try to force it 
+	if load_as_cpu_or_gpu is not None:
+		wuml.pytorch_device = load_as_cpu_or_gpu
+
 	netData = pickle_load(path)
 
 	if netData['name'] == 'basicNetwork':
@@ -166,7 +170,7 @@ def load_torch_network(path):
 
 		code = marshal.loads(netData['costFunction'])
 		costFunction = types.FunctionType(code, globals(), "costFunction")
-		net = wuml.combinedNetwork(None, None, None, costFunction, network_behavior_on_call, pickled_network_info=netData)
+		net = wuml.combinedNetwork(None, None, None, costFunction, network_behavior_on_call, pickled_network_info=netData, data_mean=netData['μ'], data_std=netData['σ'])
 	elif netData['name'] == 'autoencoder':
 		code = marshal.loads(netData['costFunction'])
 		costFunction = types.FunctionType(code, globals(), "costFunction")

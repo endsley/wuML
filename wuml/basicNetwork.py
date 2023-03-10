@@ -217,10 +217,8 @@ class basicNetwork:
 			self.model = θ['model']
 			self.network_output_in_CPU_during_usage = True
 
-		if torch.cuda.is_available(): 
-			self.device = 'cuda'
-			self.model.to(self.device)		# store the network weights in gpu or cpu device
-		else: self.device = 'cpu'
+		self.device = wuml.get_current_device()
+		self.model.to(self.device)		# store the network weights in gpu or cpu device
 
 		self.out_structural = None
 		self.info(printOut=network_info_print)
@@ -260,7 +258,7 @@ class basicNetwork:
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
 		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
 		info_str += '\tTrain Loop Callback: %s\n'%str(self.on_new_epoch_call_back)
-		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
+		info_str += '\tDevice type: %r\n'%self.device
 		info_str += '\tNetwork Structure\n'
 		for i in self.model.children():
 			try:

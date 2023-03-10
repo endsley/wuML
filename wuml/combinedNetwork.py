@@ -1,14 +1,16 @@
 
+import sys
 from wuml.basicNetwork import *
 from wuml.type_check import *
 import torch
 import numpy as np
 
+
 class combinedNetwork():
 	def __init__(self, data, netStructureList, netInputDimList, costFunction, network_behavior_on_call, optimizer_steps_order=None, 
 						early_exit_loss_threshold=0.0000001, 
 						on_new_epoch_call_back = None, pickled_network_info=None,
-						max_epoch=1000, 	
+						max_epoch=1000, data_mean=None, data_std=None,	force_network_to_use_CPU=False,
 						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
 						network_usage_output_type='Tensor', learning_rate=0.001, lr_decay_rate=0.5, lr_decay_patience=50):
 		'''
@@ -21,14 +23,21 @@ class combinedNetwork():
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
 		self.explainer_mode = False
+		if force_network_to_use_CPU: wuml.pytorch_device = 'cpu'
+
+		# the network is awared if the data was centered
+		if wtype(data) is 'wData':
+			self.μ = data.μ
+			self.σ = data.σ
+		else:
+			self.μ = data_mean
+			self.σ = data_std
+
 
 		self.network_behavior_on_call = network_behavior_on_call
 		self.on_new_epoch_call_back = on_new_epoch_call_back #set this as a callback at each function
 		self.costFunction = costFunction
-
-
-		if torch.cuda.is_available(): self.device = 'cuda'
-		else: self.device = 'cpu'
+		self.device = wuml.get_current_device()
 
 		if pickled_network_info is None:
 			dat = wuml.ensure_wData(data)
@@ -75,8 +84,23 @@ class combinedNetwork():
 			self.extra_dataType = pickled_network_info['extra_dataType']
 			self.batch_size = 32
 
+			for model in self.networkList:
+				model.to(self.device)
+			
+
 		self.info()
 
+	def center_and_scaled(self, data):
+		# the network is awared if the data was centered
+		if self.μ is not None and self.σ is not None:
+			X = ensure_numpy(data)
+			X = (X - self.μ)/self.σ
+			try:
+				return ensure_data_type(X, type_name=wtype(data), ensure_column_format=True, column_names=data.columns)
+			except:
+				return ensure_data_type(X, type_name=wtype(data), ensure_column_format=True)
+		else:
+			return data
 
 	def output_network_data_for_storage(self):
 		net = {}
@@ -94,6 +118,8 @@ class combinedNetwork():
 		net['netStructureList'] = self.netStructureList
 		net['networkList'] = self.networkList
 		net['extra_dataType'] = self.extra_dataType
+		net['μ'] = self.μ
+		net['σ'] = self.σ
 
 		return net
 
@@ -105,7 +131,7 @@ class combinedNetwork():
 		info_str += '\tMax number of epochs: %d\n'%self.max_epoch
 		info_str += '\tCost Function: %s\n'%wuml.get_function_name(self.costFunction)
 		if self.on_new_epoch_call_back is not None: info_str += '\tTrain Loop Callback: %s\n'%wuml.get_function_name(self.on_new_epoch_call_back)
-		info_str += '\tCuda Available: %r\n'%torch.cuda.is_available()
+		info_str += '\tDevice type: %r\n'%self.device
 
 		for j, net in enumerate(self.networkList):
 			info_str += '\tNetworks %d Structure\n'%(j) 
@@ -177,13 +203,14 @@ class combinedNetwork():
 					if get_commandLine_input()[1] != 'disabled': 
 						txt = '\tepoch: %d, Avg Loss/dimension: %.4f, Learning Rate: %.8f'%((epoch+1), loss_avg, enc_scheduler._last_lr[0])
 						write_to_current_line(txt)
-		wuml.jupyter_print('\n')
-
+		
+		for net in self.networkList: net.eval()
 
 	def __call__(self, data, output_type='Tensor', out_structural=None):
 		'''
 			out_structural (mostly for classification purpose): None, '1d_labels', 'one_hot'
 		'''
+
 		data = ensure_wData(data)
 		X = ensure_proper_model_input_format(data)
 		X = ensure_tensor(X, dataType=torch.FloatTensor)
@@ -202,6 +229,7 @@ class combinedNetwork():
 					formatted_data.append(newD)
 
 		all_net_output = self.network_behavior_on_call(formatted_data, self.networkList)	
+
 		if wtype(all_net_output) == 'list':
 			return wuml.cast_each_item_in_list_as(all_net_output, output_type)
 		elif wtype(all_net_output) == 'Tensor':

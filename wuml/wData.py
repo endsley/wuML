@@ -29,7 +29,7 @@ class wData:
 					label_type=None, label2_type=None, #it should be either 'continuous' or 'discrete'
 					encode_discrete_label_to_one_hot=False,
 					xtorchDataType=torch.FloatTensor, ytorchDataType=torch.FloatTensor, 
-					columns_to_ignore=None, mv_columns_to_extra_data=None,
+					columns_to_ignore=None, mv_columns_to_extra_data=None, only_keep_these_columns=None,
 					batch_size=32, randomly_shuffle_batch=True, 
 					replace_this_entry_with_nan=None, preprocess_data=None):
 		'''
@@ -55,7 +55,15 @@ class wData:
 		self.first_column_as_sample_index = first_column_as_sample_index
 		self.xpath = xpath
 		self.column_names = column_names
+		self.only_keep_these_columns = only_keep_these_columns
 		self.Y = None
+		self.label_type = label_type
+		self.batch_size = batch_size
+		self.torchloader = None
+		self.μ = None
+		self.σ = None
+
+
 
 		self.mv_columns_to_extra_data = mv_columns_to_extra_data
 		self.extra_data_preprocessing = extra_data_preprocessing
@@ -68,16 +76,16 @@ class wData:
 		# format the data
 		self.format_data_based_on_input_type(X_npArray, dataFrame, columns_to_ignore)
 		self.format_extra_data_based_on_input_type()
-
-
-		self.label_type = label_type
-		self.shape = self.df.shape
-		self.batch_size = batch_size
-		self.torchloader = None
-		self.columns = self.column_names = self.df.columns		# you can use columns or column_names, they are exactly the same, columns_names is more descriptive, columns is compatible with pandas dataframe
-
-
 		self.format_label(Y_npArray=Y_npArray, ypath=ypath, label_column_name=label_column_name, label_column_id=label_column_id, encode_discrete_label_to_one_hot=encode_discrete_label_to_one_hot)
+		if self.only_keep_these_columns is not None:
+			retained_columns = self.get_columns(self.only_keep_these_columns)
+			self.update_data(retained_columns)
+
+
+
+		self.columns = self.column_names = self.df.columns		# you can use columns or column_names, they are exactly the same, columns_names is more descriptive, columns is compatible with pandas dataframe
+		self.shape = self.df.shape
+
 		self.Data_preprocess(preprocess_data)
 		self.initialize_pytorch_settings(xtorchDataType, ytorchDataType)
 
@@ -155,6 +163,7 @@ class wData:
 
 		self.strip_white_space_from_column_names()
 		if columns_to_ignore is not None: self.delete_column(columns_to_ignore)
+
 		self.X = self.df.values
 
 
@@ -199,10 +208,10 @@ class wData:
 					wuml.remove_rows_with_missing_labels(self)
 
 
-	def Data_preprocess(self, preprocess_data='center and scale'):
+	def Data_preprocess(self, preprocess_data='center and scale', mean=None, std=None):
 		#	Various ways to preprocess the data
 		if preprocess_data == 'center and scale':
-			self.X = preprocessing.scale(self.X)
+			[self.X, self.μ, self.σ] = wuml.center_and_scale(self.X, return_type='ndarray', also_return_mean_and_std=True, mean=mean, std=std)
 			self.df = pd.DataFrame(data=self.X, columns=self.df.columns)
 		elif preprocess_data == 'linearly between 0 and 1':
 			self.X = wuml.wuml.map_data_between_0_and_1(self.X, output_type_name='ndarray', map_type='linear')
@@ -218,9 +227,7 @@ class wData:
 			self.ytorchDataType = torch.LongTensor
 		else:
 			self.ytorchDataType = ytorchDataType				
-
-		if torch.cuda.is_available(): self.device = 'cuda'
-		else: self.device = 'cpu'
+		self.device = wuml.get_current_device()
 
 	def swap_label(self, column_name_use_for_label):
 		labelC = wuml.ensure_DataFrame(self.Y, columns=self.label_column_name)
@@ -252,15 +259,21 @@ class wData:
 
 	def get_columns(self, columns):
 		if type(columns).__name__ == 'int': 
-			return ensure_wData(self.df.iloc[:,columns], column_names=[columns])
-			
-		columns = ensure_list(columns)
-		subColumns = self.df[columns]
-		return ensure_wData(subColumns)
+			remaining_columns = ensure_wData(self.df.iloc[:,columns], column_names=[columns])
+		else:	
+			columns = ensure_list(columns)
+			subColumns = self.df[columns]
+			remaining_columns = ensure_wData(subColumns)
+
+		remaining_columns.Y = self.Y
+		remaining_columns.extra_data_dictionary = self.extra_data_dictionary
+		return remaining_columns
 
 	def update_data(self, data, columns=None):
 		if wtype(data) == 'DataFrame':
 			self.update_DataFrame(data)
+		if wtype(data) == 'wData':
+			self.update_DataFrame(data.df)
 		elif wtype(data) == 'ndarray':
 			new_df = pd.DataFrame(data, columns=columns)
 			self.update_DataFrame(new_df)
@@ -343,6 +356,9 @@ class wData:
 			if j == class_name_or_id:
 				class_samples = np.vstack((class_samples, self.X[i]))
 
+		class_samples = ensure_wData(class_samples, self.columns)
+		N = class_samples.shape[0]
+		class_samples.Y = np.full((N), class_name_or_id)
 		return class_samples
 
 	def retrieve_scalar_value(self):

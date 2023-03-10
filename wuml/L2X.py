@@ -40,11 +40,9 @@ class l2x:
 			self.θˢ = θ['θˢ']
 			self.θᴼ = θ['θᴼ']
 
-		if torch.cuda.is_available(): 
-			self.device = 'cuda'
-			self.θˢ.to(self.device)		# store the network weights in gpu or cpu device
-			self.θᴼ.to(self.device)		# store the network weights in gpu or cpu device
-		else: self.device = 'cpu'
+		self.device = wuml.get_current_device()
+		self.θˢ.to(self.device)		# store the network weights in gpu or cpu device
+		self.θᴼ.to(self.device)		# store the network weights in gpu or cpu device
 		self.info()
 
 	def export_network(self, save_path):

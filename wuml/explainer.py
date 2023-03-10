@@ -22,11 +22,15 @@ from interpret.blackbox import LimeTabular
 from interpret.blackbox import ShapKernel
 
 class explainer():
-	def __init__(self, data, model, explainer_algorithm='shap'):
+	def __init__(self, data, model, explainer_algorithm='shap', which_model_output_to_use=None):
 		'''
 			data : need to be in wData
+			which_model_output_to_use: sometimes the model output multiple outputs in a list instead of just the label, 
+					this integer tells us which item within the last should be used
 		'''
+		self.which_model_output_to_use = which_model_output_to_use
 		data = wuml.ensure_wData(data)
+
 		reduce_down_to = 70
 		if data.shape[0] > reduce_down_to:
 			km = wuml.clustering(data, n_clusters=reduce_down_to, method='KMeans')
@@ -46,6 +50,9 @@ class explainer():
 
 	def model_predict_wrapper(self, X_input):
 		y = self.model_prediction(X_input)
+		if self.which_model_output_to_use is not None:
+			y = y[self.which_model_output_to_use]
+
 		y = ensure_numpy(y, ensure_column_format=False)
 		y = np.squeeze(y)
 
@@ -54,7 +61,7 @@ class explainer():
 
 
 
-	def __call__(self, data, y=None, display=True):
+	def __call__(self, data, y=None, display=True, outpath=None, figsize=None):
 		data = wuml.ensure_wData(data)
 		self.column_names = data.column_names
 		
@@ -67,6 +74,16 @@ class explainer():
 
 		self.joint_table = self.feature_importance_table(local_explain, print_out=display)
 		self.global_summary = self.most_important_features(local_explain, print_out=display)
+
+		#if figsize is not None or outpath is not None:
+		#	# plot out and save importance
+		#	[y, ŷ, Δy] = ensure_list(np.round(self.joint_table.X, 4)[0])[-3:]
+		#	pred_str = 'y = %.3f\nŷ = %.3f'%(y, ŷ)
+		#	for i in range(self.joint_table.shape[0]): 
+		#		feature_importance = self.joint_table.X[i]
+		#		feature_importance = feature_importance[0:len(feature_importance)-3]
+		#		B = wplotlib.bar(self.column_names, feature_importance, 'Sample %s: '%i, 'Features', 'Importance', horizontal=True, imgText=pred_str, xTextShift=1.05, yTextShift=0, figsize=figsize, outpath=output)
+
 		return [self.joint_table, self.global_summary]
 
 	def feature_importance_table(self, local_explain, print_out=True):
