@@ -12,6 +12,7 @@ from wuml.type_check import *
 from wuml.IO import *
 import numpy as np
 import pandas as pd
+import marshal, types
 
 from interpret import set_visualize_provider
 from interpret.provider import InlineProvider
@@ -29,24 +30,35 @@ class explainer():
 					this integer tells us which item within the last should be used
 		'''
 		self.which_model_output_to_use = which_model_output_to_use
-		data = wuml.ensure_wData(data)
+		self.data = wuml.ensure_wData(data)
+		self.explainer_algorithm = explainer_algorithm
 
 		reduce_down_to = 70
-		if data.shape[0] > reduce_down_to:
-			km = wuml.clustering(data, n_clusters=reduce_down_to, method='KMeans')
+		if self.data.shape[0] > reduce_down_to:
+			km = wuml.clustering(self.data, n_clusters=reduce_down_to, method='KMeans')
 			Cs = km.model.cluster_centers_
-			data = wuml.ensure_wData(Cs, column_names=data.columns)
+			self.data = wuml.ensure_wData(Cs, column_names=data.columns)
 			jupyter_print('\nNote: Since there are too many input samples, kmeans was employed to reduce the sample down to %d\n'%reduce_down_to)
 
-		model.explainer_mode = True
-		self.joint_table = None
-
+		self.joint_table = None		# initialize a table of all feature importances
 		if wtype(model) == 'autoencoder': self.model_prediction = model.objective_network
 		else: self.model_prediction = model
 		
 
 		explain_types = {'lime':LimeTabular, 'shap':ShapKernel}
-		self.explainer = explain_types[explainer_algorithm](predict_fn=self.model_predict_wrapper, data=data.df)
+		self.explainer = explain_types[explainer_algorithm](predict_fn=self.model_predict_wrapper, data=self.data.df)
+		model.explainer = self
+
+
+	def output_network_data_for_storage(self, existing_db=None):
+		if existing_db is None: existing_db = {}
+
+		existing_db['explainer'] = 'exists'
+		existing_db['reference_data'] = self.data.X
+		existing_db['explainer_algorithm'] = self.explainer_algorithm
+		existing_db['which_model_output_to_use'] = self.which_model_output_to_use
+
+		return existing_db
 
 	def model_predict_wrapper(self, X_input):
 		y = self.model_prediction(X_input)

@@ -6,9 +6,10 @@ import os
   
 code_list = []
 code_list.append('basic_shap_lime_explainer.py')
-#code_list.append('basicNN_explainer.py')
-#code_list.append('autoencoder_explainer.py')
-#code_list.append('complexNet_explained.py')
+code_list.append('basicNN_explainer.py')
+code_list.append('autoencoder_explainer.py')
+code_list.append('complexNet_explained.py')
+code_list.append('load_network_with_explainer.py')
 
 #print('Running data_stats folder')
 #for code in code_list:

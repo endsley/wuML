@@ -9,7 +9,7 @@ import numpy as np
 class combinedNetwork():
 	def __init__(self, data, netStructureList, netInputDimList, costFunction, network_behavior_on_call, optimizer_steps_order=None, 
 						early_exit_loss_threshold=0.0000001, 
-						on_new_epoch_call_back = None, pickled_network_info=None,
+						on_new_epoch_call_back = None, pickled_network_info=None, explainer=None,
 						max_epoch=1000, data_mean=None, data_std=None,	force_network_to_use_CPU=False,
 						X_dataType=torch.FloatTensor, Y_dataType=torch.FloatTensor, extra_dataType=None,
 						network_usage_output_type='Tensor', learning_rate=0.001, lr_decay_rate=0.5, lr_decay_patience=50):
@@ -22,8 +22,8 @@ class combinedNetwork():
 			network_behavior_on_call:  what happens if you call  net(data) after instantiation
 		'''
 		if get_commandLine_input()[1] == 'disabled': max_epoch = 10
-		self.explainer_mode = False
 		if force_network_to_use_CPU: wuml.pytorch_device = 'cpu'
+		self.explainer = explainer			# If this model's features were explained, we save the explainer here
 
 		# the network is awared if the data was centered
 		if wtype(data) is 'wData':
@@ -120,6 +120,8 @@ class combinedNetwork():
 		net['extra_dataType'] = self.extra_dataType
 		net['μ'] = self.μ
 		net['σ'] = self.σ
+		if wtype(self.explainer) == 'explainer':
+			net = self.explainer.output_network_data_for_storage(net)
 
 		return net
 

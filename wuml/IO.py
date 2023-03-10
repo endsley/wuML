@@ -161,7 +161,7 @@ def load_torch_network(path, load_as_cpu_or_gpu=None): # load_as_cpu_or_gpu, if 
 		wuml.pytorch_device = load_as_cpu_or_gpu
 
 	netData = pickle_load(path)
-
+	
 	if netData['name'] == 'basicNetwork':
 		net = wuml.basicNetwork(None, None, pickled_network_info=netData)
 	elif netData['name'] == 'combinedNetwork':
@@ -171,6 +171,11 @@ def load_torch_network(path, load_as_cpu_or_gpu=None): # load_as_cpu_or_gpu, if 
 		code = marshal.loads(netData['costFunction'])
 		costFunction = types.FunctionType(code, globals(), "costFunction")
 		net = wuml.combinedNetwork(None, None, None, costFunction, network_behavior_on_call, pickled_network_info=netData, data_mean=netData['μ'], data_std=netData['σ'])
+
+		if 'explainer' in netData.keys():
+			net.explainer = wuml.explainer(netData['reference_data'], net, explainer_algorithm=netData['explainer_algorithm'], which_model_output_to_use=netData['which_model_output_to_use'])
+
+
 	elif netData['name'] == 'autoencoder':
 		code = marshal.loads(netData['costFunction'])
 		costFunction = types.FunctionType(code, globals(), "costFunction")

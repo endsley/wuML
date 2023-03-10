@@ -88,20 +88,21 @@ netStructureList.append([(100,'relu'),(3,'none')])
 netStructureList.append([(50,'relu'),(1,'none')])
 netInputDimList = [13, 3]
 
-model = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, 
+model = wuml.combinedNetwork(data, netStructureList, netInputDimList, costFunction, force_network_to_use_CPU=True,
 							optimizer_steps_order=optimizer_steps_order,
-							max_epoch=1000, on_new_epoch_call_back=status_printing,
+							max_epoch=200, on_new_epoch_call_back=status_printing,
 							network_behavior_on_call=network_behavior_on_call,
 							Y_dataType=torch.LongTensor, extra_dataType=[torch.FloatTensor]) 
 model.fit()
 ŷᵦ = model(data)
 
-SR = wuml.summarize_regression_result(Y2, ŷᵦ)
+#SR = wuml.summarize_regression_result(Y2, ŷᵦ)
 E = wuml.explainer(data, model, explainer_algorithm='shap')
-exp = E(data[0:10,:], y=Y2)
+#exp = E(data[0:10,:], y=Y2)
 
 sample_id = 3
 E.plot_individual_sample_importance(data[sample_id,:], y=Y2[sample_id], sample_id=sample_id, figsize=(6,10))
+wuml.save_torch_network(model, './combined_net.pk')
 
 
 

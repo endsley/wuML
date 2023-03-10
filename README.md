@@ -78,7 +78,8 @@ pip install wuml
 [Run basic Shap/lime explainer (Regression/Classification)](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/basic_shap_lime_explainer.ipynb) \
 [Run basic Shap/lime explainer on basic network](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/basicNN_explainer.ipynb) \
 [Run basic Shap/lime explainer on autoencoder network](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/autoencoder_explainer.ipynb) \
-[Run basic Shap/lime explainer on complex network](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/complexNet_explained.ipynb) 
+[Run basic Shap/lime explainer on complex network](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/complexNet_explained.ipynb) \
+[After saving Network with Explainer, here we load it](https://github.com/endsley/wuML/blob/main/examples/explainer/ipynb/load_network_with_explainer.ipynb) 
 
 
 ### Regression / Classification
