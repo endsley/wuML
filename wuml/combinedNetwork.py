@@ -113,8 +113,6 @@ class combinedNetwork():
 
 		net['lr'] = self.lr
 		net['max_epoch'] = self.max_epoch
-		net['X_dataType'] = self.X_dataType
-		net['Y_dataType'] = self.Y_dataType
 		net['netStructureList'] = self.netStructureList
 		net['networkList'] = self.networkList
 		net['extra_dataType'] = self.extra_dataType

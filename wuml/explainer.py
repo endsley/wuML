@@ -32,6 +32,7 @@ class explainer():
 		self.which_model_output_to_use = which_model_output_to_use
 		self.data = wuml.ensure_wData(data)
 		self.explainer_algorithm = explainer_algorithm
+		self.column_names = self.data.column_names
 
 		reduce_down_to = 70
 		if self.data.shape[0] > reduce_down_to:
@@ -57,6 +58,7 @@ class explainer():
 		existing_db['reference_data'] = self.data.X
 		existing_db['explainer_algorithm'] = self.explainer_algorithm
 		existing_db['which_model_output_to_use'] = self.which_model_output_to_use
+		existing_db['column_names'] = self.column_names
 
 		return existing_db
 
@@ -75,8 +77,6 @@ class explainer():
 
 	def __call__(self, data, y=None, display=True, outpath=None, figsize=None):
 		data = wuml.ensure_wData(data)
-		self.column_names = data.column_names
-		
 		if y is not None:
 			local_explain = self.explainer.explain_local(data.df, y)
 		else:

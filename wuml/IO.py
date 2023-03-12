@@ -23,7 +23,7 @@ from IPython.display import clear_output, HTML, Math
 from wuml.type_check import *
 from IPython.display import display_html
 from itertools import chain,cycle
-
+  
 
 
 #	display 2 dataframes side by side
@@ -173,7 +173,8 @@ def load_torch_network(path, load_as_cpu_or_gpu=None): # load_as_cpu_or_gpu, if 
 		net = wuml.combinedNetwork(None, None, None, costFunction, network_behavior_on_call, pickled_network_info=netData, data_mean=netData['μ'], data_std=netData['σ'])
 
 		if 'explainer' in netData.keys():
-			net.explainer = wuml.explainer(netData['reference_data'], net, explainer_algorithm=netData['explainer_algorithm'], which_model_output_to_use=netData['which_model_output_to_use'])
+			stored_reference_data = wuml.ensure_wData(netData['reference_data'] , column_names=netData['column_names'])
+			net.explainer = wuml.explainer(stored_reference_data, net, explainer_algorithm=netData['explainer_algorithm'], which_model_output_to_use=netData['which_model_output_to_use'])
 
 
 	elif netData['name'] == 'autoencoder':
@@ -214,6 +215,20 @@ def initialize_empty_folder(path):
 def path_exists(path):
 	if os.path.exists(path): return True
 	return False
+
+def list_all_files_in_directory(path, with_extension=None):
+	all_files = os.listdir(path)
+
+	if with_extension is not None:
+		new_all_files = []
+		for f in all_files:
+			file_extension = Path(f).suffix
+			if with_extension == file_extension:
+				new_all_files.append(f)
+
+		all_files = new_all_files
+
+	return all_files
 
 def ensure_path_exists(path):
 	if os.path.exists(path): return True
