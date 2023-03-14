@@ -14,34 +14,44 @@ from wuml.type_check import *
 
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space='', round_value=3):
 
-	cName = None
-	if wtype(m) =='DataFrame': 
-		out_str = str(m.round(round_value))
-	else:
-		m = ensure_wData(m)
-		cName = ensure_numpy(m.columns)
-		m = wuml.ensure_numpy(m)
+	M = ensure_wData(m)
+	M.round(rounding=round_value)
 
-		try: m = np.round(m, round_value)
-		except: pass
-		if cName is not None: m = np.vstack((cName,m))
-		m = str(m)
-	
-		if verticalize:
-			if len(m.shape) == 1:
-				m = np.atleast_2d(m).T
-	
-		out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
-		out_str = str(out_str).replace('.]',']')
+	if auto_print: wuml.jupyter_print(M)
+	else: return str(M)
 
-		if wtype(title) == 'str':
-			L1 = out_str.split('\n')
-			L1_max_width = len(max(L1, key=len))
-			t1 = str.center(title, L1_max_width)
-			out_str = t1 + '\n' + out_str
-	
-	if auto_print: wuml.jupyter_print(out_str)
-	else: return out_str
+
+#	This portion is deprecated, we now use dataframe instead of np array.
+
+#	cName = None
+#	if wtype(m) =='DataFrame': 
+#		out_str = str(m.round(round_value))
+#	else:
+#		m = ensure_wData(m)
+#		cName = ensure_numpy(m.columns)
+#		m = wuml.ensure_numpy(m)
+#
+#		try: m = np.round(m, round_value)
+#		except: pass
+#		if cName is not None: m = np.vstack((cName,m))
+#		m = str(m)
+#	
+#		if verticalize:
+#			if len(m.shape) == 1:
+#				m = np.atleast_2d(m).T
+#
+#		out_str = front_tab + str(m).replace('\n ','\n' + front_tab).replace('[[','[').replace(']]',']') + end_space + '\n'
+#		out_str = str(out_str).replace('.]',']')
+#
+#		if wtype(title) == 'str':
+#			L1 = out_str.split('\n')
+#			L1_max_width = len(max(L1, key=len))
+#			t1 = str.center(title, L1_max_width)
+#			out_str = t1 + '\n' + out_str	
+#	if auto_print: wuml.jupyter_print(out_str)
+#	else: return out_str
+
+
 
 def append_same_string_infront_of_block_of_string(front_string, back_block_string):
 
@@ -55,7 +65,8 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	str2 = str(str2)
 
 	L1 = str1.split('\n')
-	L2 = str2.strip().split('\n')
+	#L2 = str2.strip().split('\n')
+	L2 = str2.split('\n')
 
 	if len(L1) > len(L2):
 		Δ = len(L1) - len(L2)
@@ -79,12 +90,12 @@ def block_two_string_concatenate(str1, str2, spacing='\t', add_titles=[], auto_p
 	else: return outS
 
 
-def block_matrix_concatenate(matrix_list, spacing='\t'):
-	
+def block_matrix_concatenate(matrix_list, spacing='\t\t'):
+
 	strList = []
 	for m in matrix_list:
-		M = wuml.ensure_numpy(m)
-		strList.append(pretty_np_array(M).strip())
+		#strList.append(pretty_np_array(m).strip())
+		strList.append(pretty_np_array(m))
 
 	return block_string_concatenate(strList, spacing=spacing)
 

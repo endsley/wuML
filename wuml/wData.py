@@ -127,6 +127,11 @@ class wData:
 			self.extra_data_dictionary['numpy'].append(ensure_numpy(Dat_np))
 			#self.extra_data_dictionary['df'].append(ensure_DataFrame(Dat_np))
 
+
+	def round(self, rounding=3):
+		self.df = self.df.round(decimals=rounding)
+		self.update_data(self.df)
+
 	def format_data_based_on_input_type(self, X_npArray, dataFrame, columns_to_ignore):
 		first_row_is_label = self.first_row_is_label
 
@@ -272,13 +277,13 @@ class wData:
 	def update_data(self, data, columns=None):
 		if wtype(data) == 'DataFrame':
 			self.update_DataFrame(data)
-		if wtype(data) == 'wData':
+		elif wtype(data) == 'wData':
 			self.update_DataFrame(data.df)
 		elif wtype(data) == 'ndarray':
 			new_df = pd.DataFrame(data, columns=columns)
 			self.update_DataFrame(new_df)
 		else:
-			raise ValueError('data_loading.update_data function does not recognizes input data type = %s', wtype(data))
+			raise ValueError('wData.update_data function does not recognizes input data type = %s'%wtype(data))
 
 
 	def update_DataFrame(self, df):

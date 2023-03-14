@@ -42,7 +42,7 @@ def DF_display_side_by_side(*args,titles=cycle([''])):
 	display_html(html_str,raw=True)
 
 
-def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print=True):
+def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print=True, rounding=3):
 
 	if wuml.isnotebook():			# and wtype(M1) =='DataFrame' and wtype(M2) =='DataFrame':
 		M1 = ensure_DataFrame(M1)
@@ -51,7 +51,7 @@ def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print
 	else:
 		eK = wuml.pretty_np_array(M1, front_tab='', title=title1, auto_print=False).strip()
 		eQ = wuml.pretty_np_array(M2, front_tab='\t', title=title2, auto_print=False).strip()
-		wuml.block_two_string_concatenate(eK, eQ, spacing='\t', add_titles=[], auto_print=auto_print)
+		wuml.block_two_string_concatenate(eK, eQ, spacing='\t\t', add_titles=[], auto_print=auto_print)
 
 
 

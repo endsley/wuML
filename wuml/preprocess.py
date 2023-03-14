@@ -241,6 +241,22 @@ def center_scale_with_missing_data(X, replace_nan_with_0=False):
 
 	return X, ignore_column_with_0_σ
 
+
+
+def split_training_validation_test(data, label=None, data_name=None, data_path=None, save_as='none', train_valid_test_percent_split=[0.8, 0.1, 0.1], xdata_type="%.4f", ydata_type="%d"):
+#	train_valid_test_percent_split: must add up to equal to 1
+
+	TVT = train_valid_test_percent_split
+	test_percentage = TVT[1] + TVT[2]
+	[X_train, X_rest, y_train, y_rest] = split_training_test(data, label=label, test_percentage=test_percentage, xdata_type=xdata_type, ydata_type=ydata_type)
+
+	test_percentage2 = TVT[2]/test_percentage
+	[X_validate, X_test, y_validate, y_test] = split_training_test(X_rest, label=label, test_percentage=test_percentage2, xdata_type=xdata_type, ydata_type=ydata_type)
+
+	return [X_train, y_train, X_validate, y_validate, X_test, y_test]
+
+
+
 def split_training_test(data, label=None, data_name=None, data_path=None, save_as='none', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
 	X = ensure_numpy(data)
 	Y = None
