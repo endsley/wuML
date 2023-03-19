@@ -271,7 +271,7 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 		if len(data.extra_data_dictionary['numpy']) > 0:
 			input_dat_list.extend(data.extra_data_dictionary['numpy'])
 
-	split_list = train_test_split(*input_dat_list, test_size=test_percentage, random_state=42)
+	split_list = train_test_split(*input_dat_list, test_size=test_percentage, random_state=30)
 	#X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
 	X_train = split_list[0]
 	X_test = split_list[1]
@@ -311,6 +311,7 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 	X_train.Y = y_train
 	X_train.label_type = data.label_type
 	X_train.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
+	X_train.label_column_name = data.label_column_name
 
 	if len(split_list) > 4:	xDat = split_list[4:][1::2]	# get all the test extra data
 	else: xDat = None
@@ -319,6 +320,7 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 	X_test.Y = y_test
 	X_test.label_type = data.label_type
 	X_test.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
+	X_test.label_column_name = data.label_column_name
 
 	return [X_train, X_test, y_train, y_test]
 

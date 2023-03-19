@@ -47,6 +47,7 @@ class wData:
 		'''
 		self.path_prefix = path_prefix
 		self.label_column_name = label_column_name
+		
 		self.label_column_id = label_column_id
 		self.randomly_shuffle_batch = randomly_shuffle_batch
 		self.row_id_with_feature_names = row_id_with_feature_names
@@ -127,7 +128,6 @@ class wData:
 			self.extra_data_dictionary['numpy'].append(ensure_numpy(Dat_np))
 			#self.extra_data_dictionary['df'].append(ensure_DataFrame(Dat_np))
 
-
 	def round(self, rounding=3):
 		self.df = self.df.round(decimals=rounding)
 		self.update_data(self.df)
@@ -147,7 +147,6 @@ class wData:
 		elif X_npArray is not None:
 			if wtype(self.column_names) == 'str': self.column_names = [self.column_names]
 			self.df = pd.DataFrame(X_npArray, columns=self.column_names)
-
 			if first_row_is_label: 
 				self.df = self.df.rename(columns=self.df.iloc[0]).drop(self.df.index[0])
 	
@@ -242,6 +241,8 @@ class wData:
 
 	def replace_label(self, newY, label_name=None):
 		self.Y = ensure_numpy(newY)
+		self.Y = np.squeeze(self.Y)
+
 		if label_name is not None: self.label_column_name = label_name
 
 	def strip_white_space_from_column_names(self):
@@ -292,6 +293,11 @@ class wData:
 		self.X = self.df.values
 		self.shape = self.df.shape
 	
+	def update_column_type(self, update_dictionary):	# the dictionary looks like {'score': float, 'Accᶜ': float } with column name and type
+		new_df = self.df.astype(update_dictionary)
+		self.update_DataFrame(new_df)
+
+
 	def reset_index(self):
 		self.df.reset_index(drop=True, inplace=True)	
 		self.update_DataFrame(self.df)

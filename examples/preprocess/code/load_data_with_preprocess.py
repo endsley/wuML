@@ -21,7 +21,7 @@ data = wuml.wData(xpath='../../data/wine.csv', ypath='../../data/wine_label.csv'
 
 μ = np.mean(data.X, axis=0)
 σ = np.std(data.X, axis=0)
-wuml.print_two_matrices_side_by_side(μ, σ)
+wuml.print_two_matrices_side_by_side(μ, σ, title1='mean', title2='std')
 
 
 

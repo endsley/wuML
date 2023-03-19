@@ -27,7 +27,7 @@ class rebalance_data:
 				y = data.Y
 				X = data.X
 				self.columns = data.columns
-				self.label_column_name = data.get_column_names_as_a_list()
+				self.label_column_name = data.label_column_name
 				self.label_column_id = data.label_column_id
 			else:
 				raise ValueError('data must be wData if the label y is None')

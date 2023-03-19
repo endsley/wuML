@@ -62,6 +62,7 @@ pip install wuml
 
 ### Distance Between Distributions
 [Wasserstein Distance Example](https://github.com/endsley/wuML/blob/main/examples/distance_between_distributions/ipynb/wasserstein_example.ipynb) \
+[MMD Distance Example](https://github.com/endsley/wuML/blob/main/examples/distance_between_distributions/ipynb/mmd_example.ipynb) 
 
 
 ### Distribution Modeling

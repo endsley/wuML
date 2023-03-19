@@ -113,6 +113,9 @@ def ensure_wData(data, column_names=None, extra_data=None):
 		return wuml.wData(X_npArray=data.Ӽ, extra_data=extra_data)
 	elif wtype(data) == 'Series': 
 		return wuml.wData(X_npArray=data.to_numpy(), column_names=column_names, extra_data=extra_data)
+	elif wtype(data) == 'float64': 
+		return wuml.wData(X_npArray=np.array([data]), column_names=column_names, extra_data=extra_data)
+
 
 def ensure_DataFrame(data, columns=None, index=None):
 	columns = ensure_list(columns)

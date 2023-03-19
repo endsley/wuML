@@ -15,8 +15,7 @@ data = wuml.make_classification_data( n_samples=300, n_features=6, n_informative
 tenF_LDA_LR = wuml.ten_folder_classifier(data, classifier='SVM')
 tenF_LDA_LR.show_results()
 
+jupyter_print('\nIf we use the entire 10 models and obtain labels by voting, we get')
 ӯ = tenF_LDA_LR(data)
 summary = wuml.summarize_classification_result(data.Y, ӯ)
-jupyter_print('\nIf we use the entire 10 models and obtain labels by voting, we get')
-jupyter_print('Avg Error: %.3f'%summary.avg_error())
 

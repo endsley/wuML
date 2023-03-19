@@ -8,8 +8,10 @@ if os.path.exists('/home/chieh/code/wuML'):
 	sys.path.insert(0,'/home/chieh/code/wuML')
 
 import wuml
+from scipy import stats
 import wplotlib
 from wuml import jupyter_print
+from sklearn.metrics.pairwise import rbf_kernel
 import numpy as np
 import ot
 
@@ -69,4 +71,29 @@ def wasserstein_distance(X, Y, M=None, XY_as_histogram=True, output_as='ndarray'
 		raise ValueError('XY_as_histogram as False is not yet supported')
 
 
+def mmd(X,Y, sigma=1):
+	X = np.squeeze(wuml.ensure_numpy(X))
+	Y = np.squeeze(wuml.ensure_numpy(Y))
+
+	n = X.shape[0]
+	m = Y.shape[0]
+	γ = 1.0/(2*sigma*sigma)
+
+	Kx  = np.sum(rbf_kernel(X))
+	Ky  = np.sum(rbf_kernel(Y))
+	Kxy = np.sum(rbf_kernel(X,Y))
+	
+	mmdᒾ =  Kx/(n*n) - Kxy*2/(m*n) + Ky/(m*m)
+	return mmdᒾ
+
+if __name__ == "__main__":
+	X = np.random.randn(50,2)
+	Y = np.random.randn(50,2)
+	Z = np.random.rand(50,2) + 20
+
+	Dxy = mmd(X,Y)
+	Dxz = mmd(X,Z)
+
+	print('D(X,Y) = %.4f'%Dxy)
+	print('D(X,Z) = %.4f\n'%Dxz)
 

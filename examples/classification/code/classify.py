@@ -30,7 +30,6 @@ ikdr = wuml.pickle_load('RL_classifier.pk')
 jupyter_print('You can get the labels by passing the data into the class')
 ӯ = ikdr(data)
 summary = wuml.summarize_classification_result(data.Y, ӯ)
-jupyter_print('Avg Error: %.3f'%summary.avg_error())
 
 jupyter_print('\nSorted Feature Importance')
 cf.output_sorted_feature_importance_table(data.columns)

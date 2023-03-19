@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+import os
+import sys
+if os.path.exists('/home/chieh/code/wPlotLib'):
+	sys.path.insert(0,'/home/chieh/code/wPlotLib')
+if os.path.exists('/home/chieh/code/wuML'):
+	sys.path.insert(0,'/home/chieh/code/wuML')
+
 from wplotlib import histograms
 import numpy as np
 import wuml
@@ -17,8 +24,21 @@ def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=F
 	M = ensure_wData(m)
 	M.round(rounding=round_value)
 
+	#if wtype(m) == 'float64': 
+	#	import pdb; pdb.set_trace()
+
 	if auto_print: wuml.jupyter_print(M)
-	else: return str(M)
+	else: 
+		out_str = str(M)
+		L1 = out_str.split('\n')
+		L1_max_width = len(max(L1, key=len))
+		if wtype(title) == 'str':
+			t1 = str.center(title, L1_max_width)
+			out_str = t1 + '\n' + out_str + end_space
+		else:
+			out_str = out_str + end_space
+
+		return out_str
 
 
 #	This portion is deprecated, we now use dataframe instead of np array.

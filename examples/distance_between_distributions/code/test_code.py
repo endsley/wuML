@@ -5,6 +5,7 @@ import os
 
 code_list = []
 code_list.append('wasserstein_example.py')
+code_list.append('mmd_example.py')
 
 print('Running data_stats folder')
 for code in code_list:
