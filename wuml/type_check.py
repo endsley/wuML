@@ -98,7 +98,15 @@ def ensure_list(data):
 
 def ensure_wData(data, column_names=None, extra_data=None):
 	if wtype(data) == 'ndarray': 
+		#	Sometimes, the data is only 1 dimension, but wData requires 2 dimension to match columns names
+		#	this little code fixes this problem
+		if column_names is not None:
+			if len(column_names) > 1 and len(data.shape) == 1:
+				data = np.expand_dims(data, axis=0)
+		# ---------------------------------------------
+
 		return wuml.wData(X_npArray=data, column_names=column_names, extra_data=extra_data)
+
 	elif wtype(data) == 'Index': 
 		ArrayType = np.array(data.tolist())
 		return wuml.wData(X_npArray=ArrayType, column_names=column_names, extra_data=extra_data)

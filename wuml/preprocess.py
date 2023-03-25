@@ -257,7 +257,7 @@ def split_training_validation_test(data, label=None, data_name=None, data_path=N
 
 
 
-def split_training_test(data, label=None, data_name=None, data_path=None, save_as='none', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d"):
+def split_training_test(data, label=None, data_name=None, data_path=None, save_as='none', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d", random_state=None):
 	X = ensure_numpy(data)
 	Y = None
 
@@ -271,7 +271,7 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 		if len(data.extra_data_dictionary['numpy']) > 0:
 			input_dat_list.extend(data.extra_data_dictionary['numpy'])
 
-	split_list = train_test_split(*input_dat_list, test_size=test_percentage, random_state=30)
+	split_list = train_test_split(*input_dat_list, test_size=test_percentage, random_state=random_state)
 	#X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_percentage, random_state=42)
 	X_train = split_list[0]
 	X_test = split_list[1]

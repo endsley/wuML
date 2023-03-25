@@ -20,6 +20,9 @@ def get_current_device():
 	else: wuml.pytorch_device = 'cpu'
 	return wuml.pytorch_device
 
+
+
+
 #	Loss function
 #	----------------------------------------------
 def CrossEntropyLoss(y, ŷ):

@@ -2,6 +2,12 @@
 import numpy as np
 import random
 import string
+from wuml.type_check import *
+
+
+def random_matrix_via_Gaussian_distribution(height, width):
+	M = np.random.randn(height, width)
+	return ensure_wData(M)
 
 
 def gen_squared_symmetric_matrix(length, distribution='Gaussian'):

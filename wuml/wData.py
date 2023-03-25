@@ -171,8 +171,9 @@ class wData:
 		self.X = self.df.values
 
 
-	def format_label(self, Y_npArray=None, ypath=None, label_column_name=None, label_column_id=None, encode_discrete_label_to_one_hot=False):
+	def format_label(self, Y_npArray=None, ypath=None, label_column_name=None, label_type=None, label_column_id=None, encode_discrete_label_to_one_hot=False):
 
+		self.label_type = label_type
 		# as long as label is needed, we must designate continuous or discrete labels
 		if not np.all(np.array([Y_npArray, ypath, label_column_name, label_column_id]) == None):
 			if self.label_type is None: raise ValueError('\n\tError : If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
@@ -361,6 +362,21 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 
+	def get_all_samples_based_on_condition_of_column(self, column_name, condition='greater than', conditional_value=0):
+		#	condition='greater than', 'less than', 'equal', 'greater than or equal to', 'less than or equal to'
+		if condition == 'greater than':
+			new_df = self.df[self.df[column_name] > conditional_value]
+		elif condition == 'greater than or equal to':
+			new_df = self.df[self.df[column_name] >= conditional_value]
+		elif condition == 'less than':
+			new_df = self.df[self.df[column_name] < conditional_value]
+		elif condition == 'less than or equal to':
+			new_df = self.df[self.df[column_name] <= conditional_value]
+		elif condition == 'equal':
+			new_df = self.df[self.df[column_name] == conditional_value]
+
+		return ensure_wData(new_df, self.columns)
+
 	def get_all_samples_from_a_class(self, class_name_or_id):
 		class_samples = np.empty((0,self.X.shape[1]))
 		for i, j in enumerate(self.Y):
@@ -393,6 +409,33 @@ class wData:
 				self.delete_column('label')
 		else:
 			self.df.to_csv(path, index=add_row_indices, header=include_column_names, float_format=float_format)
+
+	def max(self):
+		return np.max(self.X)
+
+	def max_of_each_column(self, return_type='wData'):
+		return ensure_data_type(np.max(self.X, axis=0), type_name=return_type, column_names=self.columns)
+
+	def max_of_each_row(self, return_type='wData'):
+		return ensure_data_type(np.max(self.X, axis=1), type_name=return_type, column_names=self.columns)
+
+	def min(self):
+		return np.min(self.X)
+
+	def min_of_each_column(self, return_type='wData'):
+		return ensure_data_type(np.min(self.X, axis=0), type_name=return_type, column_names=self.columns)
+
+	def min_of_each_row(self, return_type='wData'):
+		return ensure_data_type(np.min(self.X, axis=1), type_name=return_type, column_names=self.columns)
+
+	def remove_last_few_rows(self, n_rows):
+		self.df.drop(self.df.tail(n_rows).index,inplace=True)
+		self.update_DataFrame(self.df)
+
+	def remove_first_few_rows(self, n_rows):
+		self.df.drop(self.df.head(n_rows).index,inplace=True)
+		self.update_DataFrame(self.df)
+
 
 	def __getitem__(self, item):
 		#	If item is string, it will return the column corresponding to the column name

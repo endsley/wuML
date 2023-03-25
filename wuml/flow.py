@@ -9,7 +9,6 @@ from wuml.type_check import *
 
 
 
-
 class RealNVP(nn.Module):
 	def __init__(self, nets, nett, num_flows, prior, D=2, dequantization=True):
 		super(RealNVP, self).__init__()
@@ -28,7 +27,6 @@ class RealNVP(nn.Module):
 		# forward: whether it is a pass from x to y (forward=True), or from y to x (forward=False)
 		
 		(xa, xb) = torch.chunk(x, 2, 1)
-		
 		s = self.s[index](xa)
 		t = self.t[index](xa)
 		
@@ -91,39 +89,41 @@ class flow:
 		self.print_status = print_status
 
 		# get data
-		self.data = data
-		self.X = X = ensure_wData(data)
-
-		if X.Y is None: X.Y = X.X
-
-		[X_train, X_test, y_train, y_test] = wuml.split_training_test(X, test_percentage=0.2, save_as='none')
-		X_train_DL = X_train.get_data_as('DataLoader')
-		X_test_DL = X_test.get_data_as('DataLoader')
-		d = X.shape[1]
-
-		# scale (s) network
-		self.S = nets = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, d // 2), nn.Tanh())
-		
-		# translation (t) network
-		self.T = nett = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, M), nn.LeakyReLU(), 
-										nn.Linear(M, d // 2))
-
-		self.device = wuml.get_current_device()
-		# Prior (a.k.a. the base distribution): Gaussian
-		μ = torch.zeros(d)
-		σ = torch.eye(d)
-		μ = μ.to(self.device, non_blocking=True )
-		σ = σ.to(self.device, non_blocking=True )
-		self.prior = prior = torch.distributions.MultivariateNormal(μ, σ)
+		if data is not None:
+			self.data = data
+			self.X = X = ensure_wData(data)
+			if X.shape[1]%2 != 0: raise ValueError('\n\tError: The data needs an even number of features')
+	
+			if X.Y is None: X.Y = X.X
+	
+			[X_train, X_test, y_train, y_test] = wuml.split_training_test(X, test_percentage=0.2, save_as='none')
+			X_train_DL = X_train.get_data_as('DataLoader')
+			X_test_DL = X_test.get_data_as('DataLoader')
+			d = X.shape[1]
+	
+			# scale (s) network
+			self.S = nets = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, d // 2), nn.Tanh())
+			
+			# translation (t) network
+			self.T = nett = lambda: nn.Sequential(nn.Linear(d // 2, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, M), nn.LeakyReLU(), 
+											nn.Linear(M, d // 2))
+	
+			self.device = wuml.get_current_device()
+			# Prior (a.k.a. the base distribution): Gaussian
+			μ = torch.zeros(d)
+			σ = torch.eye(d)
+			μ = μ.to(self.device, non_blocking=True )
+			σ = σ.to(self.device, non_blocking=True )
+			self.prior = prior = torch.distributions.MultivariateNormal(μ, σ)
 
 		# Init RealNVP
 		if load_model_path is not None:
@@ -167,8 +167,8 @@ class flow:
 				if hasattr(model, 'dequantization'):
 					if model.dequantization:
 						x = x + (1. - torch.rand(x.shape))/2.
+
 				loss = model.forward(x)
-	
 				optimizer.zero_grad()
 				loss.backward(retain_graph=True)
 				optimizer.step()
