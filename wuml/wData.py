@@ -173,7 +173,7 @@ class wData:
 
 	def format_label(self, Y_npArray=None, ypath=None, label_column_name=None, label_type=None, label_column_id=None, encode_discrete_label_to_one_hot=False):
 
-		self.label_type = label_type
+		if label_type is not None: self.label_type = label_type
 		# as long as label is needed, we must designate continuous or discrete labels
 		if not np.all(np.array([Y_npArray, ypath, label_column_name, label_column_id]) == None):
 			if self.label_type is None: raise ValueError('\n\tError : If you are using labels, you must include the argument label_type= "continuout" or "discrete"')
