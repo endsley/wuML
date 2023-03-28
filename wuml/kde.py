@@ -17,6 +17,10 @@ class KDE:
 			self.model = wuml.pickle_load(load_model_path)
 			return 
 
+		self.columns = None
+		if wtype(data) == 'wData':
+			self.columns = data.columns
+
 		data = ensure_numpy(data)
 
 		# use grid search cross-validation to optimize the bandwidth
@@ -28,8 +32,10 @@ class KDE:
 		self.model = self.grid.best_estimator_
 
 	def generate_samples(self, num_of_samples, return_data_type='wData'):
-		samples = self.model.sample(num_of_samples, random_state=0)
-		return ensure_data_type(samples, type_name=return_data_type)
+		rV = np.round(100*np.random.rand()).astype(int)
+		
+		samples = self.model.sample(num_of_samples, random_state=rV)
+		return ensure_data_type(samples, type_name=return_data_type, column_names=self.columns)
 
 	def integrate(self, x0, x1):	# This only works for 1D data
 		[result, error] = wuml.integrate(self, x0, x1)

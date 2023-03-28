@@ -11,6 +11,7 @@ from sklearn import preprocessing
 import wuml
 
 from wuml.type_check import *
+from wuml.IO import jupyter_print
 import wplotlib
 import pandas as pd
 import torch
@@ -196,11 +197,29 @@ class wData:
 			if encode_discrete_label_to_one_hot:
 				self.Y = wuml.one_hot_encoding(self.Y)
 
+
+	def swap_label(self, column_name_use_for_label):
+		labelC = wuml.ensure_DataFrame(self.Y, columns=self.label_column_name)
+		newLabel = self.pop_column(column_name_use_for_label)
+		self.replace_label(newLabel, label_name=column_name_use_for_label)
+		self.append_columns(labelC)
+
+	def replace_label_with_column(self, column_name_use_for_label):
+		newLabel = self.pop_column(column_name_use_for_label)
+		self.replace_label(newLabel, label_name=column_name_use_for_label)
+
+	def replace_label(self, newY, label_name=None):
+		self.Y = ensure_numpy(newY)
+		self.Y = np.squeeze(self.Y)
+
+		if label_name is not None: self.label_column_name = label_name
+
+
 	def check_for_missingness(self):
 		# raise a warning if there are missing entries within the data
 		try:
 			mL = np.sum(np.isnan(self.X))
-			if mL > 0: wuml.jupyter_print('\nWarning: %d entries are missing.'%(mL))
+			if mL > 0: jupyter_print('\nWarning: %d entries are missing.'%(mL))
 		except: pass
 
 		if self.Y is None: return
@@ -208,7 +227,7 @@ class wData:
 		if missingLabels is not None: 
 			if missingLabels > 0: 
 				mL = np.sum(np.isnan(self.Y))
-				wuml.jupyter_print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
+				jupyter_print('Warning: %.5f percent or %d samples of the labels are missing:  \n'%(missingLabels*100, mL))
 				removeSample = input("Would you like to remove the samples with missing labels [y]/n?")
 				if removeSample == '' or removeSample == 'y' or removeSample == 'Y':
 					wuml.remove_rows_with_missing_labels(self)
@@ -235,17 +254,6 @@ class wData:
 			self.ytorchDataType = ytorchDataType				
 		self.device = wuml.get_current_device()
 
-	def swap_label(self, column_name_use_for_label):
-		labelC = wuml.ensure_DataFrame(self.Y, columns=self.label_column_name)
-		newLabel = self.pop_column(column_name_use_for_label)
-		self.replace_label(newLabel, label_name=column_name_use_for_label)
-		self.append_columns(labelC)
-
-	def replace_label(self, newY, label_name=None):
-		self.Y = ensure_numpy(newY)
-		self.Y = np.squeeze(self.Y)
-
-		if label_name is not None: self.label_column_name = label_name
 
 	def strip_white_space_from_column_names(self):
 		# make sure to strip white space from column names
@@ -346,7 +354,7 @@ class wData:
 		self.update_DataFrame(self.df)
 
 	def info(self):
-		wuml.jupyter_print(self.df.info())
+		jupyter_print(self.df.info())
 
 	def get_data_as(self, data_type): #'DataFrame', 'read_csv', 'Tensor'
 		if data_type == 'wData': return self
@@ -364,7 +372,7 @@ class wData:
 			self.torchloader = DataLoader(dataset=self.DM, batch_size=self.batch_size, shuffle=self.randomly_shuffle_batch, pin_memory=True, num_workers=1)
 			return self.torchloader
 
-	def get_all_samples_based_on_condition_of_column(self, column_name, condition='greater than', conditional_value=0):
+	def get_all_samples_based_on_condition_of_column(self, column_name, condition='greater than', conditional_value=0, upper_bound=None, lower_bound=None):
 		#	condition='greater than', 'less than', 'equal', 'greater than or equal to', 'less than or equal to'
 		if condition == 'greater than':
 			new_df = self.df[self.df[column_name] > conditional_value]
@@ -376,6 +384,9 @@ class wData:
 			new_df = self.df[self.df[column_name] <= conditional_value]
 		elif condition == 'equal':
 			new_df = self.df[self.df[column_name] == conditional_value]
+		elif condition == 'in between':
+			new_df = self.df[self.df[column_name] <= upper_bound]
+			new_df = new_df[new_df[column_name] >= lower_bound]
 
 		return ensure_wData(new_df, self.columns)
 
@@ -415,6 +426,12 @@ class wData:
 	def max(self):
 		return np.max(self.X)
 
+	def mean_of_each_column(self, return_type='wData'):
+		return ensure_data_type(np.mean(self.X, axis=0), type_name=return_type, column_names=self.columns)
+
+	def std_of_each_column(self, return_type='wData'):
+		return ensure_data_type(np.std(self.X, axis=0), type_name=return_type, column_names=self.columns)
+
 	def max_of_each_column(self, return_type='wData'):
 		return ensure_data_type(np.max(self.X, axis=0), type_name=return_type, column_names=self.columns)
 
@@ -442,6 +459,25 @@ class wData:
 		X = np.squeeze(self.get_columns(feature_name, return_type='ndarray'))
 		H = wplotlib.histograms(X, num_bins=num_bins, title=feature_name, fontsize=12, facecolor='blue', α=0.5, subplot=None, ylogScale=ylogScale)
 		return X
+
+	def get_column_stats(self, column_name, print_stat=True, float_round2Int=False):
+		y = np.squeeze(self.get_columns(column_name, return_type='ndarray'))
+		if float_round2Int:
+			y = (np.round(y)).astype(int)
+
+		l = np.unique(y)
+		t = len(y)
+		jupyter_print('The column has %d samples\n'%t)
+		table = np.empty((0,3))
+		for i in l:
+			sn = len(np.where(y == i)[0])
+			table = np.vstack((table, np.array([[i, sn, sn/t]])))
+	
+		df = pd.DataFrame(table, columns=['class id', 'num sample', 'percentage'])
+		if print_stat: jupyter_print(df)
+		stat = ensure_wData(df)
+	
+		return stat
 
 
 	def __getitem__(self, item):

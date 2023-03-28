@@ -29,6 +29,8 @@ import itertools
 import random
 
 
+
+
 def get_label_stats(data, print_stat=True):
 	if wtype(data) == 'wData': y = data.Y
 	else: y = ensure_numpy(data)
