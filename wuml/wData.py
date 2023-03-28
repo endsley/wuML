@@ -11,6 +11,7 @@ from sklearn import preprocessing
 import wuml
 
 from wuml.type_check import *
+import wplotlib
 import pandas as pd
 import torch
 import numpy as np
@@ -38,7 +39,7 @@ class wData:
 			dataFrame: if dataFrame is set, it ignores the path and use the dataFrame directly as the data itself
 			ypath: loads the data as the label
 			label_column_name: if the label is loaded together with xpath, this separates label into Y
-			preprocess_data: 'center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
+			preprocess_data='center and scale', 'linearly between 0 and 1', 'between 0 and 1 via cdf'
 			first_column_as_sample_index: if the first column is used as sample ID
 			extra_data: is a list of data that can be appended to the dataset, it has to be the same number of samples as X and y, if not a list, then it will be casted into a list
 			extra_data_preprocessing is a list of lists including commands to preprocess, e.g., given 2 extra data [['center and scale'],['ensure_ proper discrete labels']]
@@ -264,7 +265,7 @@ class wData:
 	def get_column_names_as_a_list(self):
 		return ensure_wData(self.df.columns)
 
-	def get_columns(self, columns):
+	def get_columns(self, columns, return_type='wData'):
 		if type(columns).__name__ == 'int': 
 			remaining_columns = ensure_wData(self.df.iloc[:,columns], column_names=[columns])
 		else:	
@@ -274,7 +275,8 @@ class wData:
 
 		remaining_columns.Y = self.Y
 		remaining_columns.extra_data_dictionary = self.extra_data_dictionary
-		return remaining_columns
+
+		return wuml.ensure_data_type(remaining_columns, type_name=return_type)
 
 	def update_data(self, data, columns=None):
 		if wtype(data) == 'DataFrame':
@@ -435,6 +437,11 @@ class wData:
 	def remove_first_few_rows(self, n_rows):
 		self.df.drop(self.df.head(n_rows).index,inplace=True)
 		self.update_DataFrame(self.df)
+
+	def get_feature_histograms(self, feature_name, num_bins=10, ylogScale=False):
+		X = np.squeeze(self.get_columns(feature_name, return_type='ndarray'))
+		H = wplotlib.histograms(X, num_bins=num_bins, title=feature_name, fontsize=12, facecolor='blue', α=0.5, subplot=None, ylogScale=ylogScale)
+		return X
 
 
 	def __getitem__(self, item):

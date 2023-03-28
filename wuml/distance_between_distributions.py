@@ -78,7 +78,6 @@ def mmd(X,Y, sigma=1):
 	n = X.shape[0]
 	m = Y.shape[0]
 	γ = 1.0/(2*sigma*sigma)
-	γ = 1
 
 	Kx  = np.sum(rbf_kernel(X, gamma=γ))
 	Ky  = np.sum(rbf_kernel(Y, gamma=γ))

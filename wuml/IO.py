@@ -55,7 +55,7 @@ def print_two_matrices_side_by_side(M1, M2, title1=None, title2=None, auto_print
 
 
 
-def jupyter_print(value, display_all_rows=False, display_all_columns=False, font_size=1, latex=False, endString=None, testing_mode=''):
+def jupyter_print(value, display_all_rows=True, display_all_columns=False, font_size=1, latex=False, endString=None, testing_mode=''):
 	cmds = wuml.get_commandLine_input()
 	if testing_mode == 'disabled' or cmds[1] == 'disabled': return
 
