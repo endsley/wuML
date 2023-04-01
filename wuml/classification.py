@@ -226,7 +226,7 @@ class classification:
 		return str(self.result_summary(print_out=False))
 
 
-def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=None, kernel='rbf',
+def run_every_classifier(data, y=None, y_column_name=None, test_data=None, order_by='Test', q=None, kernel='rbf',
 						classifiers=['GP', 'SVM', 'RandomForest', 'KNN', 'NeuralNet', 'LDA', 'NaiveBayes', 'IKDR','LogisticRegression']	):
 	'''
 	data is type wData
@@ -235,12 +235,12 @@ def run_every_classifier(data, y=None, y_column_name=None, order_by='Test', q=No
 	'''
 	
 	results = {}
-	
+
 	if q is None: q = int(data.shape[1]/2)
 	df = pd.DataFrame()
 	for reg in classifiers:
 		wuml.write_to_current_line('Running %s'%reg)
-		results[reg] = classification(data, y=y, classifier=reg, split_train_test=True, q=q, kernel='rbf')
+		results[reg] = classification(data, y=y, classifier=reg, test_data=test_data, split_train_test=True, q=q, kernel='rbf')
 		df = df.append(results[reg].result_summary(print_out=False))
 
 	if order_by == 'Test': results['Train/Test Summary'] = df.sort_values(['Test','Train'], ascending=False)

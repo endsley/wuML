@@ -257,6 +257,7 @@ def split_training_validation_test(data, label=None, data_name=None, data_path=N
 
 
 
+#[X_train, X_test, y_train, y_test] = wuml.split_training_test(data, test_percentage=0.2)
 def split_training_test(data, label=None, data_name=None, data_path=None, save_as='none', test_percentage=0.1, xdata_type="%.4f", ydata_type="%d", random_state=None):
 	X = ensure_numpy(data)
 	Y = None

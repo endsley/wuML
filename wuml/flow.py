@@ -73,6 +73,8 @@ class RealNVP(nn.Module):
 		return x.view(-1, self.D)
 
 
+
+
 class flow:
 	def __init__(self, data=None, flow_mothod='realNVP', network_width=1024, output_model_name='flow', print_status=True, 
 					lr = 1e-3, max_epochs=1000, max_patience=None, num_flows=8, dequantization=False, 
