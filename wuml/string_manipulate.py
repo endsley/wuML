@@ -22,11 +22,8 @@ from wuml.type_check import *
 def pretty_np_array(m, front_tab='', verticalize=False, title=None, auto_print=False, end_space='', round_value=3):
 
 	M = ensure_wData(m)
+
 	M.round(rounding=round_value)
-
-	#if wtype(m) == 'float64': 
-	#	import pdb; pdb.set_trace()
-
 	if auto_print: wuml.jupyter_print(M)
 	else: 
 		out_str = str(M)

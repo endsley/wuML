@@ -2,9 +2,9 @@
 
 import sys
 import os
-  
+
 code_list = []
-code_list.append('random_features.py')
+code_list.append('DR_examples.py')
 
 print('Running ' + os.getcwd() + ' folder')
 for code in code_list:

@@ -42,5 +42,5 @@ cdf_val = Pₓ2.integrate(-7, 0)		# you can get the cdf by integration.
 textstr = 'Blue: True Density\nRed: KDE estimated density\nGreen: Histogram sampled from KDE'
 lp = lines(X,realProb, color='blue', marker=',', show=False)
 lines(X,estimatedProb, color='red', marker=',', imgText=textstr, show=False)
-histograms(newX, num_bins=10, title='Using KDE to Estimate Distributions', facecolor='green', α=0.5, normalize=True)
+histograms(newX, num_bins=10, title='Using saved KDE to Estimate Distributions', facecolor='green', α=0.5, normalize=True)
 

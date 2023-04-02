@@ -54,7 +54,7 @@ lp = wplotlib.lines(newX, Ŷline, title_font=11, title='Without Batch Normalizat
 #-----------------------------------------------
 #	Create network with batch normalization and train		
 #	For bn layers, ('bn', False), the 2nd boolean term sets if we use γ,β terms or not
-bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(30,'relu'),('bn', True), (50,'relu'),('bn', True),(1,'none')], max_epoch=50, learning_rate=0.001)
+bNet = wuml.basicNetwork(costFunction, data, networkStructure=[(30,'relu'),('bn', True), (50,'relu'),('bn', True),(1,'none')], max_epoch=100, learning_rate=0.001)
 bNet.train(print_status=True)
 Ŷ = bNet(data, output_type='ndarray')		#Takes Numpy array or Tensor as input and outputs a Tensor
 

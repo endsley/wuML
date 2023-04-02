@@ -10,7 +10,7 @@ code_list.append('flow_example.py')
 code_list.append('flow_prob.py')
 code_list.append('model_exponential_distr_via_MLE_with_cdf.py')
 
-print('Running data_stats folder')
+print('Running ' + os.getcwd() + ' folder')
 for code in code_list:
 	print('\tRunning ' + code)
 	os.system('./' + code + ' disabled')

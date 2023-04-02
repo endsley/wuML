@@ -4,9 +4,9 @@ import sys
 import os
   
 code_list = []
-code_list.append('random_features.py')
+code_list.append('data_manipualation.py')
 
-print('Running ' + os.getcwd() + ' folder')
+print('Running data_stats folder')
 for code in code_list:
 	print('\tRunning ' + code)
 	os.system('./' + code + ' disabled')

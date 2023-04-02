@@ -71,6 +71,7 @@ def jupyter_print(value, display_all_rows=True, display_all_columns=False, font_
 	if display_all_rows: pd.set_option('display.max_rows', None)
 	if wuml.isnotebook():
 		if wtype(value) == 'DataFrame': 
+			value = value.style.set_table_styles([ {"selector": "th", "props": [("text-align", "center")]}, {"selector": "td", "props": [("text-align", "center")]}])
 			display(value)
 		elif wtype(value) == 'ndarray': 
 			display(ensure_DataFrame(value))
@@ -152,6 +153,8 @@ def read_txt_file(path):
 	return content
 
 def save_torch_network(network_obj, path):
+	if get_commandLine_input()[1] == 'disabled': return
+
 	N = network_obj
 	netData  = N.output_network_data_for_storage()
 	pickle_dump(netData, path)
@@ -346,10 +349,14 @@ def output_two_columns_side_by_side(col_1, col_2, labels=None, rounding=3):
 		output = wuml.ensure_wData(np.hstack((col_1, col_2)), column_names=labels)
 		jupyter_print(output, display_all_rows=True)
 	else:
-		output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
+		npM = np.hstack((col_1, col_2))
+		dat = wuml.wData(X_npArray=npM, column_names=labels)
+		output = wuml.pretty_np_array(dat)
 
-		if labels is not None:
-			output = wuml.pretty_np_array(labels) + output
+		#output = wuml.pretty_np_array(np.hstack((col_1, col_2)))
+		#if labels is not None:
+		#	output = wuml.pretty_np_array(labels) + output
+
 		wuml.jupyter_print(output)
 
 		return output

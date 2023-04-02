@@ -31,5 +31,6 @@ from wplotlib import lines
 data = wuml.wData('../../data/Chem_decimated_imputed.csv', first_row_is_label=True)
 data.delete_column('id')	# the id should not be part of the likelihood 
 sample_weights = wuml.get_likelihood_weight(data['finalga_best'])
+
 result = wuml.output_two_columns_side_by_side(data['finalga_best'], sample_weights, labels=['age','weight'], rounding=3)
 

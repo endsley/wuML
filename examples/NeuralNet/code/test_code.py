@@ -15,7 +15,7 @@ code_list.append('weighted_regression.py')
 code_list.append('complexNet.py')
 
 
-print('Running data_stats folder')
+print('Running ' + os.getcwd() + ' folder')
 for code in code_list:
 	print('\tRunning ' + code)
 	os.system('./' + code + ' disabled')

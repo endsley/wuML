@@ -4,9 +4,11 @@ import sys
 import os
   
 code_list = []
-code_list.append('random_features.py')
+code_list.append('complex_10_fold.py')
+code_list.append('repeate_experiment_on_diff_settings.py')
+code_list.append('simple_run_k_fold.py')
 
-print('Running ' + os.getcwd() + ' folder')
+print('Running data_stats folder')
 for code in code_list:
 	print('\tRunning ' + code)
 	os.system('./' + code + ' disabled')

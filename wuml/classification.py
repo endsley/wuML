@@ -52,6 +52,9 @@ class classification:
 		elif type(data).__name__ == 'wData':
 			y = data.Y
 		else: raise ValueError('Undefined label Y')
+		self.binary_label = wuml.is_binary_label(y)
+
+
 
 		if test_data is not None:
 			if wuml.wtype(data) == 'wData': self.X_train = data.X
@@ -190,12 +193,33 @@ class classification:
 			plt.show()
 
 	def result_summary(self, print_out=True):
+		NP = wuml.ensure_numpy
+		S = np.squeeze
+		NPR = np.round
+
 		if self.split_train_test:
-			column_names = ['classifier', 'Train', 'Test']
-			data = np.array([[self.original_classifier_name, self.Train_acc , self.Test_acc]])
+			if self.binary_label:
+				Train_precision = NPR(wuml.precision(S(NP(self.y_train)), self.ŷ_train), 3)
+				Train_recall = NPR(wuml.recall(S(NP(self.y_train)), self.ŷ_train), 3)
+
+				test_precision = NPR(wuml.precision(S(NP(self.y_test)), self.ŷ_test), 3)
+				test_recall = NPR(wuml.recall(S(NP(self.y_test)), self.ŷ_test), 3)
+
+				column_names = ['classifier', 'Train', 'Test', 'Tr-Precision', 'Tr-Recall', 'Te-Precision', 'Te-Recall']
+				data = np.array([[self.original_classifier_name, self.Train_acc , self.Test_acc, Train_precision, Train_recall, test_precision, test_recall]])
+			else:
+				column_names = ['classifier', 'Train', 'Test']
+				data = np.array([[self.original_classifier_name, self.Train_acc , self.Test_acc]])
 		else:
-			column_names = ['classifier', 'Train']
-			data = np.array([[self.original_classifier_name, self.Train_acc]])
+			if self.binary_label:
+				Train_precision = wuml.precision(S(NP(self.y_train)), self.ŷ_train)
+				Train_recall = wuml.recall(S(NP(self.y_train)), self.ŷ_train)
+
+				column_names = ['classifier', 'Train', 'Test', '+Precision', '+Recall']
+				data = np.array([[self.original_classifier_name, self.Train_acc , self.Test_acc, Train_precision, Train_recall]])
+			else:
+				column_names = ['classifier', '-Train']
+				data = np.array([[self.original_classifier_name, self.Train_acc]])
 
 		df = pd.DataFrame(data, columns=column_names,index=[''])
 		if print_out: wuml.jupyter_print('\n', df)
@@ -239,7 +263,7 @@ def run_every_classifier(data, y=None, y_column_name=None, test_data=None, order
 	if q is None: q = int(data.shape[1]/2)
 	df = pd.DataFrame()
 	for reg in classifiers:
-		wuml.write_to_current_line('Running %s'%reg)
+		wuml.jupyter_print('Running %s'%reg)
 		results[reg] = classification(data, y=y, classifier=reg, test_data=test_data, split_train_test=True, q=q, kernel='rbf')
 		df = df.append(results[reg].result_summary(print_out=False))
 
@@ -258,7 +282,7 @@ class ten_folder_classifier:
 	
 		self.classifier_list = []
 		for i, fold in enumerate(tenFoldData):
-			wuml.write_to_current_line('Running fold :%d'%(i+1))
+			wuml.jupyter_print('Running fold :%d'%(i+1))
 			[X_train, Y_train, X_test, Y_test] = fold
 			cf = wuml.classification(X_train, y=Y_train, test_data=X_test, testY=Y_test, classifier=classifier, kernel=kernel, q=q)
 			self.classifier_list.append(cf)

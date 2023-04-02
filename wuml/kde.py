@@ -14,7 +14,8 @@ from wuml.type_check import *
 class KDE:
 	def __init__(self, data=None, load_model_path=None):
 		if load_model_path is not None:
-			self.model = wuml.pickle_load(load_model_path)
+			#self.model = wuml.pickle_load(load_model_path)
+			[self.model, self.columns] = wuml.pickle_load(load_model_path)
 			return 
 
 		self.columns = None
@@ -42,7 +43,8 @@ class KDE:
 		return result
 
 	def save(self, pth): 
-		wuml.pickle_dump(self.model, pth)
+		outDat = [self.model, self.columns]
+		wuml.pickle_dump(outDat, pth)
 
 	def __call__(self, data, return_log_likelihood=False):
 		X = ensure_numpy(data)
