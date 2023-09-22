@@ -90,7 +90,7 @@ def ensure_list(data):
 		npD = data.df.to_numpy()
 		npD = np.squeeze(npD)
 		return npD.tolist()
-	elif type_name=='DataFrame':
+	elif wtype(data)=='DataFrame':
 		npD = data.to_numpy()
 		npD = np.squeeze(npD)
 		return npD.tolist()

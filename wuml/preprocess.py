@@ -307,21 +307,25 @@ def split_training_test(data, label=None, data_name=None, data_path=None, save_a
 	# if there are extra data for training
 	if len(split_list) > 4:	xDat = split_list[4:][::2]	# get all the training extra data
 	else: xDat = None
-	
-	X_train = ensure_wData(X_train, column_names=data.df.columns, extra_data=xDat)
-	X_train.Y = y_train
-	X_train.label_type = data.label_type
-	X_train.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
-	X_train.label_column_name = data.label_column_name
 
-	if len(split_list) > 4:	xDat = split_list[4:][1::2]	# get all the test extra data
-	else: xDat = None
+	if wtype(data)=='ndarray':
+		X_train = ensure_wData(X_train, column_names=None, extra_data=xDat)
+		X_train.Y = y_train
 
-	X_test = ensure_wData(X_test, column_names=data.df.columns, extra_data=xDat)
-	X_test.Y = y_test
-	X_test.label_type = data.label_type
-	X_test.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
-	X_test.label_column_name = data.label_column_name
+		X_test = ensure_wData(X_test, column_names=None, extra_data=xDat)
+		X_test.Y = y_test
+	elif wtype(data) == 'wData': 
+		X_train = ensure_wData(X_train, column_names=data.df.columns, extra_data=xDat)
+		X_train.label_type = data.label_type
+		X_train.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
+		X_train.label_column_name = data.label_column_name
+		X_train.Y = y_train
+
+		X_test = ensure_wData(X_test, column_names=data.df.columns, extra_data=xDat)
+		X_test.Y = y_test
+		X_test.label_type = data.label_type
+		X_test.initialize_pytorch_settings(data.xtorchDataType, data.ytorchDataType)
+		X_test.label_column_name = data.label_column_name
 
 	return [X_train, X_test, y_train, y_test]
 

@@ -47,7 +47,6 @@ class regression:
 
 		X = NP(data)
 		y = ensure_label(data, y=y, y_column_name=y_column_name)
-
 		if split_train_test:
 			self.X_train, self.X_test, self.y_train, self.y_test = wuml.split_training_test(data, label=y, xdata_type="%.4f", ydata_type="%.4f")
 		else:

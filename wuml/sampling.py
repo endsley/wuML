@@ -9,6 +9,8 @@ def random_matrix_via_Gaussian_distribution(height, width):
 	M = np.random.randn(height, width)
 	return ensure_wData(M)
 
+def gen_poisson(λ, size):
+	return np.random.poisson(λ, size=size)
 
 def gen_squared_symmetric_matrix(length, distribution='Gaussian'):
 	if distribution == 'Gaussian':
